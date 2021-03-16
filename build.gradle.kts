@@ -34,7 +34,6 @@ dependencies {
 //    implementation("org.springframework.integration:spring-integration-jdbc")
 //    implementation("org.springframework.integration:spring-integration-security")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
-    runtimeOnly("com.h2database:h2")
     runtimeOnly("mysql:mysql-connector-java")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 //    testImplementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner")
@@ -42,6 +41,7 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:mysql")
+    testRuntimeOnly("com.h2database:h2")
 }
 
 dependencyManagement {
