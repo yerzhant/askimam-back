@@ -24,4 +24,14 @@ internal class NotBlankStringTest {
     internal fun `should not be blank`() {
         assertThrows<IllegalArgumentException> { NotBlankString.of(" ") }
     }
+
+    @Test
+    internal fun `should be equal`() {
+        assertThat(NotBlankString.of("A string")).isEqualTo(NotBlankString.of("A string"))
+    }
+
+    @Test
+    internal fun `should not be equal`() {
+        assertThat(NotBlankString.of("A string")).isNotEqualTo(NotBlankString.of("A String"))
+    }
 }
