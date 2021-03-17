@@ -35,12 +35,15 @@ dependencies {
 //    implementation("org.springframework.integration:spring-integration-security")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("mysql:mysql-connector-java")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude(module = "mockito-core")
+    }
 //    testImplementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner")
 //    testImplementation("org.springframework.integration:spring-integration-test")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:mysql")
+    testImplementation("com.ninja-squad:springmockk:3.0.1")
     testRuntimeOnly("com.h2database:h2")
 }
 
