@@ -24,4 +24,8 @@ class NotBlankString private constructor(val value: String) {
         return value.hashCode()
     }
 
+    override fun toString(): String {
+        return "NotBlankString(value='$value')"
+    }
+
 }

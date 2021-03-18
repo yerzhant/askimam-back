@@ -2,6 +2,10 @@ package kz.azan.askimam.chat.domain.model
 
 import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.event.MessageAdded
+import kz.azan.askimam.chat.domain.model.Message.Sender.Imam
+import kz.azan.askimam.chat.domain.model.Message.Sender.Inquirer
+import kz.azan.askimam.chat.domain.model.Message.Type.Audio
+import kz.azan.askimam.chat.domain.model.Message.Type.Text
 import kz.azan.askimam.common.domain.EventPublisher
 import kz.azan.askimam.common.type.NotBlankString
 import kz.azan.askimam.imam.domain.model.ImamId
@@ -10,12 +14,12 @@ import java.time.Clock
 import java.time.ZonedDateTime
 
 class Chat(
-    val type: Type,
-    private var subject: NotBlankString?,
-    firstMessage: NotBlankString,
-    val askedBy: InquirerId,
     private val clock: Clock,
     private val eventPublisher: EventPublisher,
+    val type: Type,
+    val askedBy: InquirerId,
+    firstMessage: NotBlankString,
+    private var subject: NotBlankString? = null,
 ) {
     private val createdAt = ZonedDateTime.now(clock)!!
     private var updatedAt = ZonedDateTime.now(clock)!!
@@ -27,57 +31,17 @@ class Chat(
     init {
         messages.add(
             MessageEntity(
-                Message.Type.Text,
-                Message.Sender.Inquirer,
-                firstMessage,
                 clock,
+                Text,
+                Inquirer,
+                firstMessage,
             )
         )
         eventPublisher.publish(ChatCreated(subject, firstMessage))
     }
 
-    constructor(
-        type: Type,
-        firstMessage: NotBlankString,
-        askedBy: InquirerId,
-        clock: Clock,
-        eventPublisher: EventPublisher,
-    ) : this(type, null, firstMessage, askedBy, clock, eventPublisher)
-
     fun createdAt() = createdAt
     fun updatedAt() = updatedAt
-
-    fun subject(): NotBlankString = subject ?: messages.first().text()
-
-    fun messages() = messages.map {
-        Message(
-            it.createdAt,
-            it.updatedAt(),
-            it.type,
-            it.sender,
-            it.text()
-        )
-    }.toList()
-
-    fun renameSubject(newSubject: NotBlankString) {
-        subject = newSubject
-    }
-
-    fun addNewTextMessage(sender: Message.Sender, newMessage: NotBlankString) {
-        messages.add(
-            MessageEntity(
-                Message.Type.Text,
-                sender,
-                newMessage,
-                clock,
-            )
-        )
-        when (sender) {
-            Message.Sender.Inquirer -> isViewedByImam = false
-            Message.Sender.Imam -> isViewedByInquirer = false
-        }
-        eventPublisher.publish(MessageAdded(subject, newMessage))
-    }
 
     fun isAnswered() = answeredBy != null
     fun isViewedByImam() = isViewedByImam
@@ -92,14 +56,64 @@ class Chat(
         isViewedByInquirer = true
     }
 
+    fun subject(): NotBlankString = subject ?: messages.first().text()
+
+    fun messages() = messages.map {
+        Message(
+            it.createdAt,
+            it.updatedAt(),
+            it.type,
+            it.sender,
+            it.text(),
+            it.audio,
+        )
+    }.toList()
+
+    fun renameSubject(newSubject: NotBlankString) {
+        subject = newSubject
+    }
+
+    fun addNewTextMessage(sender: Message.Sender, text: NotBlankString) {
+        addNewMessage(Text, sender, text)
+    }
+
+    fun addNewAudioMessage(sender: Message.Sender, audio: NotBlankString) {
+        addNewMessage(Audio, sender, NotBlankString.of("Аудио"), audio)
+    }
+
+    private fun addNewMessage(
+        type: Message.Type,
+        sender: Message.Sender,
+        text: NotBlankString,
+        audio: NotBlankString? = null,
+    ) {
+        messages.add(
+            MessageEntity(
+                clock,
+                type,
+                sender,
+                text,
+                audio,
+            )
+        )
+
+        when (sender) {
+            Inquirer -> isViewedByImam = false
+            Imam -> isViewedByInquirer = false
+        }
+
+        eventPublisher.publish(MessageAdded(subject, text))
+    }
+
     enum class Type { Public, Private }
 }
 
 private class MessageEntity(
+    clock: Clock,
     val type: Message.Type,
     val sender: Message.Sender,
     private var text: NotBlankString,
-    clock: Clock,
+    val audio: NotBlankString? = null,
 ) {
     val createdAt = ZonedDateTime.now(clock)!!
     private var updatedAt: ZonedDateTime? = null

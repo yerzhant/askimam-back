@@ -10,6 +10,7 @@ import kz.azan.askimam.chat.domain.model.Chat.Type.Private
 import kz.azan.askimam.chat.domain.model.Chat.Type.Public
 import kz.azan.askimam.chat.domain.model.Message.Sender.Imam
 import kz.azan.askimam.chat.domain.model.Message.Sender.Inquirer
+import kz.azan.askimam.chat.domain.model.Message.Type.Audio
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
 import kz.azan.askimam.common.domain.EventPublisher
 import kz.azan.askimam.common.type.NotBlankString
@@ -62,7 +63,13 @@ internal class ChatTest {
         fixtureClock()
         every { eventPublisher.publish(ChatCreated(null, fixtureMessage())) } returns Unit
 
-        Chat(Private, fixtureMessage(), fixtureInquirerId(), clock, eventPublisher).run {
+        Chat(
+            clock,
+            eventPublisher,
+            Private,
+            fixtureInquirerId(),
+            fixtureMessage(),
+        ).run {
             assertThat(subject()).isEqualTo(fixtureMessage())
         }
 
@@ -177,6 +184,23 @@ internal class ChatTest {
         }
     }
 
+    @Test
+    internal fun `should add a new audio`() {
+        val audio = NotBlankString.of("Аудио")
+        fixtureClock()
+        fixturePublicChat(audio).run {
+            addNewAudioMessage(Imam, fixtureAudio())
+
+            assertThat(messages().last().type).isEqualTo(Audio)
+            assertThat(messages().last().text).isEqualTo(audio)
+            assertThat(messages().last().audio).isEqualTo(fixtureAudio())
+        }
+
+        verify {
+            eventPublisher.publish(MessageAdded(fixtureSubject(), audio))
+        }
+    }
+
     private fun fixtureClock() {
         every { clock.zone } returns fixedClock.zone
         every { clock.instant() } returns fixedClock.instant()
@@ -198,12 +222,12 @@ internal class ChatTest {
         every { eventPublisher.publish(MessageAdded(subject, newMessage)) } returns Unit
 
         return Chat(
-            Public,
-            subject,
-            firstMessage,
-            fixtureInquirerId(),
             clock,
             eventPublisher,
+            Public,
+            fixtureInquirerId(),
+            firstMessage,
+            subject,
         )
     }
 
@@ -216,6 +240,8 @@ internal class ChatTest {
     private fun fixtureNewMessage() = NotBlankString.of("A new message")
 
     private fun fixtureNewReply() = NotBlankString.of("A new reply")
+
+    private fun fixtureAudio() = NotBlankString.of("audio.mp3")
 
     private fun fixtureNow() = ZonedDateTime.now(fixedClock)
 

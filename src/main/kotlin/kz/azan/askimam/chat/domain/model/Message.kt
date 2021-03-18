@@ -9,6 +9,7 @@ data class Message(
     val type: Type,
     val sender: Sender,
     val text: NotBlankString,
+    val audio: NotBlankString?,
 ) {
     enum class Type { Text, Audio }
     enum class Sender { Imam, Inquirer }
