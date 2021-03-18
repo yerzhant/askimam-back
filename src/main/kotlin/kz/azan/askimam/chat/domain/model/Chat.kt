@@ -8,8 +8,7 @@ import kz.azan.askimam.chat.domain.model.Message.Type.Audio
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
 import kz.azan.askimam.common.domain.EventPublisher
 import kz.azan.askimam.common.type.NotBlankString
-import kz.azan.askimam.imam.domain.model.ImamId
-import kz.azan.askimam.inquirer.domain.model.InquirerId
+import kz.azan.askimam.user.domain.model.User
 import java.time.Clock
 import java.time.ZonedDateTime
 
@@ -17,7 +16,7 @@ class Chat(
     private val clock: Clock,
     private val eventPublisher: EventPublisher,
     val type: Type,
-    val askedBy: InquirerId,
+    val askedBy: User.Id,
     firstMessage: NotBlankString,
     private var subject: NotBlankString? = null,
 ) {
@@ -72,11 +71,11 @@ class Chat(
         subject = newSubject
     }
 
-    fun addNewTextMessage(sender: Message.Sender, text: NotBlankString, answeredBy: ImamId? = null) {
+    fun addNewTextMessage(sender: Message.Sender, text: NotBlankString, answeredBy: User.Id? = null) {
         addNewMessage(Text, sender, text, answeredBy = answeredBy)
     }
 
-    fun addNewAudioMessage(sender: Message.Sender, audio: NotBlankString, answeredBy: ImamId) {
+    fun addNewAudioMessage(sender: Message.Sender, audio: NotBlankString, answeredBy: User.Id) {
         addNewMessage(Audio, sender, NotBlankString.of("Аудио"), audio, answeredBy)
     }
 
@@ -85,7 +84,7 @@ class Chat(
         sender: Message.Sender,
         text: NotBlankString,
         audio: NotBlankString? = null,
-        answeredBy: ImamId?,
+        answeredBy: User.Id?,
     ) {
         messages.add(
             MessageEntity(
@@ -115,7 +114,7 @@ private class MessageEntity(
     val sender: Message.Sender,
     private var text: NotBlankString,
     val audio: NotBlankString? = null,
-    private var answeredBy: ImamId? = null,
+    private var answeredBy: User.Id? = null,
 ) {
     val createdAt = ZonedDateTime.now(clock)!!
     private var updatedAt: ZonedDateTime? = null

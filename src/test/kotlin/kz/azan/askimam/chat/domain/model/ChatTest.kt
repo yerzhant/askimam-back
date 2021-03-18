@@ -14,8 +14,7 @@ import kz.azan.askimam.chat.domain.model.Message.Type.Audio
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
 import kz.azan.askimam.common.domain.EventPublisher
 import kz.azan.askimam.common.type.NotBlankString
-import kz.azan.askimam.imam.domain.model.ImamId
-import kz.azan.askimam.inquirer.domain.model.InquirerId
+import kz.azan.askimam.user.domain.model.User
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.*
@@ -158,7 +157,7 @@ internal class ChatTest {
         fixtureClockAndThen(31)
 
         fixturePublicChat(fixtureNewReply()).run {
-            addNewTextMessage(Imam, fixtureNewReply(), answeredBy = ImamId(1))
+            addNewTextMessage(Imam, fixtureNewReply(), answeredBy = fixtureImamId())
 
             assertThat(isViewedByInquirer()).isFalse
             assertThat(updatedAt()).isEqualTo(timeAfter(31))
@@ -168,7 +167,7 @@ internal class ChatTest {
             assertThat(messages().last().type).isEqualTo(Text)
             assertThat(messages().last().sender).isEqualTo(Imam)
             assertThat(messages().last().text).isEqualTo(fixtureNewReply())
-            assertThat(messages().last().answeredBy).isEqualTo(ImamId(1))
+            assertThat(messages().last().answeredBy).isEqualTo(fixtureImamId())
         }
     }
 
@@ -177,7 +176,7 @@ internal class ChatTest {
         fixtureClock()
 
         fixturePublicChat(fixtureNewReply()).run {
-            addNewTextMessage(Imam, fixtureNewReply(), ImamId(1))
+            addNewTextMessage(Imam, fixtureNewReply(), fixtureImamId())
             assertThat(isViewedByInquirer()).isFalse
 
             viewedByInquirer()
@@ -191,7 +190,7 @@ internal class ChatTest {
         val audio = NotBlankString.of("Аудио")
         fixtureClock()
         fixturePublicChat(audio).run {
-            addNewAudioMessage(Imam, fixtureAudio(), ImamId(1))
+            addNewAudioMessage(Imam, fixtureAudio(), fixtureImamId())
 
             assertThat(messages().last().type).isEqualTo(Audio)
             assertThat(messages().last().text).isEqualTo(audio)
@@ -233,7 +232,9 @@ internal class ChatTest {
         )
     }
 
-    private fun fixtureInquirerId() = InquirerId(1)
+    private fun fixtureImamId() = User.Id(1)
+
+    private fun fixtureInquirerId() = User.Id(2)
 
     private fun fixtureSubject() = NotBlankString.of("Subject")
 

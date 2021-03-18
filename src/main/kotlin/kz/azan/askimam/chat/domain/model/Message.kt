@@ -1,7 +1,7 @@
 package kz.azan.askimam.chat.domain.model
 
 import kz.azan.askimam.common.type.NotBlankString
-import kz.azan.askimam.imam.domain.model.ImamId
+import kz.azan.askimam.user.domain.model.User
 import java.time.ZonedDateTime
 
 data class Message(
@@ -11,7 +11,7 @@ data class Message(
     val sender: Sender,
     val text: NotBlankString,
     val audio: NotBlankString?,
-    val answeredBy: ImamId?,
+    val answeredBy: User.Id?,
 ) {
     enum class Type { Text, Audio }
     enum class Sender { Imam, Inquirer }
