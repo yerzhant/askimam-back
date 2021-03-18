@@ -71,8 +71,12 @@ class Chat(
         subject = newSubject
     }
 
-    fun addNewTextMessage(sender: Message.Sender, text: NotBlankString, answeredBy: User.Id? = null) {
-        addNewMessage(Text, sender, text, answeredBy = answeredBy)
+    fun addNewTextMessageByInquirer(text: NotBlankString) {
+        addNewMessage(Text, Inquirer, text)
+    }
+
+    fun addNewTextMessageByImam(text: NotBlankString, answeredBy: User.Id) {
+        addNewMessage(Text, Imam, text, answeredBy = answeredBy)
     }
 
     fun addNewAudioMessage(sender: Message.Sender, audio: NotBlankString, answeredBy: User.Id) {
@@ -84,7 +88,7 @@ class Chat(
         sender: Message.Sender,
         text: NotBlankString,
         audio: NotBlankString? = null,
-        answeredBy: User.Id?,
+        answeredBy: User.Id? = null,
     ) {
         messages.add(
             MessageEntity(

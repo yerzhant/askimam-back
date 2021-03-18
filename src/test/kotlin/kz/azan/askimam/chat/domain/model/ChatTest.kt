@@ -99,7 +99,7 @@ internal class ChatTest {
         fixtureClockAndThen(30)
 
         fixturePublicChat().run {
-            addNewTextMessage(Inquirer, fixtureNewMessage())
+            addNewTextMessageByInquirer(fixtureNewMessage())
 
             assertThat(updatedAt()).isEqualTo(timeAfter(30))
 
@@ -146,7 +146,7 @@ internal class ChatTest {
 
         fixturePublicChat().run {
             viewedByImam()
-            addNewTextMessage(Inquirer, fixtureNewMessage())
+            addNewTextMessageByInquirer(fixtureNewMessage())
 
             assertThat(isViewedByImam()).isFalse
         }
@@ -157,7 +157,7 @@ internal class ChatTest {
         fixtureClockAndThen(31)
 
         fixturePublicChat(fixtureNewReply()).run {
-            addNewTextMessage(Imam, fixtureNewReply(), answeredBy = fixtureImamId())
+            addNewTextMessageByImam(fixtureNewReply(), fixtureImamId())
 
             assertThat(isViewedByInquirer()).isFalse
             assertThat(updatedAt()).isEqualTo(timeAfter(31))
@@ -176,7 +176,7 @@ internal class ChatTest {
         fixtureClock()
 
         fixturePublicChat(fixtureNewReply()).run {
-            addNewTextMessage(Imam, fixtureNewReply(), fixtureImamId())
+            addNewTextMessageByImam(fixtureNewReply(), fixtureImamId())
             assertThat(isViewedByInquirer()).isFalse
 
             viewedByInquirer()
