@@ -2,18 +2,20 @@ package kz.azan.askimam.chat.domain.model
 
 import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.event.MessageAdded
-import kz.azan.askimam.common.domain.Notifications
+import kz.azan.askimam.common.domain.EventPublisher
 import kz.azan.askimam.common.type.NotBlankString
 import kz.azan.askimam.imam.domain.model.ImamId
+import kz.azan.askimam.inquirer.domain.model.InquirerId
 import java.time.Clock
 import java.time.ZonedDateTime
 
 class Chat(
-    private val clock: Clock,
-    private val notifications: Notifications,
     val type: Type,
     private var subject: NotBlankString?,
     firstMessage: NotBlankString,
+    val askedBy: InquirerId,
+    private val clock: Clock,
+    private val eventPublisher: EventPublisher,
 ) {
     private val createdAt = ZonedDateTime.now(clock)!!
     private var updatedAt = ZonedDateTime.now(clock)!!
@@ -25,21 +27,22 @@ class Chat(
     init {
         messages.add(
             MessageEntity(
-                clock,
                 Message.Type.Text,
                 Message.Sender.Inquirer,
                 firstMessage,
+                clock,
             )
         )
-        notifications.notify(ChatCreated(subject, firstMessage))
+        eventPublisher.publish(ChatCreated(subject, firstMessage))
     }
 
     constructor(
-        clock: Clock,
-        notifications: Notifications,
         type: Type,
-        firstMessage: NotBlankString
-    ) : this(clock, notifications, type, null, firstMessage)
+        firstMessage: NotBlankString,
+        askedBy: InquirerId,
+        clock: Clock,
+        eventPublisher: EventPublisher,
+    ) : this(type, null, firstMessage, askedBy, clock, eventPublisher)
 
     fun createdAt() = createdAt
     fun updatedAt() = updatedAt
@@ -48,7 +51,7 @@ class Chat(
 
     fun messages() = messages.map {
         Message(
-            it.createdAt(),
+            it.createdAt,
             it.updatedAt(),
             it.type,
             it.sender,
@@ -61,17 +64,25 @@ class Chat(
     }
 
     fun addNewTextMessage(sender: Message.Sender, newMessage: NotBlankString) {
-        messages.add(MessageEntity(clock, Message.Type.Text, sender, newMessage))
+        messages.add(
+            MessageEntity(
+                Message.Type.Text,
+                sender,
+                newMessage,
+                clock,
+            )
+        )
         when (sender) {
             Message.Sender.Inquirer -> isViewedByImam = false
             Message.Sender.Imam -> isViewedByInquirer = false
         }
-        notifications.notify(MessageAdded(subject, newMessage))
+        eventPublisher.publish(MessageAdded(subject, newMessage))
     }
 
     fun isAnswered() = answeredBy != null
     fun isViewedByImam() = isViewedByImam
     fun isViewedByInquirer() = isViewedByInquirer
+    fun answeredBy() = answeredBy
 
     fun viewedByImam() {
         isViewedByImam = true
@@ -85,15 +96,14 @@ class Chat(
 }
 
 private class MessageEntity(
-    clock: Clock,
     val type: Message.Type,
     val sender: Message.Sender,
     private var text: NotBlankString,
+    clock: Clock,
 ) {
-    private val createdAt = ZonedDateTime.now(clock)!!
+    val createdAt = ZonedDateTime.now(clock)!!
     private var updatedAt: ZonedDateTime? = null
 
-    fun createdAt() = createdAt
     fun updatedAt() = updatedAt
 
     fun text() = text

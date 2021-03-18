@@ -1,7 +1,7 @@
 package kz.azan.askimam.common.domain
 
-interface Notifications {
-    fun notify(event: Event)
+interface EventPublisher {
+    fun publish(event: Event)
 }
 
 abstract class Event

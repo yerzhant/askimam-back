@@ -6,14 +6,20 @@ import io.mockk.verify
 import io.mockk.verifySequence
 import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.event.MessageAdded
-import kz.azan.askimam.common.domain.Notifications
+import kz.azan.askimam.chat.domain.model.Chat.Type.Private
+import kz.azan.askimam.chat.domain.model.Chat.Type.Public
+import kz.azan.askimam.chat.domain.model.Message.Sender.Imam
+import kz.azan.askimam.chat.domain.model.Message.Sender.Inquirer
+import kz.azan.askimam.chat.domain.model.Message.Type.Text
+import kz.azan.askimam.common.domain.EventPublisher
 import kz.azan.askimam.common.type.NotBlankString
+import kz.azan.askimam.inquirer.domain.model.InquirerId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.*
 
 internal class ChatTest {
-    private val notifications = mockk<Notifications>()
+    private val eventPublisher = mockk<EventPublisher>()
 
     private val fixedClock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
     private val clock = mockk<Clock>()
@@ -23,26 +29,29 @@ internal class ChatTest {
         fixtureClock()
 
         with(fixturePublicChat()) {
-            assertThat(type).isEqualTo(Chat.Type.Public)
-            assertThat(createdAt()).isEqualTo(ZonedDateTime.now(fixedClock))
-            assertThat(updatedAt()).isEqualTo(ZonedDateTime.now(fixedClock))
+            assertThat(type).isEqualTo(Public)
+            assertThat(createdAt()).isEqualTo(fixtureNow())
+            assertThat(updatedAt()).isEqualTo(fixtureNow())
             assertThat(isAnswered()).isFalse
             assertThat(isViewedByImam()).isFalse
+            assertThat(isViewedByInquirer()).isTrue
+            assertThat(askedBy).isEqualTo(fixtureInquirerId())
+            assertThat(answeredBy()).isNull()
             assertThat(subject()).isEqualTo(fixtureSubject())
 
             assertThat(messages().size).isEqualTo(1)
-            assertThat(messages().first().createdAt).isEqualTo(ZonedDateTime.now(fixedClock))
+            assertThat(messages().first().createdAt).isEqualTo(fixtureNow())
             assertThat(messages().first().updatedAt).isNull()
-            assertThat(messages().first().type).isEqualTo(Message.Type.Text)
-            assertThat(messages().first().sender).isEqualTo(Message.Sender.Inquirer)
+            assertThat(messages().first().type).isEqualTo(Text)
+            assertThat(messages().first().sender).isEqualTo(Inquirer)
             assertThat(messages().first().text).isEqualTo(fixtureMessage())
         }
 
         verify {
-            notifications.notify(
+            eventPublisher.publish(
                 ChatCreated(
                     fixtureSubject(),
-                    fixtureMessage()
+                    fixtureMessage(),
                 )
             )
         }
@@ -50,13 +59,20 @@ internal class ChatTest {
 
     @Test
     internal fun `should create a chat without a subject`() {
-        val aMessage = fixtureMessage()
-
         fixtureClock()
-        every { notifications.notify(ChatCreated(null, aMessage)) } returns Unit
+        every { eventPublisher.publish(ChatCreated(null, fixtureMessage())) } returns Unit
 
-        Chat(clock, notifications, Chat.Type.Private, aMessage).run {
-            assertThat(subject()).isEqualTo(aMessage)
+        Chat(Private, fixtureMessage(), fixtureInquirerId(), clock, eventPublisher).run {
+            assertThat(subject()).isEqualTo(fixtureMessage())
+        }
+
+        verify {
+            eventPublisher.publish(
+                ChatCreated(
+                    null,
+                    fixtureMessage(),
+                )
+            )
         }
     }
 
@@ -76,25 +92,26 @@ internal class ChatTest {
         fixtureClockAndThen(30)
 
         fixturePublicChat().run {
-            addNewTextMessage(Message.Sender.Inquirer, fixtureNewMessage())
+            addNewTextMessage(Inquirer, fixtureNewMessage())
 
-            assertThat(updatedAt()).isEqualTo(zonedDateTimeAfter(30))
+            assertThat(updatedAt()).isEqualTo(timeAfter(30))
 
             assertThat(messages().size).isEqualTo(2)
-            assertThat(messages().last().createdAt).isEqualTo(zonedDateTimeAfter(30))
-            assertThat(messages().last().type).isEqualTo(Message.Type.Text)
-            assertThat(messages().last().sender).isEqualTo(Message.Sender.Inquirer)
+            assertThat(messages().last().createdAt).isEqualTo(timeAfter(30))
+            assertThat(messages().last().updatedAt).isNull()
+            assertThat(messages().last().type).isEqualTo(Text)
+            assertThat(messages().last().sender).isEqualTo(Inquirer)
             assertThat(messages().last().text).isEqualTo(fixtureNewMessage())
         }
 
         verifySequence {
-            notifications.notify(
+            eventPublisher.publish(
                 ChatCreated(
                     fixtureSubject(),
                     fixtureMessage()
                 )
             )
-            notifications.notify(
+            eventPublisher.publish(
                 MessageAdded(
                     fixtureSubject(),
                     fixtureNewMessage()
@@ -117,12 +134,12 @@ internal class ChatTest {
     }
 
     @Test
-    internal fun `should reset Is viewed by imam flag after a new message`() {
+    internal fun `should reset Is viewed by an imam flag after a new message`() {
         fixtureClock()
 
         fixturePublicChat().run {
             viewedByImam()
-            addNewTextMessage(Message.Sender.Inquirer, fixtureNewMessage())
+            addNewTextMessage(Inquirer, fixtureNewMessage())
 
             assertThat(isViewedByImam()).isFalse
         }
@@ -133,25 +150,25 @@ internal class ChatTest {
         fixtureClockAndThen(31)
 
         fixturePublicChat(fixtureNewReply()).run {
-            addNewTextMessage(Message.Sender.Imam, fixtureNewReply())
+            addNewTextMessage(Imam, fixtureNewReply())
 
             assertThat(isViewedByInquirer()).isFalse
-            assertThat(updatedAt()).isEqualTo(zonedDateTimeAfter(31))
+            assertThat(updatedAt()).isEqualTo(timeAfter(31))
 
             assertThat(messages().size).isEqualTo(2)
-            assertThat(messages().last().createdAt).isEqualTo(zonedDateTimeAfter(31))
-            assertThat(messages().last().type).isEqualTo(Message.Type.Text)
-            assertThat(messages().last().sender).isEqualTo(Message.Sender.Imam)
+            assertThat(messages().last().createdAt).isEqualTo(timeAfter(31))
+            assertThat(messages().last().type).isEqualTo(Text)
+            assertThat(messages().last().sender).isEqualTo(Imam)
             assertThat(messages().last().text).isEqualTo(fixtureNewReply())
         }
     }
 
     @Test
-    internal fun `should set Is viewed by inquirer flag`() {
+    internal fun `should set Is viewed by an inquirer flag`() {
         fixtureClock()
 
         fixturePublicChat(fixtureNewReply()).run {
-            addNewTextMessage(Message.Sender.Imam, fixtureNewReply())
+            addNewTextMessage(Imam, fixtureNewReply())
             assertThat(isViewedByInquirer()).isFalse
 
             viewedByInquirer()
@@ -177,25 +194,30 @@ internal class ChatTest {
         val subject = fixtureSubject()
         val firstMessage = fixtureMessage()
 
-        every { notifications.notify(ChatCreated(subject, firstMessage)) } returns Unit
-        every { notifications.notify(MessageAdded(subject, newMessage)) } returns Unit
+        every { eventPublisher.publish(ChatCreated(subject, firstMessage)) } returns Unit
+        every { eventPublisher.publish(MessageAdded(subject, newMessage)) } returns Unit
 
         return Chat(
-            clock,
-            notifications,
-            Chat.Type.Public,
+            Public,
             subject,
             firstMessage,
+            fixtureInquirerId(),
+            clock,
+            eventPublisher,
         )
     }
 
-    private fun fixtureSubject() = NotBlankString.of("Subject")
+    private fun fixtureInquirerId() = InquirerId(1)
 
-    private fun fixtureNewMessage() = NotBlankString.of("A new message")
+    private fun fixtureSubject() = NotBlankString.of("Subject")
 
     private fun fixtureMessage() = NotBlankString.of("A message")
 
+    private fun fixtureNewMessage() = NotBlankString.of("A new message")
+
     private fun fixtureNewReply() = NotBlankString.of("A new reply")
 
-    private fun zonedDateTimeAfter(minutes: Long) = ZonedDateTime.now(fixedClock).plusMinutes(minutes)
+    private fun fixtureNow() = ZonedDateTime.now(fixedClock)
+
+    private fun timeAfter(minutes: Long) = fixtureNow().plusMinutes(minutes)
 }
