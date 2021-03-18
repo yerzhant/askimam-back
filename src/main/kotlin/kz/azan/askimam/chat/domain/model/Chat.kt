@@ -23,7 +23,6 @@ class Chat(
 ) {
     private val createdAt = ZonedDateTime.now(clock)!!
     private var updatedAt = ZonedDateTime.now(clock)!!
-    private var answeredBy: ImamId? = null
     private var isViewedByImam = false
     private var isViewedByInquirer = true
     private val messages = mutableListOf<MessageEntity>()
@@ -43,10 +42,9 @@ class Chat(
     fun createdAt() = createdAt
     fun updatedAt() = updatedAt
 
-    fun isAnswered() = answeredBy != null
+    fun isAnswered() = messages.any { it.answeredBy() != null }
     fun isViewedByImam() = isViewedByImam
     fun isViewedByInquirer() = isViewedByInquirer
-    fun answeredBy() = answeredBy
 
     fun viewedByImam() {
         isViewedByImam = true
@@ -66,6 +64,7 @@ class Chat(
             it.sender,
             it.text(),
             it.audio,
+            it.answeredBy(),
         )
     }.toList()
 
@@ -73,12 +72,12 @@ class Chat(
         subject = newSubject
     }
 
-    fun addNewTextMessage(sender: Message.Sender, text: NotBlankString) {
-        addNewMessage(Text, sender, text)
+    fun addNewTextMessage(sender: Message.Sender, text: NotBlankString, answeredBy: ImamId? = null) {
+        addNewMessage(Text, sender, text, answeredBy = answeredBy)
     }
 
-    fun addNewAudioMessage(sender: Message.Sender, audio: NotBlankString) {
-        addNewMessage(Audio, sender, NotBlankString.of("Аудио"), audio)
+    fun addNewAudioMessage(sender: Message.Sender, audio: NotBlankString, answeredBy: ImamId) {
+        addNewMessage(Audio, sender, NotBlankString.of("Аудио"), audio, answeredBy)
     }
 
     private fun addNewMessage(
@@ -86,6 +85,7 @@ class Chat(
         sender: Message.Sender,
         text: NotBlankString,
         audio: NotBlankString? = null,
+        answeredBy: ImamId?,
     ) {
         messages.add(
             MessageEntity(
@@ -94,6 +94,7 @@ class Chat(
                 sender,
                 text,
                 audio,
+                answeredBy,
             )
         )
 
@@ -114,6 +115,7 @@ private class MessageEntity(
     val sender: Message.Sender,
     private var text: NotBlankString,
     val audio: NotBlankString? = null,
+    private var answeredBy: ImamId? = null,
 ) {
     val createdAt = ZonedDateTime.now(clock)!!
     private var updatedAt: ZonedDateTime? = null
@@ -121,4 +123,5 @@ private class MessageEntity(
     fun updatedAt() = updatedAt
 
     fun text() = text
+    fun answeredBy() = answeredBy
 }

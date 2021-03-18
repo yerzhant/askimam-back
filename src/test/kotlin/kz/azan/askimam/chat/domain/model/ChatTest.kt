@@ -14,6 +14,7 @@ import kz.azan.askimam.chat.domain.model.Message.Type.Audio
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
 import kz.azan.askimam.common.domain.EventPublisher
 import kz.azan.askimam.common.type.NotBlankString
+import kz.azan.askimam.imam.domain.model.ImamId
 import kz.azan.askimam.inquirer.domain.model.InquirerId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -37,15 +38,15 @@ internal class ChatTest {
             assertThat(isViewedByImam()).isFalse
             assertThat(isViewedByInquirer()).isTrue
             assertThat(askedBy).isEqualTo(fixtureInquirerId())
-            assertThat(answeredBy()).isNull()
             assertThat(subject()).isEqualTo(fixtureSubject())
 
             assertThat(messages().size).isEqualTo(1)
-            assertThat(messages().first().createdAt).isEqualTo(fixtureNow())
-            assertThat(messages().first().updatedAt).isNull()
             assertThat(messages().first().type).isEqualTo(Text)
             assertThat(messages().first().sender).isEqualTo(Inquirer)
             assertThat(messages().first().text).isEqualTo(fixtureMessage())
+            assertThat(messages().first().createdAt).isEqualTo(fixtureNow())
+            assertThat(messages().first().updatedAt).isNull()
+            assertThat(messages().first().answeredBy).isNull()
         }
 
         verify {
@@ -157,7 +158,7 @@ internal class ChatTest {
         fixtureClockAndThen(31)
 
         fixturePublicChat(fixtureNewReply()).run {
-            addNewTextMessage(Imam, fixtureNewReply())
+            addNewTextMessage(Imam, fixtureNewReply(), answeredBy = ImamId(1))
 
             assertThat(isViewedByInquirer()).isFalse
             assertThat(updatedAt()).isEqualTo(timeAfter(31))
@@ -167,6 +168,7 @@ internal class ChatTest {
             assertThat(messages().last().type).isEqualTo(Text)
             assertThat(messages().last().sender).isEqualTo(Imam)
             assertThat(messages().last().text).isEqualTo(fixtureNewReply())
+            assertThat(messages().last().answeredBy).isEqualTo(ImamId(1))
         }
     }
 
@@ -175,7 +177,7 @@ internal class ChatTest {
         fixtureClock()
 
         fixturePublicChat(fixtureNewReply()).run {
-            addNewTextMessage(Imam, fixtureNewReply())
+            addNewTextMessage(Imam, fixtureNewReply(), ImamId(1))
             assertThat(isViewedByInquirer()).isFalse
 
             viewedByInquirer()
@@ -189,7 +191,7 @@ internal class ChatTest {
         val audio = NotBlankString.of("Аудио")
         fixtureClock()
         fixturePublicChat(audio).run {
-            addNewAudioMessage(Imam, fixtureAudio())
+            addNewAudioMessage(Imam, fixtureAudio(), ImamId(1))
 
             assertThat(messages().last().type).isEqualTo(Audio)
             assertThat(messages().last().text).isEqualTo(audio)
