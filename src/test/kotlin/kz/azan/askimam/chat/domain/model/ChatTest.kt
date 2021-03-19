@@ -68,6 +68,7 @@ internal class ChatTest {
             eventPublisher,
             Private,
             fixtureInquirerId(),
+            fixtureMessageId,
             fixtureMessage(),
         ).run {
             assertThat(subject()).isEqualTo(fixtureMessage())
@@ -99,7 +100,7 @@ internal class ChatTest {
         fixtureClockAndThen(30)
 
         fixturePublicChat().run {
-            addNewTextMessageByInquirer(fixtureNewMessage())
+            addNewTextMessageByInquirer(fixtureMessageId, fixtureNewMessage())
 
             assertThat(updatedAt()).isEqualTo(timeAfter(30))
 
@@ -146,7 +147,7 @@ internal class ChatTest {
 
         fixturePublicChat().run {
             viewedByImam()
-            addNewTextMessageByInquirer(fixtureNewMessage())
+            addNewTextMessageByInquirer(Message.Id(2), fixtureNewMessage())
 
             assertThat(isViewedByImam()).isFalse
         }
@@ -157,7 +158,7 @@ internal class ChatTest {
         fixtureClockAndThen(31)
 
         fixturePublicChat(fixtureNewReply()).run {
-            addNewTextMessageByImam(fixtureNewReply(), fixtureImamId())
+            addNewTextMessageByImam(Message.Id(2), fixtureNewReply(), fixtureImamId())
 
             assertThat(isViewedByInquirer()).isFalse
             assertThat(updatedAt()).isEqualTo(timeAfter(31))
@@ -176,7 +177,7 @@ internal class ChatTest {
         fixtureClock()
 
         fixturePublicChat(fixtureNewReply()).run {
-            addNewTextMessageByImam(fixtureNewReply(), fixtureImamId())
+            addNewTextMessageByImam(Message.Id(2), fixtureNewReply(), fixtureImamId())
             assertThat(isViewedByInquirer()).isFalse
 
             viewedByInquirer()
@@ -190,7 +191,7 @@ internal class ChatTest {
         val audio = NotBlankString.of("Аудио")
         fixtureClock()
         fixturePublicChat(audio).run {
-            addNewAudioMessage(Imam, fixtureAudio(), fixtureImamId())
+            addNewAudioMessage(Message.Id(2), Imam, fixtureAudio(), fixtureImamId())
 
             assertThat(messages().last().type).isEqualTo(Audio)
             assertThat(messages().last().text).isEqualTo(audio)
@@ -199,6 +200,17 @@ internal class ChatTest {
 
         verify {
             eventPublisher.publish(MessageAdded(fixtureSubject(), audio))
+        }
+    }
+
+    @Test
+    internal fun `should delete a message`() {
+        fixtureClock()
+
+        with(fixturePublicChat()) {
+            deleteMessage(fixtureMessageId)
+
+            assertThat(messages().size).isZero
         }
     }
 
@@ -227,6 +239,7 @@ internal class ChatTest {
             eventPublisher,
             Public,
             fixtureInquirerId(),
+            fixtureMessageId,
             firstMessage,
             subject,
         )
@@ -237,6 +250,8 @@ internal class ChatTest {
     private fun fixtureInquirerId() = User.Id(2)
 
     private fun fixtureSubject() = NotBlankString.of("Subject")
+
+    private val fixtureMessageId = Message.Id(1)
 
     private fun fixtureMessage() = NotBlankString.of("A message")
 

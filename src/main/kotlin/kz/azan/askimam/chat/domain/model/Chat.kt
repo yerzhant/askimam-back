@@ -17,7 +17,8 @@ class Chat(
     private val eventPublisher: EventPublisher,
     val type: Type,
     val askedBy: User.Id,
-    firstMessage: NotBlankString,
+    messageId: Message.Id,
+    messageText: NotBlankString,
     private var subject: NotBlankString? = null,
 ) {
     private val createdAt = ZonedDateTime.now(clock)!!
@@ -30,12 +31,13 @@ class Chat(
         messages.add(
             MessageEntity(
                 clock,
+                messageId,
                 Text,
                 Inquirer,
-                firstMessage,
+                messageText,
             )
         )
-        eventPublisher.publish(ChatCreated(subject, firstMessage))
+        eventPublisher.publish(ChatCreated(subject, messageText))
     }
 
     fun createdAt() = createdAt
@@ -57,6 +59,7 @@ class Chat(
 
     fun messages() = messages.map {
         Message(
+            it.id,
             it.createdAt,
             it.updatedAt(),
             it.type,
@@ -71,19 +74,20 @@ class Chat(
         subject = newSubject
     }
 
-    fun addNewTextMessageByInquirer(text: NotBlankString) {
-        addNewMessage(Text, Inquirer, text)
+    fun addNewTextMessageByInquirer(id: Message.Id, text: NotBlankString) {
+        addNewMessage(id, Text, Inquirer, text)
     }
 
-    fun addNewTextMessageByImam(text: NotBlankString, answeredBy: User.Id) {
-        addNewMessage(Text, Imam, text, answeredBy = answeredBy)
+    fun addNewTextMessageByImam(id: Message.Id, text: NotBlankString, answeredBy: User.Id) {
+        addNewMessage(id, Text, Imam, text, answeredBy = answeredBy)
     }
 
-    fun addNewAudioMessage(sender: Message.Sender, audio: NotBlankString, answeredBy: User.Id) {
-        addNewMessage(Audio, sender, NotBlankString.of("Аудио"), audio, answeredBy)
+    fun addNewAudioMessage(id: Message.Id, sender: Message.Sender, audio: NotBlankString, answeredBy: User.Id) {
+        addNewMessage(id, Audio, sender, NotBlankString.of("Аудио"), audio, answeredBy)
     }
 
     private fun addNewMessage(
+        id: Message.Id,
         type: Message.Type,
         sender: Message.Sender,
         text: NotBlankString,
@@ -93,6 +97,7 @@ class Chat(
         messages.add(
             MessageEntity(
                 clock,
+                id,
                 type,
                 sender,
                 text,
@@ -109,11 +114,16 @@ class Chat(
         eventPublisher.publish(MessageAdded(subject, text))
     }
 
+    fun deleteMessage(id: Message.Id) {
+        messages.removeIf { it.id == id }
+    }
+
     enum class Type { Public, Private }
 }
 
 private class MessageEntity(
     clock: Clock,
+    val id: Message.Id,
     val type: Message.Type,
     val sender: Message.Sender,
     private var text: NotBlankString,

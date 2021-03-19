@@ -5,6 +5,7 @@ import kz.azan.askimam.user.domain.model.User
 import java.time.ZonedDateTime
 
 data class Message(
+    val id: Id,
     val createdAt: ZonedDateTime,
     val updatedAt: ZonedDateTime?,
     val type: Type,
@@ -13,6 +14,8 @@ data class Message(
     val audio: NotBlankString?,
     val answeredBy: User.Id?,
 ) {
+    data class Id(val value: Long)
+
     enum class Type { Text, Audio }
     enum class Sender { Imam, Inquirer }
 }
