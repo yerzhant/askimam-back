@@ -1,7 +1,6 @@
 package kz.azan.askimam.chat.domain.model
 
 import io.mockk.every
-import io.mockk.mockk
 import io.mockk.verify
 import io.mockk.verifySequence
 import kz.azan.askimam.chat.domain.event.ChatCreated
@@ -14,18 +13,11 @@ import kz.azan.askimam.chat.domain.model.Message.Sender.Imam
 import kz.azan.askimam.chat.domain.model.Message.Sender.Inquirer
 import kz.azan.askimam.chat.domain.model.Message.Type.Audio
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
-import kz.azan.askimam.common.domain.EventPublisher
 import kz.azan.askimam.common.type.NotBlankString
-import kz.azan.askimam.user.domain.model.User
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import java.time.*
 
-internal class ChatTest {
-    private val eventPublisher = mockk<EventPublisher>()
-
-    private val fixedClock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
-    private val clock = mockk<Clock>()
+internal class ChatTest : ChatFixtures() {
 
     @Test
     internal fun `should create a chat`() {
@@ -251,57 +243,4 @@ internal class ChatTest {
             eventPublisher.publish(MessageUpdated(Message.Id(2), NotBlankString.of("Update"), timeAfter(15)))
         }
     }
-
-    private fun fixtureClock() {
-        every { clock.zone } returns fixedClock.zone
-        every { clock.instant() } returns fixedClock.instant()
-    }
-
-    private fun fixtureClockAndThen(vararg minutes: Long) {
-        every { clock.zone } returns fixedClock.zone
-        every { clock.instant() } returnsMany listOf(
-            fixedClock.instant(),
-            *minutes.map {
-                Clock.offset(fixedClock, Duration.ofMinutes(it)).instant()
-            }.toTypedArray()
-        )
-    }
-
-    private fun fixturePublicChat(newMessage: NotBlankString = fixtureNewMessage): Chat {
-        val subject = fixtureSubject
-        val firstMessage = fixtureMessage
-
-        every { eventPublisher.publish(ChatCreated(subject, firstMessage)) } returns Unit
-        every { eventPublisher.publish(MessageAdded(subject, newMessage)) } returns Unit
-
-        return Chat(
-            clock,
-            eventPublisher,
-            Public,
-            fixtureInquirerId,
-            fixtureMessageId,
-            firstMessage,
-            subject,
-        )
-    }
-
-    private val fixtureImamId = User.Id(1)
-
-    private val fixtureInquirerId = User.Id(2)
-
-    private val fixtureSubject = NotBlankString.of("Subject")
-
-    private val fixtureMessageId = Message.Id(1)
-
-    private val fixtureMessage = NotBlankString.of("A message")
-
-    private val fixtureNewMessage = NotBlankString.of("A new message")
-
-    private val fixtureNewReply = NotBlankString.of("A new reply")
-
-    private val fixtureAudio = NotBlankString.of("audio.mp3")
-
-    private val fixtureNow = ZonedDateTime.now(fixedClock)
-
-    private fun timeAfter(minutes: Long) = fixtureNow.plusMinutes(minutes)
 }
