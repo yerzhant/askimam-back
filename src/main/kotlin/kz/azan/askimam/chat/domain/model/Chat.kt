@@ -2,6 +2,7 @@ package kz.azan.askimam.chat.domain.model
 
 import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.event.MessageAdded
+import kz.azan.askimam.chat.domain.event.MessageDeleted
 import kz.azan.askimam.chat.domain.model.Message.Sender.Imam
 import kz.azan.askimam.chat.domain.model.Message.Sender.Inquirer
 import kz.azan.askimam.chat.domain.model.Message.Type.Audio
@@ -116,6 +117,7 @@ class Chat(
 
     fun deleteMessage(id: Message.Id) {
         messages.removeIf { it.id == id }
+        eventPublisher.publish(MessageDeleted(id))
     }
 
     fun updateTextMessageByInquirer(id: Message.Id, text: NotBlankString) {

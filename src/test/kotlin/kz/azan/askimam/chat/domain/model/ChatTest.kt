@@ -6,6 +6,7 @@ import io.mockk.verify
 import io.mockk.verifySequence
 import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.event.MessageAdded
+import kz.azan.askimam.chat.domain.event.MessageDeleted
 import kz.azan.askimam.chat.domain.model.Chat.Type.Private
 import kz.azan.askimam.chat.domain.model.Chat.Type.Public
 import kz.azan.askimam.chat.domain.model.Message.Sender.Imam
@@ -186,11 +187,16 @@ internal class ChatTest {
     @Test
     internal fun `should delete a message`() {
         fixtureClock()
+        every { eventPublisher.publish(MessageDeleted(fixtureMessageId)) } returns Unit
 
         with(fixturePublicChat()) {
             deleteMessage(fixtureMessageId)
 
             assertThat(messages().size).isZero
+        }
+
+        verify {
+            eventPublisher.publish(MessageDeleted(fixtureMessageId))
         }
     }
 
