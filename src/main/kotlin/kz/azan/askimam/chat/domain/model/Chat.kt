@@ -74,19 +74,19 @@ class Chat(
         subject = newSubject
     }
 
-    fun addNewTextMessageByInquirer(id: Message.Id, text: NotBlankString) {
-        addNewMessage(id, Text, Inquirer, text)
+    fun addTextMessageByInquirer(id: Message.Id, text: NotBlankString) {
+        addMessage(id, Text, Inquirer, text)
     }
 
-    fun addNewTextMessageByImam(id: Message.Id, text: NotBlankString, answeredBy: User.Id) {
-        addNewMessage(id, Text, Imam, text, answeredBy = answeredBy)
+    fun addTextMessageByImam(id: Message.Id, text: NotBlankString, answeredBy: User.Id) {
+        addMessage(id, Text, Imam, text, answeredBy = answeredBy)
     }
 
-    fun addNewAudioMessage(id: Message.Id, sender: Message.Sender, audio: NotBlankString, answeredBy: User.Id) {
-        addNewMessage(id, Audio, sender, NotBlankString.of("Аудио"), audio, answeredBy)
+    fun addAudioMessage(id: Message.Id, sender: Message.Sender, audio: NotBlankString, answeredBy: User.Id) {
+        addMessage(id, Audio, sender, NotBlankString.of("Аудио"), audio, answeredBy)
     }
 
-    private fun addNewMessage(
+    private fun addMessage(
         id: Message.Id,
         type: Message.Type,
         sender: Message.Sender,
@@ -118,11 +118,23 @@ class Chat(
         messages.removeIf { it.id == id }
     }
 
+    fun updateTextMessageByInquirer(id: Message.Id, text: NotBlankString) {
+        messages.find { it.id == id && it.sender == Inquirer }?.run {
+            updateText(text)
+        }
+    }
+
+    fun updateTextMessageByImam(id: Message.Id, text: NotBlankString, imamId: User.Id) {
+        messages.find { it.id == id && it.sender == Imam && it.answeredBy() == imamId }?.run {
+            updateText(text)
+        }
+    }
+
     enum class Type { Public, Private }
 }
 
 private class MessageEntity(
-    clock: Clock,
+    private val clock: Clock,
     val id: Message.Id,
     val type: Message.Type,
     val sender: Message.Sender,
@@ -137,4 +149,9 @@ private class MessageEntity(
 
     fun text() = text
     fun answeredBy() = answeredBy
+
+    fun updateText(text: NotBlankString) {
+        this.text = text
+        updatedAt = ZonedDateTime.now(clock)
+    }
 }

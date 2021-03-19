@@ -90,7 +90,7 @@ internal class ChatTest {
         fixtureClockAndThen(30)
 
         fixturePublicChat().run {
-            addNewTextMessageByInquirer(fixtureMessageId, fixtureNewMessage)
+            addTextMessageByInquirer(fixtureMessageId, fixtureNewMessage)
 
             assertThat(updatedAt()).isEqualTo(timeAfter(30))
 
@@ -127,7 +127,7 @@ internal class ChatTest {
 
         fixturePublicChat().run {
             viewedByImam()
-            addNewTextMessageByInquirer(Message.Id(2), fixtureNewMessage)
+            addTextMessageByInquirer(Message.Id(2), fixtureNewMessage)
 
             assertThat(isViewedByImam()).isFalse
         }
@@ -138,7 +138,7 @@ internal class ChatTest {
         fixtureClockAndThen(31)
 
         fixturePublicChat(fixtureNewReply).run {
-            addNewTextMessageByImam(Message.Id(2), fixtureNewReply, fixtureImamId)
+            addTextMessageByImam(Message.Id(2), fixtureNewReply, fixtureImamId)
 
             assertThat(isViewedByInquirer()).isFalse
             assertThat(updatedAt()).isEqualTo(timeAfter(31))
@@ -157,7 +157,7 @@ internal class ChatTest {
         fixtureClock()
 
         fixturePublicChat(fixtureNewReply).run {
-            addNewTextMessageByImam(Message.Id(2), fixtureNewReply, fixtureImamId)
+            addTextMessageByImam(Message.Id(2), fixtureNewReply, fixtureImamId)
             assertThat(isViewedByInquirer()).isFalse
 
             viewedByInquirer()
@@ -171,7 +171,7 @@ internal class ChatTest {
         val audio = NotBlankString.of("Аудио")
         fixtureClock()
         fixturePublicChat(audio).run {
-            addNewAudioMessage(Message.Id(2), Imam, fixtureAudio, fixtureImamId)
+            addAudioMessage(Message.Id(2), Imam, fixtureAudio, fixtureImamId)
 
             assertThat(messages().last().type).isEqualTo(Audio)
             assertThat(messages().last().text).isEqualTo(audio)
@@ -194,16 +194,43 @@ internal class ChatTest {
         }
     }
 
+    @Test
+    internal fun `should update a message by an inquirer`() {
+        fixtureClockAndThen(10)
+
+        with(fixturePublicChat()) {
+            updateTextMessageByInquirer(fixtureMessageId, fixtureNewMessage)
+
+            assertThat(messages().first().text).isEqualTo(fixtureNewMessage)
+            assertThat(messages().first().updatedAt).isEqualTo(timeAfter(10))
+        }
+    }
+
+    @Test
+    internal fun `should update a message by an imam`() {
+        fixtureClockAndThen(11, 15)
+
+        with(fixturePublicChat(fixtureNewReply)) {
+            addTextMessageByImam(Message.Id(2), fixtureNewReply, fixtureImamId)
+            updateTextMessageByImam(Message.Id(2), NotBlankString.of("Update"), fixtureImamId)
+
+            assertThat(messages().last().text).isEqualTo(NotBlankString.of("Update"))
+            assertThat(messages().last().updatedAt).isEqualTo(timeAfter(15))
+        }
+    }
+
     private fun fixtureClock() {
         every { clock.zone } returns fixedClock.zone
         every { clock.instant() } returns fixedClock.instant()
     }
 
-    private fun fixtureClockAndThen(minutes: Long) {
+    private fun fixtureClockAndThen(vararg minutes: Long) {
         every { clock.zone } returns fixedClock.zone
         every { clock.instant() } returnsMany listOf(
             fixedClock.instant(),
-            Clock.offset(fixedClock, Duration.ofMinutes(minutes)).instant(),
+            *minutes.map {
+                Clock.offset(fixedClock, Duration.ofMinutes(it)).instant()
+            }.toTypedArray()
         )
     }
 
