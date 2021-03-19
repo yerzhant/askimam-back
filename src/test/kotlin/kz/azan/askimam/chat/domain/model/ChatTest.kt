@@ -7,6 +7,7 @@ import io.mockk.verifySequence
 import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.event.MessageAdded
 import kz.azan.askimam.chat.domain.event.MessageDeleted
+import kz.azan.askimam.chat.domain.event.MessageUpdated
 import kz.azan.askimam.chat.domain.model.Chat.Type.Private
 import kz.azan.askimam.chat.domain.model.Chat.Type.Public
 import kz.azan.askimam.chat.domain.model.Message.Sender.Imam
@@ -203,6 +204,15 @@ internal class ChatTest {
     @Test
     internal fun `should update a message by an inquirer`() {
         fixtureClockAndThen(10)
+        every {
+            eventPublisher.publish(
+                MessageUpdated(
+                    fixtureMessageId,
+                    fixtureNewMessage,
+                    timeAfter(10)
+                )
+            )
+        } returns Unit
 
         with(fixturePublicChat()) {
             updateTextMessageByInquirer(fixtureMessageId, fixtureNewMessage)
@@ -210,11 +220,24 @@ internal class ChatTest {
             assertThat(messages().first().text).isEqualTo(fixtureNewMessage)
             assertThat(messages().first().updatedAt).isEqualTo(timeAfter(10))
         }
+
+        verify {
+            eventPublisher.publish(MessageUpdated(fixtureMessageId, fixtureNewMessage, timeAfter(10)))
+        }
     }
 
     @Test
     internal fun `should update a message by an imam`() {
         fixtureClockAndThen(11, 15)
+        every {
+            eventPublisher.publish(
+                MessageUpdated(
+                    Message.Id(2),
+                    NotBlankString.of("Update"),
+                    timeAfter(15)
+                )
+            )
+        } returns Unit
 
         with(fixturePublicChat(fixtureNewReply)) {
             addTextMessageByImam(Message.Id(2), fixtureNewReply, fixtureImamId)
@@ -222,6 +245,10 @@ internal class ChatTest {
 
             assertThat(messages().last().text).isEqualTo(NotBlankString.of("Update"))
             assertThat(messages().last().updatedAt).isEqualTo(timeAfter(15))
+        }
+
+        verify {
+            eventPublisher.publish(MessageUpdated(Message.Id(2), NotBlankString.of("Update"), timeAfter(15)))
         }
     }
 
