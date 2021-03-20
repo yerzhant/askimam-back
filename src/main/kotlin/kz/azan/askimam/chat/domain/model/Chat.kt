@@ -118,15 +118,8 @@ class Chat(
         eventPublisher.publish(MessageDeleted(id))
     }
 
-    fun updateTextMessageByInquirer(id: Message.Id, text: NotBlankString) {
+    fun updateTextMessage(id: Message.Id, text: NotBlankString, author: User) {
         messages.find { it.id == id }?.run {
-            updateText(text)
-            eventPublisher.publish(MessageUpdated(id, text, updatedAt()!!))
-        }
-    }
-
-    fun updateTextMessageByImam(id: Message.Id, text: NotBlankString, imamId: User.Id) {
-        messages.find { it.id == id && it.authorId == imamId }?.run {
             updateText(text)
             eventPublisher.publish(MessageUpdated(id, text, updatedAt()!!))
         }

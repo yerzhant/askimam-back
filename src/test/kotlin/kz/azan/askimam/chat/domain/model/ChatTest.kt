@@ -214,7 +214,7 @@ internal class ChatTest : ChatFixtures() {
         } returns Unit
 
         with(fixtureChat()) {
-            updateTextMessageByInquirer(fixtureMessageId, fixtureNewMessage)
+            updateTextMessage(fixtureMessageId, fixtureNewMessage, fixtureInquirer)
 
             assertThat(messages().first().text).isEqualTo(fixtureNewMessage)
             assertThat(messages().first().updatedAt).isEqualTo(timeAfter(10))
@@ -240,7 +240,7 @@ internal class ChatTest : ChatFixtures() {
 
         with(fixtureChat(fixtureNewReply)) {
             addTextMessage(Message.Id(2), fixtureNewReply, fixtureImam)
-            updateTextMessageByImam(Message.Id(2), NotBlankString.of("Update"), fixtureImamId)
+            updateTextMessage(Message.Id(2), NotBlankString.of("Update"), fixtureImam)
 
             assertThat(messages().last().text).isEqualTo(NotBlankString.of("Update"))
             assertThat(messages().last().updatedAt).isEqualTo(timeAfter(15))
