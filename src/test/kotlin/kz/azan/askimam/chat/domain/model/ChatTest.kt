@@ -11,6 +11,7 @@ import kz.azan.askimam.chat.domain.model.Chat.Type.Private
 import kz.azan.askimam.chat.domain.model.Chat.Type.Public
 import kz.azan.askimam.chat.domain.model.Message.Type.Audio
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
+import kz.azan.askimam.chat.domain.policy.AddMessagePolicy
 import kz.azan.askimam.common.type.NotBlankString
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -81,8 +82,14 @@ internal class ChatTest : ChatFixtures() {
         fixtureClockAndThen(30)
 
         fixtureChat().run {
-            addTextMessage(fixtureMessageId, fixtureNewMessage, fixtureInquirer)
+            val result = addTextMessage(
+                AddMessagePolicy.forInquirer,
+                fixtureMessageId,
+                fixtureNewMessage,
+                fixtureInquirer
+            )
 
+            assertThat(result.isEmpty).isTrue
             assertThat(updatedAt()).isEqualTo(timeAfter(30))
 
             assertThat(messages().size).isEqualTo(2)
@@ -117,8 +124,14 @@ internal class ChatTest : ChatFixtures() {
 
         fixtureChat().run {
             viewedByImam()
-            addTextMessage(Message.Id(2), fixtureNewMessage, fixtureInquirer)
+            val result = addTextMessage(
+                AddMessagePolicy.forInquirer,
+                Message.Id(2),
+                fixtureNewMessage,
+                fixtureInquirer
+            )
 
+            assertThat(result.isEmpty).isTrue
             assertThat(isViewedByImam()).isFalse
         }
     }
@@ -128,8 +141,9 @@ internal class ChatTest : ChatFixtures() {
         fixtureClockAndThen(31)
 
         fixtureChat(fixtureNewReply).run {
-            addTextMessage(Message.Id(2), fixtureNewReply, fixtureImam)
+            val option = addTextMessage(AddMessagePolicy.forImam, Message.Id(2), fixtureNewReply, fixtureImam)
 
+            assertThat(option.isEmpty).isTrue
             assertThat(isVisibleToPublic()).isTrue
             assertThat(isViewedByInquirer()).isFalse
             assertThat(updatedAt()).isEqualTo(timeAfter(31))
@@ -143,12 +157,13 @@ internal class ChatTest : ChatFixtures() {
     }
 
     @Test
-    internal fun `should not make a message visible by public if it's private`() {
+    internal fun `should not make a message visible to public if it's private`() {
         fixtureClockAndThen(31)
 
         fixtureChat(fixtureNewReply, Private).run {
-            addTextMessage(Message.Id(2), fixtureNewReply, fixtureImam)
+            val option = addTextMessage(AddMessagePolicy.forImam, Message.Id(2), fixtureNewReply, fixtureImam)
 
+            assertThat(option.isEmpty).isTrue
             assertThat(isVisibleToPublic()).isFalse
         }
     }
@@ -158,7 +173,7 @@ internal class ChatTest : ChatFixtures() {
         fixtureClock()
 
         fixtureChat(fixtureNewReply).run {
-            addTextMessage(Message.Id(2), fixtureNewReply, fixtureImam)
+            addTextMessage(AddMessagePolicy.forImam, Message.Id(2), fixtureNewReply, fixtureImam)
             assertThat(isViewedByInquirer()).isFalse
 
             viewedByInquirer()
@@ -172,8 +187,9 @@ internal class ChatTest : ChatFixtures() {
         val audio = NotBlankString.of("Аудио")
         fixtureClock()
         fixtureChat(audio).run {
-            addAudioMessage(Message.Id(2), fixtureAudio, fixtureImam)
+            val option = addAudioMessage(AddMessagePolicy.forImam, Message.Id(2), fixtureAudio, fixtureImam)
 
+            assertThat(option.isEmpty).isTrue
             assertThat(messages().last().type).isEqualTo(Audio)
             assertThat(messages().last().text).isEqualTo(audio)
             assertThat(messages().last().audio).isEqualTo(fixtureAudio)
@@ -239,7 +255,7 @@ internal class ChatTest : ChatFixtures() {
         } returns Unit
 
         with(fixtureChat(fixtureNewReply)) {
-            addTextMessage(Message.Id(2), fixtureNewReply, fixtureImam)
+            addTextMessage(AddMessagePolicy.forImam, Message.Id(2), fixtureNewReply, fixtureImam)
             updateTextMessage(Message.Id(2), NotBlankString.of("Update"), fixtureImam)
 
             assertThat(messages().last().text).isEqualTo(NotBlankString.of("Update"))

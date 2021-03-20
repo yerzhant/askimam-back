@@ -1,11 +1,14 @@
 package kz.azan.askimam.chat.domain.model
 
+import io.vavr.control.Option
 import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.event.MessageAdded
 import kz.azan.askimam.chat.domain.event.MessageDeleted
 import kz.azan.askimam.chat.domain.event.MessageUpdated
 import kz.azan.askimam.chat.domain.model.Message.Type.Audio
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
+import kz.azan.askimam.chat.domain.policy.AddMessagePolicy
+import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.common.domain.EventPublisher
 import kz.azan.askimam.common.type.NotBlankString
 import kz.azan.askimam.user.domain.model.User
@@ -76,42 +79,44 @@ class Chat(
         subject = newSubject
     }
 
-    fun addTextMessage(id: Message.Id, text: NotBlankString, author: User) {
-        addMessage(id, Text, author, text)
-    }
+    fun addTextMessage(policy: AddMessagePolicy, id: Message.Id, text: NotBlankString, author: User) =
+        addMessage(policy, id, Text, author, text)
 
-    fun addAudioMessage(id: Message.Id, audio: NotBlankString, author: User) {
-        addMessage(id, Audio, author, NotBlankString.of("Аудио"), audio)
-    }
+
+    fun addAudioMessage(policy: AddMessagePolicy, id: Message.Id, audio: NotBlankString, author: User) =
+        addMessage(policy, id, Audio, author, NotBlankString.of("Аудио"), audio)
+
 
     private fun addMessage(
+        policy: AddMessagePolicy,
         id: Message.Id,
         messageType: Message.Type,
         author: User,
         text: NotBlankString,
         audio: NotBlankString? = null,
-    ) {
-        messages.add(
-            MessageEntity(
-                clock,
-                id,
-                messageType,
-                author.id,
-                text,
-                audio,
+    ): Option<Declination> =
+        policy.isAllowed(this, author).onEmpty {
+            messages.add(
+                MessageEntity(
+                    clock,
+                    id,
+                    messageType,
+                    author.id,
+                    text,
+                    audio,
+                )
             )
-        )
 
-        when (author.type) {
-            Inquirer -> isViewedByImam = false
-            Imam -> {
-                if (type == Type.Public) isVisibleToPublic = true
-                isViewedByInquirer = false
+            when (author.type) {
+                Inquirer -> isViewedByImam = false
+                Imam -> {
+                    if (type == Type.Public) isVisibleToPublic = true
+                    isViewedByInquirer = false
+                }
             }
-        }
 
-        eventPublisher.publish(MessageAdded(subject, text))
-    }
+            eventPublisher.publish(MessageAdded(subject, text))
+        }
 
     fun deleteMessage(id: Message.Id) {
         messages.removeIf { it.id == id }
