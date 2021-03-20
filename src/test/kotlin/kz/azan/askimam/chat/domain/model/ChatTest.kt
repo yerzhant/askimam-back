@@ -12,6 +12,7 @@ import kz.azan.askimam.chat.domain.model.Chat.Type.Public
 import kz.azan.askimam.chat.domain.model.Message.Type.Audio
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
 import kz.azan.askimam.chat.domain.policy.AddMessagePolicy
+import kz.azan.askimam.chat.domain.policy.DeleteMessagePolicy
 import kz.azan.askimam.common.type.NotBlankString
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -201,13 +202,31 @@ internal class ChatTest : ChatFixtures() {
     }
 
     @Test
-    internal fun `should delete a message`() {
+    internal fun `should delete a message by an inquirer`() {
         fixtureClock()
         every { eventPublisher.publish(MessageDeleted(fixtureMessageId)) } returns Unit
 
         with(fixtureChat()) {
-            deleteMessage(fixtureMessageId)
+            val option = deleteMessage(fixtureMessageId, DeleteMessagePolicy.forInquirer, fixtureInquirer)
 
+            assertThat(option.isEmpty).isTrue
+            assertThat(messages().size).isZero
+        }
+
+        verify {
+            eventPublisher.publish(MessageDeleted(fixtureMessageId))
+        }
+    }
+
+    @Test
+    internal fun `should delete a message by an imam`() {
+        fixtureClock()
+        every { eventPublisher.publish(MessageDeleted(fixtureMessageId)) } returns Unit
+
+        with(fixtureChat()) {
+            val option = deleteMessage(fixtureMessageId, DeleteMessagePolicy.forImam, fixtureImam)
+
+            assertThat(option.isEmpty).isTrue
             assertThat(messages().size).isZero
         }
 

@@ -8,6 +8,7 @@ import kz.azan.askimam.chat.domain.event.MessageUpdated
 import kz.azan.askimam.chat.domain.model.Message.Type.Audio
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
 import kz.azan.askimam.chat.domain.policy.AddMessagePolicy
+import kz.azan.askimam.chat.domain.policy.DeleteMessagePolicy
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.common.domain.EventPublisher
 import kz.azan.askimam.common.type.NotBlankString
@@ -83,8 +84,8 @@ class Chat(
         addMessage(policy, id, Text, author, text)
 
 
-    fun addAudioMessage(policy: AddMessagePolicy, id: Message.Id, audio: NotBlankString, author: User) =
-        addMessage(policy, id, Audio, author, NotBlankString.of("Аудио"), audio)
+    fun addAudioMessage(policy: AddMessagePolicy, id: Message.Id, audio: NotBlankString, imam: User) =
+        addMessage(policy, id, Audio, imam, NotBlankString.of("Аудио"), audio)
 
 
     private fun addMessage(
@@ -118,10 +119,11 @@ class Chat(
             eventPublisher.publish(MessageAdded(subject, text))
         }
 
-    fun deleteMessage(id: Message.Id) {
-        messages.removeIf { it.id == id }
-        eventPublisher.publish(MessageDeleted(id))
-    }
+    fun deleteMessage(id: Message.Id, policy: DeleteMessagePolicy, user: User): Option<Declination> =
+        policy.isAllowed(this, user).onEmpty {
+            messages.removeIf { it.id == id }
+            eventPublisher.publish(MessageDeleted(id))
+        }
 
     fun updateTextMessage(id: Message.Id, text: NotBlankString, author: User) {
         messages.find { it.id == id }?.run {
