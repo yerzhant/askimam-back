@@ -9,7 +9,7 @@ data class Message(
     val createdAt: ZonedDateTime,
     val updatedAt: ZonedDateTime?,
     val type: Type,
-    val senderType: SenderType,
+    val authorType: AuthorType,
     val text: NotBlankString,
     val audio: NotBlankString?,
     val answeredBy: User.Id?,
@@ -17,5 +17,5 @@ data class Message(
     data class Id(val value: Long)
 
     enum class Type { Text, Audio }
-    enum class SenderType { Imam, Inquirer }
+    enum class AuthorType { Imam, Inquirer }
 }

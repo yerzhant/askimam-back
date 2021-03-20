@@ -9,8 +9,8 @@ import kz.azan.askimam.chat.domain.event.MessageDeleted
 import kz.azan.askimam.chat.domain.event.MessageUpdated
 import kz.azan.askimam.chat.domain.model.Chat.Type.Private
 import kz.azan.askimam.chat.domain.model.Chat.Type.Public
-import kz.azan.askimam.chat.domain.model.Message.SenderType.Imam
-import kz.azan.askimam.chat.domain.model.Message.SenderType.Inquirer
+import kz.azan.askimam.chat.domain.model.Message.AuthorType.Imam
+import kz.azan.askimam.chat.domain.model.Message.AuthorType.Inquirer
 import kz.azan.askimam.chat.domain.model.Message.Type.Audio
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
 import kz.azan.askimam.common.type.NotBlankString
@@ -35,7 +35,7 @@ internal class ChatTest : ChatFixtures() {
 
             assertThat(messages().size).isEqualTo(1)
             assertThat(messages().first().type).isEqualTo(Text)
-            assertThat(messages().first().senderType).isEqualTo(Inquirer)
+            assertThat(messages().first().authorType).isEqualTo(Inquirer)
             assertThat(messages().first().text).isEqualTo(fixtureMessage)
             assertThat(messages().first().createdAt).isEqualTo(fixtureNow)
             assertThat(messages().first().updatedAt).isNull()
@@ -92,7 +92,7 @@ internal class ChatTest : ChatFixtures() {
             assertThat(messages().last().createdAt).isEqualTo(timeAfter(30))
             assertThat(messages().last().updatedAt).isNull()
             assertThat(messages().last().type).isEqualTo(Text)
-            assertThat(messages().last().senderType).isEqualTo(Inquirer)
+            assertThat(messages().last().authorType).isEqualTo(Inquirer)
             assertThat(messages().last().text).isEqualTo(fixtureNewMessage)
         }
 
@@ -140,7 +140,7 @@ internal class ChatTest : ChatFixtures() {
             assertThat(messages().size).isEqualTo(2)
             assertThat(messages().last().createdAt).isEqualTo(timeAfter(31))
             assertThat(messages().last().type).isEqualTo(Text)
-            assertThat(messages().last().senderType).isEqualTo(Imam)
+            assertThat(messages().last().authorType).isEqualTo(Imam)
             assertThat(messages().last().text).isEqualTo(fixtureNewReply)
             assertThat(messages().last().answeredBy).isEqualTo(fixtureImamId)
         }
@@ -165,7 +165,7 @@ internal class ChatTest : ChatFixtures() {
         val audio = NotBlankString.of("Аудио")
         fixtureClock()
         fixturePublicChat(audio).run {
-            addAudioMessage(Message.Id(2), Imam, fixtureAudio, fixtureImamId)
+            addAudioMessage(Message.Id(2), fixtureAudio, fixtureImamId)
 
             assertThat(messages().last().type).isEqualTo(Audio)
             assertThat(messages().last().text).isEqualTo(audio)
