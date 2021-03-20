@@ -2,8 +2,10 @@ package kz.azan.askimam.chat.domain.model
 
 import io.mockk.verify
 import kz.azan.askimam.chat.domain.event.MessageDeleted
+import kz.azan.askimam.chat.domain.event.MessageUpdated
 import kz.azan.askimam.chat.domain.policy.AddMessagePolicy
 import kz.azan.askimam.chat.domain.policy.DeleteMessagePolicy
+import kz.azan.askimam.chat.domain.policy.UpdateMessagePolicy
 import kz.azan.askimam.common.type.NotBlankString
 import kz.azan.askimam.user.domain.model.User
 import org.assertj.core.api.Assertions.assertThat
@@ -58,6 +60,28 @@ class ChatPolicyTest : ChatFixtures() {
 
         verify(exactly = 0) {
             eventPublisher.publish(MessageDeleted(fixtureMessageId))
+        }
+    }
+
+    @Test
+    internal fun `should not update a message`() {
+        fixtureClockAndThen(10)
+
+        with(fixtureChat()) {
+            val option = updateTextMessage(
+                fixtureMessageId,
+                fixtureAnotherInquirer,
+                fixtureNewMessage,
+                UpdateMessagePolicy.forAll
+            )
+
+            assertThat(option.isDefined).isTrue
+            assertThat(messages().first().text).isEqualTo(fixtureMessage)
+            assertThat(messages().first().updatedAt).isNull()
+        }
+
+        verify(exactly = 0) {
+            eventPublisher.publish(MessageUpdated(fixtureMessageId, fixtureNewMessage, timeAfter(10)))
         }
     }
 }

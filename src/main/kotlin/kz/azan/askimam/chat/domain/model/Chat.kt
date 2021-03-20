@@ -9,6 +9,7 @@ import kz.azan.askimam.chat.domain.model.Message.Type.Audio
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
 import kz.azan.askimam.chat.domain.policy.AddMessagePolicy
 import kz.azan.askimam.chat.domain.policy.DeleteMessagePolicy
+import kz.azan.askimam.chat.domain.policy.UpdateMessagePolicy
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.common.domain.EventPublisher
 import kz.azan.askimam.common.type.NotBlankString
@@ -125,12 +126,13 @@ class Chat(
             eventPublisher.publish(MessageDeleted(id))
         }
 
-    fun updateTextMessage(id: Message.Id, text: NotBlankString, author: User) {
+    fun updateTextMessage(id: Message.Id, user: User, text: NotBlankString, policy: UpdateMessagePolicy) =
         messages.find { it.id == id }?.run {
-            updateText(text)
-            eventPublisher.publish(MessageUpdated(id, text, updatedAt()!!))
-        }
-    }
+            policy.isAllowed(authorId, user).onEmpty {
+                updateText(text)
+                eventPublisher.publish(MessageUpdated(id, text, updatedAt()!!))
+            }
+        } as Option<Declination>
 
     enum class Type { Public, Private }
 }
