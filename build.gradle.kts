@@ -33,6 +33,7 @@ dependencies {
 //    implementation("org.springframework.integration:spring-integration-http")
 //    implementation("org.springframework.integration:spring-integration-jdbc")
 //    implementation("org.springframework.integration:spring-integration-security")
+    implementation("io.vavr:vavr-kotlin:0.10.2")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("mysql:mysql-connector-java")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
