@@ -9,8 +9,6 @@ import kz.azan.askimam.chat.domain.event.MessageDeleted
 import kz.azan.askimam.chat.domain.event.MessageUpdated
 import kz.azan.askimam.chat.domain.model.Chat.Type.Private
 import kz.azan.askimam.chat.domain.model.Chat.Type.Public
-import kz.azan.askimam.chat.domain.model.Message.AuthorType.Imam
-import kz.azan.askimam.chat.domain.model.Message.AuthorType.Inquirer
 import kz.azan.askimam.chat.domain.model.Message.Type.Audio
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
 import kz.azan.askimam.common.type.NotBlankString
@@ -36,7 +34,6 @@ internal class ChatTest : ChatFixtures() {
             assertThat(messages().size).isEqualTo(1)
             assertThat(messages().first().type).isEqualTo(Text)
             assertThat(messages().first().authorId).isEqualTo(fixtureInquirerId)
-            assertThat(messages().first().authorType).isEqualTo(Inquirer)
             assertThat(messages().first().text).isEqualTo(fixtureMessage)
             assertThat(messages().first().createdAt).isEqualTo(fixtureNow)
             assertThat(messages().first().updatedAt).isNull()
@@ -84,7 +81,7 @@ internal class ChatTest : ChatFixtures() {
         fixtureClockAndThen(30)
 
         fixtureChat().run {
-            addTextMessageByInquirer(fixtureMessageId, fixtureNewMessage, fixtureInquirer)
+            addTextMessage(fixtureMessageId, fixtureNewMessage, fixtureInquirer)
 
             assertThat(updatedAt()).isEqualTo(timeAfter(30))
 
@@ -92,7 +89,6 @@ internal class ChatTest : ChatFixtures() {
             assertThat(messages().last().createdAt).isEqualTo(timeAfter(30))
             assertThat(messages().last().updatedAt).isNull()
             assertThat(messages().last().type).isEqualTo(Text)
-            assertThat(messages().last().authorType).isEqualTo(Inquirer)
             assertThat(messages().last().text).isEqualTo(fixtureNewMessage)
         }
 
@@ -121,7 +117,7 @@ internal class ChatTest : ChatFixtures() {
 
         fixtureChat().run {
             viewedByImam()
-            addTextMessageByInquirer(Message.Id(2), fixtureNewMessage, fixtureInquirer)
+            addTextMessage(Message.Id(2), fixtureNewMessage, fixtureInquirer)
 
             assertThat(isViewedByImam()).isFalse
         }
@@ -132,7 +128,7 @@ internal class ChatTest : ChatFixtures() {
         fixtureClockAndThen(31)
 
         fixtureChat(fixtureNewReply).run {
-            addTextMessageByImam(Message.Id(2), fixtureNewReply, fixtureImam)
+            addTextMessage(Message.Id(2), fixtureNewReply, fixtureImam)
 
             assertThat(isVisibleToPublic()).isTrue
             assertThat(isViewedByInquirer()).isFalse
@@ -141,7 +137,6 @@ internal class ChatTest : ChatFixtures() {
             assertThat(messages().size).isEqualTo(2)
             assertThat(messages().last().createdAt).isEqualTo(timeAfter(31))
             assertThat(messages().last().type).isEqualTo(Text)
-            assertThat(messages().last().authorType).isEqualTo(Imam)
             assertThat(messages().last().text).isEqualTo(fixtureNewReply)
             assertThat(messages().last().authorId).isEqualTo(fixtureImamId)
         }
@@ -152,7 +147,7 @@ internal class ChatTest : ChatFixtures() {
         fixtureClockAndThen(31)
 
         fixtureChat(fixtureNewReply, Private).run {
-            addTextMessageByImam(Message.Id(2), fixtureNewReply, fixtureImam)
+            addTextMessage(Message.Id(2), fixtureNewReply, fixtureImam)
 
             assertThat(isVisibleToPublic()).isFalse
         }
@@ -163,7 +158,7 @@ internal class ChatTest : ChatFixtures() {
         fixtureClock()
 
         fixtureChat(fixtureNewReply).run {
-            addTextMessageByImam(Message.Id(2), fixtureNewReply, fixtureImam)
+            addTextMessage(Message.Id(2), fixtureNewReply, fixtureImam)
             assertThat(isViewedByInquirer()).isFalse
 
             viewedByInquirer()
@@ -244,7 +239,7 @@ internal class ChatTest : ChatFixtures() {
         } returns Unit
 
         with(fixtureChat(fixtureNewReply)) {
-            addTextMessageByImam(Message.Id(2), fixtureNewReply, fixtureImam)
+            addTextMessage(Message.Id(2), fixtureNewReply, fixtureImam)
             updateTextMessageByImam(Message.Id(2), NotBlankString.of("Update"), fixtureImamId)
 
             assertThat(messages().last().text).isEqualTo(NotBlankString.of("Update"))

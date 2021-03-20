@@ -4,14 +4,13 @@ import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.event.MessageAdded
 import kz.azan.askimam.chat.domain.event.MessageDeleted
 import kz.azan.askimam.chat.domain.event.MessageUpdated
-import kz.azan.askimam.chat.domain.model.Message.AuthorType
-import kz.azan.askimam.chat.domain.model.Message.AuthorType.Imam
-import kz.azan.askimam.chat.domain.model.Message.AuthorType.Inquirer
 import kz.azan.askimam.chat.domain.model.Message.Type.Audio
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
 import kz.azan.askimam.common.domain.EventPublisher
 import kz.azan.askimam.common.type.NotBlankString
 import kz.azan.askimam.user.domain.model.User
+import kz.azan.askimam.user.domain.model.User.Type.Imam
+import kz.azan.askimam.user.domain.model.User.Type.Inquirer
 import java.time.Clock
 import java.time.ZonedDateTime
 
@@ -38,7 +37,6 @@ class Chat(
                 messageId,
                 Text,
                 askedBy,
-                Inquirer,
                 messageText,
             )
         )
@@ -69,7 +67,6 @@ class Chat(
             it.updatedAt(),
             it.type,
             it.authorId,
-            it.authorType,
             it.text(),
             it.audio,
         )
@@ -79,23 +76,18 @@ class Chat(
         subject = newSubject
     }
 
-    fun addTextMessageByInquirer(id: Message.Id, text: NotBlankString, author: User) {
-        addMessage(id, Text, author.id, Inquirer, text)
-    }
-
-    fun addTextMessageByImam(id: Message.Id, text: NotBlankString, author: User) {
-        addMessage(id, Text, author.id, Imam, text)
+    fun addTextMessage(id: Message.Id, text: NotBlankString, author: User) {
+        addMessage(id, Text, author, text)
     }
 
     fun addAudioMessage(id: Message.Id, audio: NotBlankString, author: User) {
-        addMessage(id, Audio, author.id, Imam, NotBlankString.of("Аудио"), audio)
+        addMessage(id, Audio, author, NotBlankString.of("Аудио"), audio)
     }
 
     private fun addMessage(
         id: Message.Id,
         messageType: Message.Type,
-        authorId: User.Id,
-        authorType: AuthorType,
+        author: User,
         text: NotBlankString,
         audio: NotBlankString? = null,
     ) {
@@ -104,14 +96,13 @@ class Chat(
                 clock,
                 id,
                 messageType,
-                authorId,
-                authorType,
+                author.id,
                 text,
                 audio,
             )
         )
 
-        when (authorType) {
+        when (author.type) {
             Inquirer -> isViewedByImam = false
             Imam -> {
                 if (type == Type.Public) isVisibleToPublic = true
@@ -128,14 +119,14 @@ class Chat(
     }
 
     fun updateTextMessageByInquirer(id: Message.Id, text: NotBlankString) {
-        messages.find { it.id == id && it.authorType == Inquirer }?.run {
+        messages.find { it.id == id }?.run {
             updateText(text)
             eventPublisher.publish(MessageUpdated(id, text, updatedAt()!!))
         }
     }
 
     fun updateTextMessageByImam(id: Message.Id, text: NotBlankString, imamId: User.Id) {
-        messages.find { it.id == id && it.authorType == Imam && it.authorId == imamId }?.run {
+        messages.find { it.id == id && it.authorId == imamId }?.run {
             updateText(text)
             eventPublisher.publish(MessageUpdated(id, text, updatedAt()!!))
         }
@@ -149,7 +140,6 @@ private class MessageEntity(
     val id: Message.Id,
     val type: Message.Type,
     val authorId: User.Id,
-    val authorType: AuthorType,
     private var text: NotBlankString,
     val audio: NotBlankString? = null,
 ) {

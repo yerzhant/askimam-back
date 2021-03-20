@@ -10,12 +10,10 @@ data class Message(
     val updatedAt: ZonedDateTime?,
     val type: Type,
     val authorId: User.Id,
-    val authorType: AuthorType,
     val text: NotBlankString,
     val audio: NotBlankString?,
 ) {
     data class Id(val value: Long)
 
     enum class Type { Text, Audio }
-    enum class AuthorType { Imam, Inquirer }
 }
