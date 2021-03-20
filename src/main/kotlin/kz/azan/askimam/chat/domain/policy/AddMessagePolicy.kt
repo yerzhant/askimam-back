@@ -5,10 +5,10 @@ import kz.azan.askimam.user.domain.model.User
 import kz.azan.askimam.user.domain.model.User.Type.Imam
 
 fun interface AddMessagePolicy {
-    fun isAllowedToAddMessage(user: User, chat: Chat): Boolean
+    fun isAllowed(chat: Chat, user: User): Boolean
 
     companion object {
-        val imam = AddMessagePolicy { user, _ -> user.type == Imam }
-        val inquirer = AddMessagePolicy { user, chat -> user.id == chat.askedBy }
+        val forImam = AddMessagePolicy { _, user -> user.type == Imam }
+        val forInquirer = AddMessagePolicy { chat, user -> user.id == chat.askedBy }
     }
 }
