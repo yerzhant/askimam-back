@@ -120,11 +120,13 @@ class Chat(
             eventPublisher.publish(MessageAdded(subject, text))
         }
 
-    fun deleteMessage(id: Message.Id, policy: DeleteMessagePolicy, user: User): Option<Declination> =
-        policy.isAllowed(this, user).onEmpty {
-            messages.removeIf { it.id == id }
-            eventPublisher.publish(MessageDeleted(id))
-        }
+    fun deleteMessage(id: Message.Id, policy: DeleteMessagePolicy, user: User) =
+        messages.find { it.id == id }?.run {
+            policy.isAllowed(authorId, user).onEmpty {
+                messages.remove(this)
+                eventPublisher.publish(MessageDeleted(id))
+            }
+        } as Option<Declination>
 
     fun updateTextMessage(id: Message.Id, user: User, text: NotBlankString, policy: UpdateMessagePolicy) =
         messages.find { it.id == id }?.run {

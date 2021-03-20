@@ -45,14 +45,7 @@ class ChatPolicyTest : ChatFixtures() {
         fixtureClock()
 
         with(fixtureChat()) {
-            val option = deleteMessage(
-                fixtureMessageId,
-                DeleteMessagePolicy.forInquirer,
-                User(
-                    User.Id(10),
-                    User.Type.Inquirer
-                )
-            )
+            val option = deleteMessage(fixtureMessageId, DeleteMessagePolicy.forInquirer, fixtureAnotherInquirer)
 
             assertThat(option.isDefined).isTrue
             assertThat(messages().size).isEqualTo(1)
