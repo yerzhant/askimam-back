@@ -9,10 +9,10 @@ data class Message(
     val createdAt: ZonedDateTime,
     val updatedAt: ZonedDateTime?,
     val type: Type,
+    val authorId: User.Id,
     val authorType: AuthorType,
     val text: NotBlankString,
     val audio: NotBlankString?,
-    val answeredBy: User.Id?,
 ) {
     data class Id(val value: Long)
 

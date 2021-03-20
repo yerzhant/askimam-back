@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.event.MessageAdded
+import kz.azan.askimam.chat.domain.model.Chat.Type.Public
 import kz.azan.askimam.common.domain.EventPublisher
 import kz.azan.askimam.common.type.NotBlankString
 import kz.azan.askimam.user.domain.model.User
@@ -31,7 +32,7 @@ open class ChatFixtures {
         )
     }
 
-    fun fixturePublicChat(newMessage: NotBlankString = fixtureNewMessage): Chat {
+    fun fixtureChat(newMessage: NotBlankString = fixtureNewMessage, type: Chat.Type = Public): Chat {
         val subject = fixtureSubject
         val firstMessage = fixtureMessage
 
@@ -41,7 +42,7 @@ open class ChatFixtures {
         return Chat(
             clock,
             eventPublisher,
-            Chat.Type.Public,
+            type,
             fixtureInquirerId,
             fixtureMessageId,
             firstMessage,
@@ -49,18 +50,18 @@ open class ChatFixtures {
         )
     }
 
-    val fixtureImamId = User.Id(1)
+    val fixtureImam = User(User.Id(1), User.Type.Imam)
+    val fixtureImamId = fixtureImam.id
 
-    val fixtureInquirerId = User.Id(2)
+    val fixtureInquirer = User(User.Id(2), User.Type.Inquirer)
+    val fixtureInquirerId = fixtureInquirer.id
 
     val fixtureSubject = NotBlankString.of("Subject")
 
     val fixtureMessageId = Message.Id(1)
 
     val fixtureMessage = NotBlankString.of("A message")
-
     val fixtureNewMessage = NotBlankString.of("A new message")
-
     val fixtureNewReply = NotBlankString.of("A new reply")
 
     val fixtureAudio = NotBlankString.of("audio.mp3")

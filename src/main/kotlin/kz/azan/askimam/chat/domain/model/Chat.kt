@@ -26,6 +26,7 @@ class Chat(
 ) {
     private val createdAt = ZonedDateTime.now(clock)!!
     private var updatedAt = ZonedDateTime.now(clock)!!
+    private var isVisibleToPublic = false
     private var isViewedByImam = false
     private var isViewedByInquirer = true
     private val messages = mutableListOf<MessageEntity>()
@@ -36,6 +37,7 @@ class Chat(
                 clock,
                 messageId,
                 Text,
+                askedBy,
                 Inquirer,
                 messageText,
             )
@@ -46,7 +48,7 @@ class Chat(
     fun createdAt() = createdAt
     fun updatedAt() = updatedAt
 
-    fun isAnswered() = messages.any { it.answeredBy() != null }
+    fun isVisibleToPublic() = isVisibleToPublic
     fun isViewedByImam() = isViewedByImam
     fun isViewedByInquirer() = isViewedByInquirer
 
@@ -66,10 +68,10 @@ class Chat(
             it.createdAt,
             it.updatedAt(),
             it.type,
+            it.authorId,
             it.authorType,
             it.text(),
             it.audio,
-            it.answeredBy(),
         )
     }.toList()
 
@@ -77,41 +79,44 @@ class Chat(
         subject = newSubject
     }
 
-    fun addTextMessageByInquirer(id: Message.Id, text: NotBlankString) {
-        addMessage(id, Text, Inquirer, text)
+    fun addTextMessageByInquirer(id: Message.Id, text: NotBlankString, author: User) {
+        addMessage(id, Text, author.id, Inquirer, text)
     }
 
-    fun addTextMessageByImam(id: Message.Id, text: NotBlankString, answeredBy: User.Id) {
-        addMessage(id, Text, Imam, text, answeredBy = answeredBy)
+    fun addTextMessageByImam(id: Message.Id, text: NotBlankString, author: User) {
+        addMessage(id, Text, author.id, Imam, text)
     }
 
-    fun addAudioMessage(id: Message.Id, audio: NotBlankString, answeredBy: User.Id) {
-        addMessage(id, Audio, Imam, NotBlankString.of("Аудио"), audio, answeredBy)
+    fun addAudioMessage(id: Message.Id, audio: NotBlankString, author: User) {
+        addMessage(id, Audio, author.id, Imam, NotBlankString.of("Аудио"), audio)
     }
 
     private fun addMessage(
         id: Message.Id,
-        type: Message.Type,
+        messageType: Message.Type,
+        authorId: User.Id,
         authorType: AuthorType,
         text: NotBlankString,
         audio: NotBlankString? = null,
-        answeredBy: User.Id? = null,
     ) {
         messages.add(
             MessageEntity(
                 clock,
                 id,
-                type,
+                messageType,
+                authorId,
                 authorType,
                 text,
                 audio,
-                answeredBy,
             )
         )
 
         when (authorType) {
             Inquirer -> isViewedByImam = false
-            Imam -> isViewedByInquirer = false
+            Imam -> {
+                if (type == Type.Public) isVisibleToPublic = true
+                isViewedByInquirer = false
+            }
         }
 
         eventPublisher.publish(MessageAdded(subject, text))
@@ -130,7 +135,7 @@ class Chat(
     }
 
     fun updateTextMessageByImam(id: Message.Id, text: NotBlankString, imamId: User.Id) {
-        messages.find { it.id == id && it.authorType == Imam && it.answeredBy() == imamId }?.run {
+        messages.find { it.id == id && it.authorType == Imam && it.authorId == imamId }?.run {
             updateText(text)
             eventPublisher.publish(MessageUpdated(id, text, updatedAt()!!))
         }
@@ -143,10 +148,10 @@ private class MessageEntity(
     private val clock: Clock,
     val id: Message.Id,
     val type: Message.Type,
+    val authorId: User.Id,
     val authorType: AuthorType,
     private var text: NotBlankString,
     val audio: NotBlankString? = null,
-    private var answeredBy: User.Id? = null,
 ) {
     val createdAt = ZonedDateTime.now(clock)!!
     private var updatedAt: ZonedDateTime? = null
@@ -154,7 +159,6 @@ private class MessageEntity(
     fun updatedAt() = updatedAt
 
     fun text() = text
-    fun answeredBy() = answeredBy
 
     fun updateText(text: NotBlankString) {
         this.text = text

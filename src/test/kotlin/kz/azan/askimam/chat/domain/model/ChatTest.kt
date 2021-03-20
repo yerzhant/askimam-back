@@ -23,11 +23,11 @@ internal class ChatTest : ChatFixtures() {
     internal fun `should create a chat`() {
         fixtureClock()
 
-        with(fixturePublicChat()) {
+        with(fixtureChat()) {
             assertThat(type).isEqualTo(Public)
             assertThat(createdAt()).isEqualTo(fixtureNow)
             assertThat(updatedAt()).isEqualTo(fixtureNow)
-            assertThat(isAnswered()).isFalse
+            assertThat(isVisibleToPublic()).isFalse
             assertThat(isViewedByImam()).isFalse
             assertThat(isViewedByInquirer()).isTrue
             assertThat(askedBy).isEqualTo(fixtureInquirerId)
@@ -35,11 +35,11 @@ internal class ChatTest : ChatFixtures() {
 
             assertThat(messages().size).isEqualTo(1)
             assertThat(messages().first().type).isEqualTo(Text)
+            assertThat(messages().first().authorId).isEqualTo(fixtureInquirerId)
             assertThat(messages().first().authorType).isEqualTo(Inquirer)
             assertThat(messages().first().text).isEqualTo(fixtureMessage)
             assertThat(messages().first().createdAt).isEqualTo(fixtureNow)
             assertThat(messages().first().updatedAt).isNull()
-            assertThat(messages().first().answeredBy).isNull()
         }
 
         verify {
@@ -72,7 +72,7 @@ internal class ChatTest : ChatFixtures() {
     internal fun `should rename a subject`() {
         fixtureClock()
 
-        fixturePublicChat().run {
+        fixtureChat().run {
             renameSubject(NotBlankString.of("New subject"))
 
             assertThat(subject()).isEqualTo(NotBlankString.of("New subject"))
@@ -83,8 +83,8 @@ internal class ChatTest : ChatFixtures() {
     internal fun `should add a new message`() {
         fixtureClockAndThen(30)
 
-        fixturePublicChat().run {
-            addTextMessageByInquirer(fixtureMessageId, fixtureNewMessage)
+        fixtureChat().run {
+            addTextMessageByInquirer(fixtureMessageId, fixtureNewMessage, fixtureInquirer)
 
             assertThat(updatedAt()).isEqualTo(timeAfter(30))
 
@@ -106,7 +106,7 @@ internal class ChatTest : ChatFixtures() {
     internal fun `should be viewed by an imam`() {
         fixtureClock()
 
-        fixturePublicChat().run {
+        fixtureChat().run {
             assertThat(isViewedByImam()).isFalse
 
             viewedByImam()
@@ -119,9 +119,9 @@ internal class ChatTest : ChatFixtures() {
     internal fun `should reset Is viewed by an imam flag after a new message`() {
         fixtureClock()
 
-        fixturePublicChat().run {
+        fixtureChat().run {
             viewedByImam()
-            addTextMessageByInquirer(Message.Id(2), fixtureNewMessage)
+            addTextMessageByInquirer(Message.Id(2), fixtureNewMessage, fixtureInquirer)
 
             assertThat(isViewedByImam()).isFalse
         }
@@ -131,9 +131,10 @@ internal class ChatTest : ChatFixtures() {
     internal fun `should add a new reply by an imam`() {
         fixtureClockAndThen(31)
 
-        fixturePublicChat(fixtureNewReply).run {
-            addTextMessageByImam(Message.Id(2), fixtureNewReply, fixtureImamId)
+        fixtureChat(fixtureNewReply).run {
+            addTextMessageByImam(Message.Id(2), fixtureNewReply, fixtureImam)
 
+            assertThat(isVisibleToPublic()).isTrue
             assertThat(isViewedByInquirer()).isFalse
             assertThat(updatedAt()).isEqualTo(timeAfter(31))
 
@@ -142,7 +143,18 @@ internal class ChatTest : ChatFixtures() {
             assertThat(messages().last().type).isEqualTo(Text)
             assertThat(messages().last().authorType).isEqualTo(Imam)
             assertThat(messages().last().text).isEqualTo(fixtureNewReply)
-            assertThat(messages().last().answeredBy).isEqualTo(fixtureImamId)
+            assertThat(messages().last().authorId).isEqualTo(fixtureImamId)
+        }
+    }
+
+    @Test
+    internal fun `should not make a message visible by public if it's private`() {
+        fixtureClockAndThen(31)
+
+        fixtureChat(fixtureNewReply, Private).run {
+            addTextMessageByImam(Message.Id(2), fixtureNewReply, fixtureImam)
+
+            assertThat(isVisibleToPublic()).isFalse
         }
     }
 
@@ -150,8 +162,8 @@ internal class ChatTest : ChatFixtures() {
     internal fun `should set Is viewed by an inquirer flag`() {
         fixtureClock()
 
-        fixturePublicChat(fixtureNewReply).run {
-            addTextMessageByImam(Message.Id(2), fixtureNewReply, fixtureImamId)
+        fixtureChat(fixtureNewReply).run {
+            addTextMessageByImam(Message.Id(2), fixtureNewReply, fixtureImam)
             assertThat(isViewedByInquirer()).isFalse
 
             viewedByInquirer()
@@ -164,8 +176,8 @@ internal class ChatTest : ChatFixtures() {
     internal fun `should add a new audio`() {
         val audio = NotBlankString.of("Аудио")
         fixtureClock()
-        fixturePublicChat(audio).run {
-            addAudioMessage(Message.Id(2), fixtureAudio, fixtureImamId)
+        fixtureChat(audio).run {
+            addAudioMessage(Message.Id(2), fixtureAudio, fixtureImam)
 
             assertThat(messages().last().type).isEqualTo(Audio)
             assertThat(messages().last().text).isEqualTo(audio)
@@ -182,7 +194,7 @@ internal class ChatTest : ChatFixtures() {
         fixtureClock()
         every { eventPublisher.publish(MessageDeleted(fixtureMessageId)) } returns Unit
 
-        with(fixturePublicChat()) {
+        with(fixtureChat()) {
             deleteMessage(fixtureMessageId)
 
             assertThat(messages().size).isZero
@@ -206,7 +218,7 @@ internal class ChatTest : ChatFixtures() {
             )
         } returns Unit
 
-        with(fixturePublicChat()) {
+        with(fixtureChat()) {
             updateTextMessageByInquirer(fixtureMessageId, fixtureNewMessage)
 
             assertThat(messages().first().text).isEqualTo(fixtureNewMessage)
@@ -231,8 +243,8 @@ internal class ChatTest : ChatFixtures() {
             )
         } returns Unit
 
-        with(fixturePublicChat(fixtureNewReply)) {
-            addTextMessageByImam(Message.Id(2), fixtureNewReply, fixtureImamId)
+        with(fixtureChat(fixtureNewReply)) {
+            addTextMessageByImam(Message.Id(2), fixtureNewReply, fixtureImam)
             updateTextMessageByImam(Message.Id(2), NotBlankString.of("Update"), fixtureImamId)
 
             assertThat(messages().last().text).isEqualTo(NotBlankString.of("Update"))
