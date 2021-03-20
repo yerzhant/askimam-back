@@ -4,8 +4,9 @@ import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.event.MessageAdded
 import kz.azan.askimam.chat.domain.event.MessageDeleted
 import kz.azan.askimam.chat.domain.event.MessageUpdated
-import kz.azan.askimam.chat.domain.model.Message.Sender.Imam
-import kz.azan.askimam.chat.domain.model.Message.Sender.Inquirer
+import kz.azan.askimam.chat.domain.model.Message.SenderType
+import kz.azan.askimam.chat.domain.model.Message.SenderType.Imam
+import kz.azan.askimam.chat.domain.model.Message.SenderType.Inquirer
 import kz.azan.askimam.chat.domain.model.Message.Type.Audio
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
 import kz.azan.askimam.common.domain.EventPublisher
@@ -65,7 +66,7 @@ class Chat(
             it.createdAt,
             it.updatedAt(),
             it.type,
-            it.sender,
+            it.senderType,
             it.text(),
             it.audio,
             it.answeredBy(),
@@ -84,14 +85,14 @@ class Chat(
         addMessage(id, Text, Imam, text, answeredBy = answeredBy)
     }
 
-    fun addAudioMessage(id: Message.Id, sender: Message.Sender, audio: NotBlankString, answeredBy: User.Id) {
-        addMessage(id, Audio, sender, NotBlankString.of("Аудио"), audio, answeredBy)
+    fun addAudioMessage(id: Message.Id, senderType: SenderType, audio: NotBlankString, answeredBy: User.Id) {
+        addMessage(id, Audio, senderType, NotBlankString.of("Аудио"), audio, answeredBy)
     }
 
     private fun addMessage(
         id: Message.Id,
         type: Message.Type,
-        sender: Message.Sender,
+        senderType: SenderType,
         text: NotBlankString,
         audio: NotBlankString? = null,
         answeredBy: User.Id? = null,
@@ -101,14 +102,14 @@ class Chat(
                 clock,
                 id,
                 type,
-                sender,
+                senderType,
                 text,
                 audio,
                 answeredBy,
             )
         )
 
-        when (sender) {
+        when (senderType) {
             Inquirer -> isViewedByImam = false
             Imam -> isViewedByInquirer = false
         }
@@ -122,14 +123,14 @@ class Chat(
     }
 
     fun updateTextMessageByInquirer(id: Message.Id, text: NotBlankString) {
-        messages.find { it.id == id && it.sender == Inquirer }?.run {
+        messages.find { it.id == id && it.senderType == Inquirer }?.run {
             updateText(text)
             eventPublisher.publish(MessageUpdated(id, text, updatedAt()!!))
         }
     }
 
     fun updateTextMessageByImam(id: Message.Id, text: NotBlankString, imamId: User.Id) {
-        messages.find { it.id == id && it.sender == Imam && it.answeredBy() == imamId }?.run {
+        messages.find { it.id == id && it.senderType == Imam && it.answeredBy() == imamId }?.run {
             updateText(text)
             eventPublisher.publish(MessageUpdated(id, text, updatedAt()!!))
         }
@@ -142,7 +143,7 @@ private class MessageEntity(
     private val clock: Clock,
     val id: Message.Id,
     val type: Message.Type,
-    val sender: Message.Sender,
+    val senderType: SenderType,
     private var text: NotBlankString,
     val audio: NotBlankString? = null,
     private var answeredBy: User.Id? = null,
