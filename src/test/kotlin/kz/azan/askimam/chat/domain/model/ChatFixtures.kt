@@ -80,6 +80,34 @@ open class ChatFixtures {
         )
     }
 
+    fun fixtureSavedMessage(): Message {
+        val now = ZonedDateTime.now(clock)
+
+        return Message(
+            fixtureMessageId,
+            Message.Type.Text,
+            now,
+            now,
+            fixtureInquirerId,
+            fixtureMessage,
+            null,
+        )
+    }
+
+    fun fixtureSavedAudioMessage(): Message {
+        val now = ZonedDateTime.now(clock)
+
+        return Message(
+            fixtureMessageId,
+            Message.Type.Text,
+            now,
+            now,
+            fixtureInquirerId,
+            NotBlankString.of("Аудио"),
+            fixtureAudio,
+        )
+    }
+
     val fixtureImam = User(User.Id(1), User.Type.Imam)
     val fixtureImamId = fixtureImam.id
 
@@ -91,7 +119,8 @@ open class ChatFixtures {
 
     val fixtureChatId = Chat.Id(1)
 
-    val fixtureSubject = NotBlankString.of("Subject")
+    val fixtureSubjectText = NotBlankString.of("Subject")
+    val fixtureSubject = Subject(fixtureSubjectText)
 
     val fixtureMessageId = Message.Id(1)
 
