@@ -14,13 +14,12 @@ import org.junit.jupiter.api.Test
 
 class ChatPolicyTest : ChatFixtures() {
 
-
     @Test
-    internal fun `should not rename a subject by not an author`() {
+    internal fun `should not update a subject by not an author`() {
         fixtureClock()
 
         fixtureChat().run {
-            val option = renameSubject(
+            val option = updateSubject(
                 NotBlankString.of("New subject"),
                 UpdateChatPolicy.forInquirer,
                 fixtureAnotherInquirer
@@ -32,11 +31,11 @@ class ChatPolicyTest : ChatFixtures() {
     }
 
     @Test
-    internal fun `should not rename a subject by not an imam`() {
+    internal fun `should not update a subject by not an imam`() {
         fixtureClock()
 
         fixtureChat().run {
-            val option = renameSubject(NotBlankString.of("New subject"), UpdateChatPolicy.forImam, fixtureInquirer)
+            val option = updateSubject(NotBlankString.of("New subject"), UpdateChatPolicy.forImam, fixtureInquirer)
 
             assertThat(option.isDefined).isTrue
             assertThat(subject()).isEqualTo(fixtureSubject)

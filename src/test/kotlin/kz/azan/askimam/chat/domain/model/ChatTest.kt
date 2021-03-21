@@ -71,11 +71,11 @@ internal class ChatTest : ChatFixtures() {
     }
 
     @Test
-    internal fun `should rename a subject by an author`() {
+    internal fun `should update a subject by an author`() {
         fixtureClock()
 
         fixtureChat().run {
-            val option = renameSubject(NotBlankString.of("New subject"), UpdateChatPolicy.forInquirer, fixtureInquirer)
+            val option = updateSubject(NotBlankString.of("New subject"), UpdateChatPolicy.forInquirer, fixtureInquirer)
 
             assertThat(option.isEmpty).isTrue
             assertThat(subject()).isEqualTo(NotBlankString.of("New subject"))
@@ -83,11 +83,11 @@ internal class ChatTest : ChatFixtures() {
     }
 
     @Test
-    internal fun `should rename a subject by an imam`() {
+    internal fun `should update a subject by an imam`() {
         fixtureClock()
 
         fixtureChat().run {
-            val option = renameSubject(NotBlankString.of("New subject"), UpdateChatPolicy.forImam, fixtureImam)
+            val option = updateSubject(NotBlankString.of("New subject"), UpdateChatPolicy.forImam, fixtureImam)
 
             assertThat(option.isEmpty).isTrue
             assertThat(subject()).isEqualTo(NotBlankString.of("New subject"))

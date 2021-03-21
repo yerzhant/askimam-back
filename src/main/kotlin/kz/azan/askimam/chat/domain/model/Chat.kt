@@ -80,7 +80,7 @@ class Chat private constructor(
         )
     }.toList()
 
-    fun renameSubject(newSubject: NotBlankString, policy: UpdateChatPolicy, user: User): Option<Declination> =
+    fun updateSubject(newSubject: NotBlankString, policy: UpdateChatPolicy, user: User): Option<Declination> =
         policy.isAllowed(this, user).onEmpty { subject = newSubject }
 
     fun addTextMessage(
