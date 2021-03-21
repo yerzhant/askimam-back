@@ -319,7 +319,7 @@ internal class ChatTest : ChatFixtures() {
         fixtureClock()
         val now = ZonedDateTime.now(clock)
         val messages =
-            mutableListOf(
+            listOf(
                 Message(
                     fixtureMessageId,
                     Text,
