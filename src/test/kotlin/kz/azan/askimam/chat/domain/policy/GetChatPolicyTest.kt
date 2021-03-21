@@ -4,6 +4,7 @@ import kz.azan.askimam.chat.domain.model.Chat.Type.Private
 import kz.azan.askimam.chat.domain.model.ChatFixtures
 import kz.azan.askimam.chat.domain.policy.GetChatPolicy.Companion.forImam
 import kz.azan.askimam.chat.domain.policy.GetChatPolicy.Companion.forInquirer
+import kz.azan.askimam.chat.domain.policy.GetChatPolicy.Companion.getFor
 import kz.azan.askimam.common.domain.Declination
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -12,12 +13,12 @@ internal class GetChatPolicyTest : ChatFixtures() {
 
     @Test
     internal fun `should return imam's policy`() {
-        assertThat(GetChatPolicy.getFor(fixtureImam)).isEqualTo(forImam)
+        assertThat(getFor(fixtureImam)).isEqualTo(forImam)
     }
 
     @Test
     internal fun `should return inquirer's policy`() {
-        assertThat(GetChatPolicy.getFor(fixtureInquirer)).isEqualTo(forInquirer)
+        assertThat(getFor(fixtureInquirer)).isEqualTo(forInquirer)
     }
 
     @Test

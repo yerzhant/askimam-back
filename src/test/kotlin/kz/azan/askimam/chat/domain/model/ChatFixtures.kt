@@ -89,6 +89,8 @@ open class ChatFixtures {
     val fixtureAnotherInquirer = User(User.Id(20), User.Type.Inquirer)
     val fixtureAnotherImam = User(User.Id(30), User.Type.Imam)
 
+    val fixtureChatId = Chat.Id(1)
+
     val fixtureSubject = NotBlankString.of("Subject")
 
     val fixtureMessageId = Message.Id(1)

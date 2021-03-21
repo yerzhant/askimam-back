@@ -14,6 +14,7 @@ class GetChat(
     operator fun invoke(id: Chat.Id): Either<Declination, Chat> {
         val currentUser = getCurrentUser()
         val policy = GetChatPolicy.getFor(currentUser)
+
         return chatRepository.findById(id).flatMap { policy.isAllowed(it, currentUser) }
     }
 }

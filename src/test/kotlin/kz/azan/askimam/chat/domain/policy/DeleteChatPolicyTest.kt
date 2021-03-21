@@ -4,11 +4,22 @@ import io.vavr.kotlin.some
 import kz.azan.askimam.chat.domain.model.ChatFixtures
 import kz.azan.askimam.chat.domain.policy.DeleteChatPolicy.Companion.forImam
 import kz.azan.askimam.chat.domain.policy.DeleteChatPolicy.Companion.forInquirer
+import kz.azan.askimam.chat.domain.policy.DeleteChatPolicy.Companion.getFor
 import kz.azan.askimam.common.domain.Declination
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 internal class DeleteChatPolicyTest : ChatFixtures() {
+
+    @Test
+    internal fun `should return imam's policy`() {
+        assertThat(getFor(fixtureImam)).isEqualTo(forImam)
+    }
+
+    @Test
+    internal fun `should return inquirer's policy`() {
+        assertThat(getFor(fixtureInquirer)).isEqualTo(forInquirer)
+    }
 
     @Test
     internal fun `should allow to delete a chat by any imam`() {
