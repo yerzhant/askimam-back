@@ -16,7 +16,7 @@ fun interface AddMessagePolicy {
             if (user.type == Imam) {
                 none()
             } else {
-                some(Declination("This operation is only allowed to imams"))
+                some(Declination.withReason("This operation is only allowed to imams"))
             }
         }
 
@@ -24,7 +24,7 @@ fun interface AddMessagePolicy {
             if (user.id == chat.askedBy) {
                 none()
             } else {
-                some(Declination("You're not allowed to add a message to someone else's chat"))
+                some(Declination.withReason("You're not allowed to add a message to someone else's chat"))
             }
         }
     }

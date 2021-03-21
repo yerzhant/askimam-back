@@ -28,7 +28,7 @@ class AddMessagePolicyTest : ChatFixtures() {
                 fixtureChat(),
                 User(fixtureImamId, Inquirer)
             )
-        ).isEqualTo(some(Declination("This operation is only allowed to imams")))
+        ).isEqualTo(some(Declination.withReason("This operation is only allowed to imams")))
     }
 
     @Test
@@ -45,6 +45,6 @@ class AddMessagePolicyTest : ChatFixtures() {
                 fixtureChat(),
                 User(Id(3), Inquirer)
             )
-        ).isEqualTo(some(Declination("You're not allowed to add a message to someone else's chat")))
+        ).isEqualTo(some(Declination.withReason("You're not allowed to add a message to someone else's chat")))
     }
 }

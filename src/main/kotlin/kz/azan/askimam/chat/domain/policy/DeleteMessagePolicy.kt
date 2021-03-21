@@ -14,7 +14,7 @@ fun interface DeleteMessagePolicy {
             if (user.type == User.Type.Imam) {
                 none()
             } else {
-                some(Declination("This operation is only allowed to imams"))
+                some(Declination.withReason("This operation is only allowed to imams"))
             }
         }
 
@@ -22,7 +22,7 @@ fun interface DeleteMessagePolicy {
             if (user.id == authorId) {
                 none()
             } else {
-                some(Declination("You're not allowed to delete someone else's message"))
+                some(Declination.withReason("You're not allowed to delete someone else's message"))
             }
         }
     }

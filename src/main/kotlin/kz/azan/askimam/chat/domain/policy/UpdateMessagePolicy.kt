@@ -14,7 +14,7 @@ fun interface UpdateMessagePolicy {
             if (authorId == user.id)
                 none()
             else
-                some(Declination("You're not allowed to edit someone else's message"))
+                some(Declination.withReason("You're not allowed to edit someone else's message"))
         }
     }
 }

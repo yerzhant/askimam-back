@@ -20,7 +20,7 @@ class DeleteMessagePolicyTest : ChatFixtures() {
     internal fun `should not allow to non imam to delete a message`() {
         assertThat(
             forImam.isAllowed(fixtureInquirerId, fixtureInquirer)
-        ).isEqualTo(some(Declination("This operation is only allowed to imams")))
+        ).isEqualTo(some(Declination.withReason("This operation is only allowed to imams")))
     }
 
     @Test
@@ -32,6 +32,6 @@ class DeleteMessagePolicyTest : ChatFixtures() {
     internal fun `should not allow an inquirer to delete someone else's message`() {
         assertThat(
             forInquirer.isAllowed(fixtureInquirerId, fixtureAnotherInquirer)
-        ).isEqualTo(some(Declination("You're not allowed to delete someone else's message")))
+        ).isEqualTo(some(Declination.withReason("You're not allowed to delete someone else's message")))
     }
 }

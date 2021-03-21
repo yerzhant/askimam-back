@@ -17,6 +17,6 @@ internal class UpdateMessagePolicyTest : ChatFixtures() {
     @Test
     internal fun `should not allow a user to update someone else's message`() {
         assertThat(forAll.isAllowed(fixtureInquirerId, fixtureAnotherInquirer))
-            .isEqualTo(some(Declination("You're not allowed to edit someone else's message")))
+            .isEqualTo(some(Declination.withReason("You're not allowed to edit someone else's message")))
     }
 }
