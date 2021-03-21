@@ -20,23 +20,26 @@ import kz.azan.askimam.user.domain.model.User.Type.Inquirer
 import java.time.Clock
 import java.time.ZonedDateTime
 
-class Chat(
+class Chat private constructor(
     private val clock: Clock,
     private val eventPublisher: EventPublisher,
     val type: Type,
     val askedBy: User.Id,
-    messageId: Message.Id,
-    messageText: NotBlankString,
     private var subject: NotBlankString? = null,
 ) {
-    private val createdAt = ZonedDateTime.now(clock)!!
-    private var updatedAt = ZonedDateTime.now(clock)!!
+    private lateinit var createdAt: ZonedDateTime
+    private lateinit var updatedAt: ZonedDateTime
+
     private var isVisibleToPublic = false
     private var isViewedByImam = false
     private var isViewedByInquirer = true
+
     private val messages = mutableListOf<MessageEntity>()
 
-    init {
+    private fun init(messageId: Message.Id, messageText: NotBlankString) {
+        createdAt = ZonedDateTime.now(clock)
+        updatedAt = createdAt
+
         messages.add(
             MessageEntity(
                 clock,
@@ -96,6 +99,8 @@ class Chat(
         audio: NotBlankString? = null,
     ): Option<Declination> =
         policy.isAllowed(this, author).onEmpty {
+            updatedAt = ZonedDateTime.now(clock)
+
             messages.add(
                 MessageEntity(
                     clock,
@@ -133,6 +138,33 @@ class Chat(
                 eventPublisher.publish(MessageUpdated(id, text, updatedAt()!!))
             }
         } as Option<Declination>
+
+    companion object {
+        fun newWithSubject(
+            clock: Clock,
+            eventPublisher: EventPublisher,
+            type: Type,
+            askedBy: User.Id,
+            subject: NotBlankString,
+            messageId: Message.Id,
+            messageText: NotBlankString,
+        ) =
+            Chat(clock, eventPublisher, type, askedBy, subject).apply {
+                init(messageId, messageText)
+            }
+
+        fun new(
+            clock: Clock,
+            eventPublisher: EventPublisher,
+            type: Type,
+            askedBy: User.Id,
+            messageId: Message.Id,
+            messageText: NotBlankString,
+        ) =
+            Chat(clock, eventPublisher, type, askedBy).apply {
+                init(messageId, messageText)
+            }
+    }
 
     enum class Type { Public, Private }
 }

@@ -53,7 +53,7 @@ internal class ChatTest : ChatFixtures() {
         fixtureClock()
         every { eventPublisher.publish(ChatCreated(null, fixtureMessage)) } returns Unit
 
-        Chat(
+        Chat.new(
             clock,
             eventPublisher,
             Private,

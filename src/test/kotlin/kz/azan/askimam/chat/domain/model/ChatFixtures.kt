@@ -39,14 +39,14 @@ open class ChatFixtures {
         every { eventPublisher.publish(ChatCreated(subject, firstMessage)) } returns Unit
         every { eventPublisher.publish(MessageAdded(subject, newMessage)) } returns Unit
 
-        return Chat(
+        return Chat.newWithSubject(
             clock,
             eventPublisher,
             type,
             fixtureInquirerId,
+            subject,
             fixtureMessageId,
             firstMessage,
-            subject,
         )
     }
 
