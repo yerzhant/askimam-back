@@ -55,14 +55,7 @@ internal class GetChatPolicyTest : ChatFixtures() {
     @Test
     internal fun `should return a public chat`() {
         fixtureClock()
-        every {
-            messageRepository.add(
-                fixtureSavedMessage(
-                    text = fixtureNewReply,
-                    userId = fixtureImamId
-                )
-            )
-        } returns none()
+        every { messageRepository.add(fixtureSavedMessage(fixtureMessageId2)) } returns none()
 
         with(fixtureChat(fixtureNewReply)) {
             addTextMessage(AddMessagePolicy.forImam, fixtureNewReply, fixtureImam)

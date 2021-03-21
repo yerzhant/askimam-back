@@ -74,7 +74,7 @@ internal class ChatTest : ChatFixtures() {
             fixtureInquirerId,
             fixtureMessage,
         ).run {
-            assertThat(subject()).isNull()
+            assertThat(get().subject()).isNull()
         }
 
         verify {
@@ -167,9 +167,7 @@ internal class ChatTest : ChatFixtures() {
 
         chat.run {
             assertThat(isViewedByImam()).isFalse
-
-            viewedByImam()
-
+            assertThat(viewedByImam().isEmpty).isTrue
             assertThat(isViewedByImam()).isTrue
         }
 
@@ -241,9 +239,7 @@ internal class ChatTest : ChatFixtures() {
         chat.run {
             addTextMessage(AddMessagePolicy.forImam, fixtureNewReply, fixtureImam)
             assertThat(isViewedByInquirer()).isFalse
-
-            viewedByInquirer()
-
+            assertThat(viewedByInquirer().isEmpty).isTrue
             assertThat(isViewedByInquirer()).isTrue
         }
 

@@ -1,6 +1,9 @@
 package kz.azan.askimam.chat.domain.model
 
+import io.vavr.control.Either
 import io.vavr.control.Option
+import io.vavr.kotlin.left
+import io.vavr.kotlin.right
 import io.vavr.kotlin.some
 import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.event.MessageAdded
@@ -46,11 +49,11 @@ class Chat private constructor(
     private fun init(messageText: NotBlankString) = messageRepository.generateId().fold(
         { some(it) },
         {
-            val message = MessageEntity.newText(clock, it, askedBy, messageText)
-            messages.add(message)
+            chatRepository.create(this).orElse {
+                val message = MessageEntity.newText(clock, it, askedBy, messageText)
 
-            chatRepository.create(this).onEmpty {
                 messageRepository.add(message.toMessage()).onEmpty {
+                    messages.add(message)
                     eventPublisher.publish(ChatCreated(subject, messageText))
                 }
             }
@@ -64,14 +67,16 @@ class Chat private constructor(
     fun isViewedByImam() = isViewedByImam
     fun isViewedByInquirer() = isViewedByInquirer
 
-    fun viewedByImam() {
+    // TODO: add update policy check
+    fun viewedByImam(): Option<Declination> {
         isViewedByImam = true
-        chatRepository.update(this)
+        return chatRepository.update(this)
     }
 
-    fun viewedByInquirer() {
+    // TODO: add update policy check
+    fun viewedByInquirer(): Option<Declination> {
         isViewedByInquirer = true
-        chatRepository.update(this)
+        return chatRepository.update(this)
     }
 
     fun subject() = subject
@@ -123,7 +128,7 @@ class Chat private constructor(
         policy: AddMessagePolicy,
         user: User
     ): Option<Declination> =
-        policy.isAllowed(this, user).onEmpty {
+        policy.isAllowed(this, user).orElse {
             updatedAt = ZonedDateTime.now(clock)
 
             when (user.type) {
@@ -134,31 +139,44 @@ class Chat private constructor(
                 }
             }
 
-            messages.add(messageEntity)
-
-            chatRepository.update(this)
-            messageRepository.add(messageEntity.toMessage())
-
-            eventPublisher.publish(MessageAdded(subject, messageEntity.text()))
+            chatRepository.update(this).orElse {
+                messageRepository.add(messageEntity.toMessage()).onEmpty {
+                    messages.add(messageEntity)
+                    eventPublisher.publish(MessageAdded(subject, messageEntity.text()))
+                }
+            }
         }
 
-    fun deleteMessage(id: Message.Id, policy: DeleteMessagePolicy, user: User) =
-        messages.find { it.id == id }?.run {
-            policy.isAllowed(authorId, user).onEmpty {
-                messages.remove(this)
-                messageRepository.delete(this.toMessage())
-                eventPublisher.publish(MessageDeleted(id))
-            }
-        } as Option<Declination>
+    fun deleteMessage(id: Message.Id, policy: DeleteMessagePolicy, user: User): Option<Declination> {
+        val messageEntity = messages.find { it.id == id } ?: return some(Declination.withReason("Invalid id"))
 
-    fun updateTextMessage(id: Message.Id, user: User, text: NotBlankString, policy: UpdateMessagePolicy) =
-        messages.find { it.id == id }?.run {
-            policy.isAllowed(authorId, user).onEmpty {
-                updateText(text)
-                messageRepository.update(this.toMessage())
-                eventPublisher.publish(MessageUpdated(id, text, this.updatedAt()!!))
+        return messageEntity.run {
+            policy.isAllowed(authorId, user).orElse {
+                messageRepository.delete(this.toMessage()).onEmpty {
+                    messages.remove(this)
+                    eventPublisher.publish(MessageDeleted(id))
+                }
             }
-        } as Option<Declination>
+        }
+    }
+
+    fun updateTextMessage(
+        id: Message.Id,
+        user: User,
+        text: NotBlankString,
+        policy: UpdateMessagePolicy
+    ): Option<Declination> {
+        val messageEntity = messages.find { it.id == id } ?: return some(Declination.withReason("Invalid id"))
+
+        return messageEntity.run {
+            policy.isAllowed(authorId, user).orElse {
+                messageRepository.update(this.toMessage()).onEmpty {
+                    updateText(text)
+                    eventPublisher.publish(MessageUpdated(id, text, this.updatedAt()!!))
+                }
+            }
+        }
+    }
 
     companion object {
         fun newWithSubject(
@@ -171,9 +189,9 @@ class Chat private constructor(
             askedBy: User.Id,
             subject: Subject,
             messageText: NotBlankString,
-        ): Chat {
+        ): Either<Declination, Chat> {
             val now = ZonedDateTime.now(clock)
-            return Chat(
+            val chat = Chat(
                 clock,
                 eventPublisher,
                 chatRepository,
@@ -184,9 +202,12 @@ class Chat private constructor(
                 now,
                 now,
                 subject
-            ).apply {
-                init(messageText)
-            }
+            )
+
+            return chat.init(messageText).fold(
+                { right(chat) },
+                { left(it) }
+            )
         }
 
         fun new(
@@ -198,9 +219,9 @@ class Chat private constructor(
             type: Type,
             askedBy: User.Id,
             messageText: NotBlankString,
-        ): Chat {
+        ): Either<Declination, Chat> {
             val now = ZonedDateTime.now(clock)
-            return Chat(
+            val chat = Chat(
                 clock,
                 eventPublisher,
                 chatRepository,
@@ -210,9 +231,12 @@ class Chat private constructor(
                 askedBy,
                 now,
                 now
-            ).apply {
-                init(messageText)
-            }
+            )
+
+            return chat.init(messageText).fold(
+                { right(chat) },
+                { left(it) }
+            )
         }
 
         fun restore(

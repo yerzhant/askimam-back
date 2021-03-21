@@ -64,7 +64,7 @@ open class ChatFixtures {
             fixtureInquirerId,
             subject,
             firstMessage,
-        )
+        ).get()
     }
 
     fun fixtureSavedChat(type: Chat.Type = Public): Chat {
