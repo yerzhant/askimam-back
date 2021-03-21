@@ -50,6 +50,36 @@ open class ChatFixtures {
         )
     }
 
+    fun fixtureSavedChat(type: Chat.Type = Public): Chat {
+        fixtureClock()
+        val subject = fixtureSubject
+        val now = ZonedDateTime.now(clock)
+
+        return Chat.restore(
+            clock,
+            eventPublisher,
+            type,
+            fixtureInquirerId,
+            now,
+            now,
+            subject,
+            listOf(
+                Message(
+                    fixtureMessageId,
+                    Message.Type.Text,
+                    now,
+                    null,
+                    fixtureInquirerId,
+                    fixtureMessage,
+                    null
+                )
+            ),
+            isVisibleToPublic = type == Public,
+            isViewedByImam = true,
+            isViewedByInquirer = false,
+        )
+    }
+
     val fixtureImam = User(User.Id(1), User.Type.Imam)
     val fixtureImamId = fixtureImam.id
 

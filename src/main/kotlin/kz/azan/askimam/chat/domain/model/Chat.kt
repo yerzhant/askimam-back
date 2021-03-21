@@ -5,6 +5,7 @@ import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.event.MessageAdded
 import kz.azan.askimam.chat.domain.event.MessageDeleted
 import kz.azan.askimam.chat.domain.event.MessageUpdated
+import kz.azan.askimam.chat.domain.model.Chat.Type.Public
 import kz.azan.askimam.chat.domain.model.Message.Type.Audio
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
 import kz.azan.askimam.chat.domain.policy.AddMessagePolicy
@@ -53,7 +54,7 @@ class Chat private constructor(
     fun createdAt() = createdAt
     fun updatedAt() = updatedAt
 
-    fun isVisibleToPublic() = isVisibleToPublic
+    fun isVisibleToPublic() = isVisibleToPublic && type == Public
     fun isViewedByImam() = isViewedByImam
     fun isViewedByInquirer() = isViewedByInquirer
 
@@ -115,7 +116,7 @@ class Chat private constructor(
             when (user.type) {
                 Inquirer -> isViewedByImam = false
                 Imam -> {
-                    if (type == Type.Public) isVisibleToPublic = true
+                    if (type == Public) isVisibleToPublic = true
                     isViewedByInquirer = false
                 }
             }
@@ -196,6 +197,7 @@ class Chat private constructor(
         )
     }
 
+    data class Id(val value: Long)
     enum class Type { Public, Private }
 }
 
