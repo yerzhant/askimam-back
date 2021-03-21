@@ -23,22 +23,26 @@ import java.time.ZonedDateTime
 class Chat private constructor(
     private val clock: Clock,
     private val eventPublisher: EventPublisher,
+
     val type: Type,
     val askedBy: User.Id,
+
     private val createdAt: ZonedDateTime,
     private var updatedAt: ZonedDateTime,
+
     private var subject: NotBlankString? = null,
+
+    private val messages: MutableList<MessageEntity> = mutableListOf(),
+
     private var isVisibleToPublic: Boolean = false,
     private var isViewedByImam: Boolean = false,
     private var isViewedByInquirer: Boolean = true,
-    private val messages: MutableList<MessageEntity> = mutableListOf(),
 ) {
     private fun init(messageId: Message.Id, messageText: NotBlankString) {
         messages.add(
-            MessageEntity(
+            MessageEntity.newText(
                 clock,
                 messageId,
-                Text,
                 askedBy,
                 messageText,
             )
@@ -78,35 +82,37 @@ class Chat private constructor(
     fun renameSubject(newSubject: NotBlankString, policy: UpdateChatPolicy, user: User): Option<Declination> =
         policy.isAllowed(this, user).onEmpty { subject = newSubject }
 
-    fun addTextMessage(policy: AddMessagePolicy, id: Message.Id, text: NotBlankString, author: User) =
-        addMessage(policy, id, Text, author, text)
-
-    fun addAudioMessage(policy: AddMessagePolicy, id: Message.Id, audio: NotBlankString, imam: User) =
-        addMessage(policy, id, Audio, imam, NotBlankString.of("Аудио"), audio)
-
-    private fun addMessage(
+    fun addTextMessage(
         policy: AddMessagePolicy,
         id: Message.Id,
-        messageType: Message.Type,
-        author: User,
         text: NotBlankString,
-        audio: NotBlankString? = null,
+        author: User
+    ): Option<Declination> {
+        val message = MessageEntity.newText(clock, id, author.id, text)
+        return addMessage(message, policy, author)
+    }
+
+    fun addAudioMessage(
+        policy: AddMessagePolicy,
+        id: Message.Id,
+        audio: NotBlankString,
+        imam: User
+    ): Option<Declination> {
+        val message = MessageEntity.newAudio(clock, id, imam.id, audio)
+        return addMessage(message, policy, imam)
+    }
+
+    private fun addMessage(
+        message: MessageEntity,
+        policy: AddMessagePolicy,
+        user: User
     ): Option<Declination> =
-        policy.isAllowed(this, author).onEmpty {
+        policy.isAllowed(this, user).onEmpty {
             updatedAt = ZonedDateTime.now(clock)
 
-            messages.add(
-                MessageEntity(
-                    clock,
-                    id,
-                    messageType,
-                    author.id,
-                    text,
-                    audio,
-                )
-            )
+            messages.add(message)
 
-            when (author.type) {
+            when (user.type) {
                 Inquirer -> isViewedByImam = false
                 Imam -> {
                     if (type == Type.Public) isVisibleToPublic = true
@@ -114,7 +120,7 @@ class Chat private constructor(
                 }
             }
 
-            eventPublisher.publish(MessageAdded(subject, text))
+            eventPublisher.publish(MessageAdded(subject, message.text()))
         }
 
     fun deleteMessage(id: Message.Id, policy: DeleteMessagePolicy, user: User) =
@@ -167,17 +173,20 @@ class Chat private constructor(
     enum class Type { Public, Private }
 }
 
-private class MessageEntity(
+private class MessageEntity private constructor(
     private val clock: Clock,
+
     val id: Message.Id,
     val type: Message.Type,
     val authorId: User.Id,
-    private var text: NotBlankString,
-    val audio: NotBlankString? = null,
-) {
-    val createdAt = ZonedDateTime.now(clock)!!
-    private var updatedAt: ZonedDateTime? = null
 
+    private var text: NotBlankString,
+
+    val audio: NotBlankString? = null,
+
+    val createdAt: ZonedDateTime = ZonedDateTime.now(clock),
+    private var updatedAt: ZonedDateTime? = null,
+) {
     fun updatedAt() = updatedAt
 
     fun text() = text
@@ -185,5 +194,24 @@ private class MessageEntity(
     fun updateText(text: NotBlankString) {
         this.text = text
         updatedAt = ZonedDateTime.now(clock)
+    }
+
+    companion object {
+        fun newText(
+            clock: Clock,
+            id: Message.Id,
+            authorId: User.Id,
+            text: NotBlankString,
+        ) = MessageEntity(clock, id, Text, authorId, text)
+
+        fun newAudio(
+            clock: Clock,
+            id: Message.Id,
+            authorId: User.Id,
+            audio: NotBlankString,
+        ): MessageEntity {
+            val text = NotBlankString.of("Аудио")
+            return MessageEntity(clock, id, Audio, authorId, text, audio)
+        }
     }
 }
