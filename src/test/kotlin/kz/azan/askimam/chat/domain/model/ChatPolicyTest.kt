@@ -5,6 +5,7 @@ import kz.azan.askimam.chat.domain.event.MessageDeleted
 import kz.azan.askimam.chat.domain.event.MessageUpdated
 import kz.azan.askimam.chat.domain.policy.AddMessagePolicy
 import kz.azan.askimam.chat.domain.policy.DeleteMessagePolicy
+import kz.azan.askimam.chat.domain.policy.UpdateChatPolicy
 import kz.azan.askimam.chat.domain.policy.UpdateMessagePolicy
 import kz.azan.askimam.common.type.NotBlankString
 import kz.azan.askimam.user.domain.model.User
@@ -12,6 +13,35 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class ChatPolicyTest : ChatFixtures() {
+
+
+    @Test
+    internal fun `should not rename a subject by not an author`() {
+        fixtureClock()
+
+        fixtureChat().run {
+            val option = renameSubject(
+                NotBlankString.of("New subject"),
+                UpdateChatPolicy.forInquirer,
+                fixtureAnotherInquirer
+            )
+
+            assertThat(option.isDefined).isTrue
+            assertThat(subject()).isEqualTo(fixtureSubject)
+        }
+    }
+
+    @Test
+    internal fun `should not rename a subject by not an imam`() {
+        fixtureClock()
+
+        fixtureChat().run {
+            val option = renameSubject(NotBlankString.of("New subject"), UpdateChatPolicy.forImam, fixtureInquirer)
+
+            assertThat(option.isDefined).isTrue
+            assertThat(subject()).isEqualTo(fixtureSubject)
+        }
+    }
 
     @Test
     internal fun `should not add a new message`() {

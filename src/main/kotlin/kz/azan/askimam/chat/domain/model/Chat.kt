@@ -9,6 +9,7 @@ import kz.azan.askimam.chat.domain.model.Message.Type.Audio
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
 import kz.azan.askimam.chat.domain.policy.AddMessagePolicy
 import kz.azan.askimam.chat.domain.policy.DeleteMessagePolicy
+import kz.azan.askimam.chat.domain.policy.UpdateChatPolicy
 import kz.azan.askimam.chat.domain.policy.UpdateMessagePolicy
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.common.domain.EventPublisher
@@ -77,17 +78,14 @@ class Chat(
         )
     }.toList()
 
-    fun renameSubject(newSubject: NotBlankString) {
-        subject = newSubject
-    }
+    fun renameSubject(newSubject: NotBlankString, policy: UpdateChatPolicy, user: User): Option<Declination> =
+        policy.isAllowed(this, user).onEmpty { subject = newSubject }
 
     fun addTextMessage(policy: AddMessagePolicy, id: Message.Id, text: NotBlankString, author: User) =
         addMessage(policy, id, Text, author, text)
 
-
     fun addAudioMessage(policy: AddMessagePolicy, id: Message.Id, audio: NotBlankString, imam: User) =
         addMessage(policy, id, Audio, imam, NotBlankString.of("Аудио"), audio)
-
 
     private fun addMessage(
         policy: AddMessagePolicy,

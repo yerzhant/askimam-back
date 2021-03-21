@@ -13,6 +13,7 @@ import kz.azan.askimam.chat.domain.model.Message.Type.Audio
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
 import kz.azan.askimam.chat.domain.policy.AddMessagePolicy
 import kz.azan.askimam.chat.domain.policy.DeleteMessagePolicy
+import kz.azan.askimam.chat.domain.policy.UpdateChatPolicy
 import kz.azan.askimam.chat.domain.policy.UpdateMessagePolicy
 import kz.azan.askimam.common.type.NotBlankString
 import org.assertj.core.api.Assertions.assertThat
@@ -69,12 +70,25 @@ internal class ChatTest : ChatFixtures() {
     }
 
     @Test
-    internal fun `should rename a subject`() {
+    internal fun `should rename a subject by an author`() {
         fixtureClock()
 
         fixtureChat().run {
-            renameSubject(NotBlankString.of("New subject"))
+            val option = renameSubject(NotBlankString.of("New subject"), UpdateChatPolicy.forInquirer, fixtureInquirer)
 
+            assertThat(option.isEmpty).isTrue
+            assertThat(subject()).isEqualTo(NotBlankString.of("New subject"))
+        }
+    }
+
+    @Test
+    internal fun `should rename a subject by an imam`() {
+        fixtureClock()
+
+        fixtureChat().run {
+            val option = renameSubject(NotBlankString.of("New subject"), UpdateChatPolicy.forImam, fixtureImam)
+
+            assertThat(option.isEmpty).isTrue
             assertThat(subject()).isEqualTo(NotBlankString.of("New subject"))
         }
     }
