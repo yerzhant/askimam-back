@@ -49,7 +49,6 @@ class ChatPolicyTest : ChatFixtures() {
         fixtureChat().run {
             val option = addTextMessage(
                 AddMessagePolicy.forInquirer,
-                fixtureMessageId1,
                 fixtureNewMessage,
                 User(User.Id(10), User.Type.Inquirer),
             )
@@ -63,7 +62,7 @@ class ChatPolicyTest : ChatFixtures() {
         val audio = NotBlankString.of("Аудио")
         fixtureClock()
         fixtureChat(audio).run {
-            val option = addAudioMessage(AddMessagePolicy.forImam, Message.Id(2), fixtureAudio, fixtureInquirer)
+            val option = addAudioMessage(AddMessagePolicy.forImam, fixtureAudio, fixtureInquirer)
 
             assertThat(option.isDefined).isTrue
         }

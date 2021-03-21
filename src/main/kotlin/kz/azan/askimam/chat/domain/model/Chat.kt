@@ -1,6 +1,7 @@
 package kz.azan.askimam.chat.domain.model
 
 import io.vavr.control.Option
+import io.vavr.kotlin.some
 import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.event.MessageAdded
 import kz.azan.askimam.chat.domain.event.MessageDeleted
@@ -42,15 +43,19 @@ class Chat private constructor(
     private var isViewedByImam: Boolean = false,
     private var isViewedByInquirer: Boolean = true,
 ) {
-    private fun init(messageId: Message.Id, messageText: NotBlankString) {
-        val message = MessageEntity.newText(clock, messageId, askedBy, messageText)
-        messages.add(message)
+    private fun init(messageText: NotBlankString) = messageRepository.generateId().fold(
+        { some(it) },
+        {
+            val message = MessageEntity.newText(clock, it, askedBy, messageText)
+            messages.add(message)
 
-        chatRepository.create(this)
-        messageRepository.add(message.toMessage())
-
-        eventPublisher.publish(ChatCreated(subject, messageText))
-    }
+            chatRepository.create(this).onEmpty {
+                messageRepository.add(message.toMessage()).onEmpty {
+                    eventPublisher.publish(ChatCreated(subject, messageText))
+                }
+            }
+        }
+    )
 
     fun createdAt() = createdAt
     fun updatedAt() = updatedAt
@@ -91,23 +96,27 @@ class Chat private constructor(
 
     fun addTextMessage(
         policy: AddMessagePolicy,
-        id: Message.Id,
         text: NotBlankString,
         author: User
-    ): Option<Declination> {
-        val message = MessageEntity.newText(clock, id, author.id, text)
-        return addMessage(message, policy, author)
-    }
+    ): Option<Declination> = messageRepository.generateId().fold(
+        { some(it) },
+        {
+            val message = MessageEntity.newText(clock, it, author.id, text)
+            addMessage(message, policy, author)
+        }
+    )
 
     fun addAudioMessage(
         policy: AddMessagePolicy,
-        id: Message.Id,
         audio: NotBlankString,
         imam: User
-    ): Option<Declination> {
-        val message = MessageEntity.newAudio(clock, id, imam.id, audio)
-        return addMessage(message, policy, imam)
-    }
+    ): Option<Declination> = messageRepository.generateId().fold(
+        { some(it) },
+        {
+            val message = MessageEntity.newAudio(clock, it, imam.id, audio)
+            addMessage(message, policy, imam)
+        }
+    )
 
     private fun addMessage(
         messageEntity: MessageEntity,
@@ -161,7 +170,6 @@ class Chat private constructor(
             type: Type,
             askedBy: User.Id,
             subject: Subject,
-            messageId: Message.Id,
             messageText: NotBlankString,
         ): Chat {
             val now = ZonedDateTime.now(clock)
@@ -177,7 +185,7 @@ class Chat private constructor(
                 now,
                 subject
             ).apply {
-                init(messageId, messageText)
+                init(messageText)
             }
         }
 
@@ -189,7 +197,6 @@ class Chat private constructor(
             id: Id,
             type: Type,
             askedBy: User.Id,
-            messageId: Message.Id,
             messageText: NotBlankString,
         ): Chat {
             val now = ZonedDateTime.now(clock)
@@ -204,7 +211,7 @@ class Chat private constructor(
                 now,
                 now
             ).apply {
-                init(messageId, messageText)
+                init(messageText)
             }
         }
 

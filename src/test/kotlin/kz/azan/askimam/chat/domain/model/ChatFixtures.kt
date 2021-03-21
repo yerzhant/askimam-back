@@ -3,6 +3,7 @@ package kz.azan.askimam.chat.domain.model
 import io.mockk.every
 import io.mockk.mockk
 import io.vavr.kotlin.none
+import io.vavr.kotlin.right
 import kz.azan.askimam.chat.app.service.GetCurrentUser
 import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.event.MessageAdded
@@ -48,6 +49,10 @@ open class ChatFixtures {
         every { chatRepository.create(any()) } returns none()
         every { chatRepository.update(any()) } returns none()
         every { messageRepository.add(fixtureSavedMessage()) } returns none()
+        every { messageRepository.generateId() } returnsMany listOf(
+            right(fixtureMessageId1),
+            right(fixtureMessageId2),
+        )
 
         return Chat.newWithSubject(
             clock,
@@ -58,7 +63,6 @@ open class ChatFixtures {
             type,
             fixtureInquirerId,
             subject,
-            fixtureMessageId1,
             firstMessage,
         )
     }
