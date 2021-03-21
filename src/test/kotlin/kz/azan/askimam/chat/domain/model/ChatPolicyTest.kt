@@ -20,13 +20,13 @@ class ChatPolicyTest : ChatFixtures() {
 
         fixtureChat().run {
             val option = updateSubject(
-                NotBlankString.of("New subject"),
+                Subject.from("New subject"),
                 UpdateChatPolicy.forInquirer,
                 fixtureAnotherInquirer
             )
 
             assertThat(option.isDefined).isTrue
-            assertThat(subject()).isEqualTo(fixtureSubject)
+            assertThat(subjectText()).isEqualTo(fixtureSubjectText)
         }
     }
 
@@ -35,10 +35,10 @@ class ChatPolicyTest : ChatFixtures() {
         fixtureClock()
 
         fixtureChat().run {
-            val option = updateSubject(NotBlankString.of("New subject"), UpdateChatPolicy.forImam, fixtureInquirer)
+            val option = updateSubject(Subject.from("New subject"), UpdateChatPolicy.forImam, fixtureInquirer)
 
             assertThat(option.isDefined).isTrue
-            assertThat(subject()).isEqualTo(fixtureSubject)
+            assertThat(subjectText()).isEqualTo(fixtureSubjectText)
         }
     }
 

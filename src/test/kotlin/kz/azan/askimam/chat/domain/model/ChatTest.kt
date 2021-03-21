@@ -34,7 +34,7 @@ internal class ChatTest : ChatFixtures() {
             assertThat(isViewedByImam()).isFalse
             assertThat(isViewedByInquirer()).isTrue
             assertThat(askedBy).isEqualTo(fixtureInquirerId)
-            assertThat(subject()).isEqualTo(fixtureSubject)
+            assertThat(subjectText()).isEqualTo(fixtureSubjectText)
 
             assertThat(messages().size).isEqualTo(1)
             assertThat(messages().first().type).isEqualTo(Text)
@@ -62,7 +62,7 @@ internal class ChatTest : ChatFixtures() {
             fixtureMessageId,
             fixtureMessage,
         ).run {
-            assertThat(subject()).isEqualTo(fixtureMessage)
+            assertThat(subjectText()).isEqualTo(fixtureMessage)
         }
 
         verify {
@@ -75,10 +75,14 @@ internal class ChatTest : ChatFixtures() {
         fixtureClock()
 
         fixtureChat().run {
-            val option = updateSubject(NotBlankString.of("New subject"), UpdateChatPolicy.forInquirer, fixtureInquirer)
+            val option = updateSubject(
+                Subject.from("New subject"),
+                UpdateChatPolicy.forInquirer,
+                fixtureInquirer
+            )
 
             assertThat(option.isEmpty).isTrue
-            assertThat(subject()).isEqualTo(NotBlankString.of("New subject"))
+            assertThat(subjectText()).isEqualTo(NotBlankString.of("New subject"))
         }
     }
 
@@ -87,10 +91,10 @@ internal class ChatTest : ChatFixtures() {
         fixtureClock()
 
         fixtureChat().run {
-            val option = updateSubject(NotBlankString.of("New subject"), UpdateChatPolicy.forImam, fixtureImam)
+            val option = updateSubject(Subject.from("New subject"), UpdateChatPolicy.forImam, fixtureImam)
 
             assertThat(option.isEmpty).isTrue
-            assertThat(subject()).isEqualTo(NotBlankString.of("New subject"))
+            assertThat(subjectText()).isEqualTo(NotBlankString.of("New subject"))
         }
     }
 
@@ -350,7 +354,7 @@ internal class ChatTest : ChatFixtures() {
             assertThat(askedBy).isEqualTo(fixtureInquirerId)
             assertThat(createdAt()).isEqualTo(now)
             assertThat(updatedAt()).isEqualTo(now.plusMinutes(10))
-            assertThat(subject()).isEqualTo(fixtureSubject)
+            assertThat(subjectText()).isEqualTo(fixtureSubjectText)
             assertThat(isVisibleToPublic()).isTrue
             assertThat(isViewedByImam()).isTrue
             assertThat(isViewedByInquirer()).isFalse

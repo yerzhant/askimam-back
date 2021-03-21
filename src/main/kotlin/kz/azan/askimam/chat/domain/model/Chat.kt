@@ -31,7 +31,7 @@ class Chat private constructor(
     private val createdAt: ZonedDateTime,
     private var updatedAt: ZonedDateTime,
 
-    private var subject: NotBlankString? = null,
+    private var subject: Subject? = null,
 
     private val messages: MutableList<MessageEntity> = mutableListOf(),
 
@@ -66,7 +66,7 @@ class Chat private constructor(
         isViewedByInquirer = true
     }
 
-    fun subject(): NotBlankString = subject ?: messages.first().text()
+    fun subjectText(): NotBlankString = subject?.value ?: messages.first().text()
 
     fun messages() = messages.map {
         Message(
@@ -80,7 +80,7 @@ class Chat private constructor(
         )
     }.toList()
 
-    fun updateSubject(newSubject: NotBlankString, policy: UpdateChatPolicy, user: User): Option<Declination> =
+    fun updateSubject(newSubject: Subject, policy: UpdateChatPolicy, user: User): Option<Declination> =
         policy.isAllowed(this, user).onEmpty { subject = newSubject }
 
     fun addTextMessage(
@@ -146,7 +146,7 @@ class Chat private constructor(
             eventPublisher: EventPublisher,
             type: Type,
             askedBy: User.Id,
-            subject: NotBlankString,
+            subject: Subject,
             messageId: Message.Id,
             messageText: NotBlankString,
         ): Chat {
@@ -177,7 +177,7 @@ class Chat private constructor(
             askedBy: User.Id,
             createdAt: ZonedDateTime,
             updatedAt: ZonedDateTime,
-            subject: NotBlankString?,
+            subject: Subject?,
             messages: List<Message>,
             isVisibleToPublic: Boolean,
             isViewedByImam: Boolean,
