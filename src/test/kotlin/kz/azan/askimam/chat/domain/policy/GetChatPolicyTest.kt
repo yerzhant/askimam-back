@@ -1,5 +1,7 @@
 package kz.azan.askimam.chat.domain.policy
 
+import io.mockk.every
+import io.vavr.kotlin.none
 import kz.azan.askimam.chat.domain.model.Chat.Type.Private
 import kz.azan.askimam.chat.domain.model.ChatFixtures
 import kz.azan.askimam.chat.domain.policy.GetChatPolicy.Companion.forImam
@@ -53,8 +55,17 @@ internal class GetChatPolicyTest : ChatFixtures() {
     @Test
     internal fun `should return a public chat`() {
         fixtureClock()
+        every {
+            messageRepository.add(
+                fixtureSavedMessage(
+                    text = fixtureNewReply,
+                    userId = fixtureImamId
+                )
+            )
+        } returns none()
+
         with(fixtureChat(fixtureNewReply)) {
-            addTextMessage(AddMessagePolicy.forImam, fixtureMessageId, fixtureNewReply, fixtureImam)
+            addTextMessage(AddMessagePolicy.forImam, fixtureMessageId1, fixtureNewReply, fixtureImam)
             assertThat(forInquirer.isAllowed(this, fixtureAnotherInquirer).isRight).isTrue
         }
     }

@@ -1,5 +1,6 @@
 package kz.azan.askimam.common.type
 
+//TODO rename to NonBlank...
 class NotBlankString private constructor(val value: String) {
 
     companion object {

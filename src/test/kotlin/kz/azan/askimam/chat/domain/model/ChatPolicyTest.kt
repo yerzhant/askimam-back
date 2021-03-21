@@ -26,7 +26,7 @@ class ChatPolicyTest : ChatFixtures() {
             )
 
             assertThat(option.isDefined).isTrue
-            assertThat(subjectText()).isEqualTo(fixtureSubjectText)
+            assertThat(subject()).isEqualTo(fixtureSubject)
         }
     }
 
@@ -38,7 +38,7 @@ class ChatPolicyTest : ChatFixtures() {
             val option = updateSubject(Subject.from("New subject"), UpdateChatPolicy.forImam, fixtureInquirer)
 
             assertThat(option.isDefined).isTrue
-            assertThat(subjectText()).isEqualTo(fixtureSubjectText)
+            assertThat(subject()).isEqualTo(fixtureSubject)
         }
     }
 
@@ -49,7 +49,7 @@ class ChatPolicyTest : ChatFixtures() {
         fixtureChat().run {
             val option = addTextMessage(
                 AddMessagePolicy.forInquirer,
-                fixtureMessageId,
+                fixtureMessageId1,
                 fixtureNewMessage,
                 User(User.Id(10), User.Type.Inquirer),
             )
@@ -74,14 +74,14 @@ class ChatPolicyTest : ChatFixtures() {
         fixtureClock()
 
         with(fixtureChat()) {
-            val option = deleteMessage(fixtureMessageId, DeleteMessagePolicy.forInquirer, fixtureAnotherInquirer)
+            val option = deleteMessage(fixtureMessageId1, DeleteMessagePolicy.forInquirer, fixtureAnotherInquirer)
 
             assertThat(option.isDefined).isTrue
             assertThat(messages().size).isEqualTo(1)
         }
 
         verify(exactly = 0) {
-            eventPublisher.publish(MessageDeleted(fixtureMessageId))
+            eventPublisher.publish(MessageDeleted(fixtureMessageId1))
         }
     }
 
@@ -91,7 +91,7 @@ class ChatPolicyTest : ChatFixtures() {
 
         with(fixtureChat()) {
             val option = updateTextMessage(
-                fixtureMessageId,
+                fixtureMessageId1,
                 fixtureAnotherInquirer,
                 fixtureNewMessage,
                 UpdateMessagePolicy.forAll
@@ -103,7 +103,7 @@ class ChatPolicyTest : ChatFixtures() {
         }
 
         verify(exactly = 0) {
-            eventPublisher.publish(MessageUpdated(fixtureMessageId, fixtureNewMessage, timeAfter(10)))
+            eventPublisher.publish(MessageUpdated(fixtureMessageId1, fixtureNewMessage, timeAfter(10)))
         }
     }
 }

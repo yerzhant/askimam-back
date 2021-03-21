@@ -24,7 +24,10 @@ import java.time.ZonedDateTime
 class Chat private constructor(
     private val clock: Clock,
     private val eventPublisher: EventPublisher,
+    private val chatRepository: ChatRepository,
+    private val messageRepository: MessageRepository,
 
+    val id: Id,
     val type: Type,
     val askedBy: User.Id,
 
@@ -40,14 +43,12 @@ class Chat private constructor(
     private var isViewedByInquirer: Boolean = true,
 ) {
     private fun init(messageId: Message.Id, messageText: NotBlankString) {
-        messages.add(
-            MessageEntity.newText(
-                clock,
-                messageId,
-                askedBy,
-                messageText,
-            )
-        )
+        val message = MessageEntity.newText(clock, messageId, askedBy, messageText)
+        messages.add(message)
+
+        chatRepository.create(this)
+        messageRepository.add(message.toMessage())
+
         eventPublisher.publish(ChatCreated(subject, messageText))
     }
 
@@ -60,13 +61,15 @@ class Chat private constructor(
 
     fun viewedByImam() {
         isViewedByImam = true
+        chatRepository.update(this)
     }
 
     fun viewedByInquirer() {
         isViewedByInquirer = true
+        chatRepository.update(this)
     }
 
-    fun subjectText(): NotBlankString = subject?.value ?: messages.first().text()
+    fun subject() = subject
 
     fun messages() = messages.map {
         Message(
@@ -81,7 +84,10 @@ class Chat private constructor(
     }.toList()
 
     fun updateSubject(newSubject: Subject, policy: UpdateChatPolicy, user: User): Option<Declination> =
-        policy.isAllowed(this, user).onEmpty { subject = newSubject }
+        policy.isAllowed(this, user).orElse {
+            subject = newSubject
+            chatRepository.update(this)
+        }
 
     fun addTextMessage(
         policy: AddMessagePolicy,
@@ -104,14 +110,12 @@ class Chat private constructor(
     }
 
     private fun addMessage(
-        message: MessageEntity,
+        messageEntity: MessageEntity,
         policy: AddMessagePolicy,
         user: User
     ): Option<Declination> =
         policy.isAllowed(this, user).onEmpty {
             updatedAt = ZonedDateTime.now(clock)
-
-            messages.add(message)
 
             when (user.type) {
                 Inquirer -> isViewedByImam = false
@@ -121,13 +125,19 @@ class Chat private constructor(
                 }
             }
 
-            eventPublisher.publish(MessageAdded(subject, message.text()))
+            messages.add(messageEntity)
+
+            chatRepository.update(this)
+            messageRepository.add(messageEntity.toMessage())
+
+            eventPublisher.publish(MessageAdded(subject, messageEntity.text()))
         }
 
     fun deleteMessage(id: Message.Id, policy: DeleteMessagePolicy, user: User) =
         messages.find { it.id == id }?.run {
             policy.isAllowed(authorId, user).onEmpty {
                 messages.remove(this)
+                messageRepository.delete(this.toMessage())
                 eventPublisher.publish(MessageDeleted(id))
             }
         } as Option<Declination>
@@ -136,7 +146,8 @@ class Chat private constructor(
         messages.find { it.id == id }?.run {
             policy.isAllowed(authorId, user).onEmpty {
                 updateText(text)
-                eventPublisher.publish(MessageUpdated(id, text, updatedAt()!!))
+                messageRepository.update(this.toMessage())
+                eventPublisher.publish(MessageUpdated(id, text, this.updatedAt()!!))
             }
         } as Option<Declination>
 
@@ -144,6 +155,9 @@ class Chat private constructor(
         fun newWithSubject(
             clock: Clock,
             eventPublisher: EventPublisher,
+            chatRepository: ChatRepository,
+            messageRepository: MessageRepository,
+            id: Id,
             type: Type,
             askedBy: User.Id,
             subject: Subject,
@@ -151,7 +165,18 @@ class Chat private constructor(
             messageText: NotBlankString,
         ): Chat {
             val now = ZonedDateTime.now(clock)
-            return Chat(clock, eventPublisher, type, askedBy, now, now, subject).apply {
+            return Chat(
+                clock,
+                eventPublisher,
+                chatRepository,
+                messageRepository,
+                id,
+                type,
+                askedBy,
+                now,
+                now,
+                subject
+            ).apply {
                 init(messageId, messageText)
             }
         }
@@ -159,13 +184,26 @@ class Chat private constructor(
         fun new(
             clock: Clock,
             eventPublisher: EventPublisher,
+            chatRepository: ChatRepository,
+            messageRepository: MessageRepository,
+            id: Id,
             type: Type,
             askedBy: User.Id,
             messageId: Message.Id,
             messageText: NotBlankString,
         ): Chat {
             val now = ZonedDateTime.now(clock)
-            return Chat(clock, eventPublisher, type, askedBy, now, now).apply {
+            return Chat(
+                clock,
+                eventPublisher,
+                chatRepository,
+                messageRepository,
+                id,
+                type,
+                askedBy,
+                now,
+                now
+            ).apply {
                 init(messageId, messageText)
             }
         }
@@ -173,6 +211,9 @@ class Chat private constructor(
         fun restore(
             clock: Clock,
             eventPublisher: EventPublisher,
+            chatRepository: ChatRepository,
+            messageRepository: MessageRepository,
+            id: Id,
             type: Type,
             askedBy: User.Id,
             createdAt: ZonedDateTime,
@@ -185,6 +226,9 @@ class Chat private constructor(
         ) = Chat(
             clock,
             eventPublisher,
+            chatRepository,
+            messageRepository,
+            id,
             type,
             askedBy,
             createdAt,
@@ -195,6 +239,25 @@ class Chat private constructor(
             isViewedByImam,
             isViewedByInquirer,
         )
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Chat
+
+        if (id != other.id) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+
+    override fun toString(): String {
+        return "Chat(clock=$clock, eventPublisher=$eventPublisher, chatRepository=$chatRepository, messageRepository=$messageRepository, id=$id, type=$type, askedBy=$askedBy, createdAt=$createdAt, updatedAt=$updatedAt, subject=$subject, messages=$messages, isVisibleToPublic=$isVisibleToPublic, isViewedByImam=$isViewedByImam, isViewedByInquirer=$isViewedByInquirer)"
     }
 
     data class Id(val value: Long)
@@ -223,6 +286,8 @@ private class MessageEntity private constructor(
         this.text = text
         updatedAt = ZonedDateTime.now(clock)
     }
+
+    fun toMessage() = Message(id, type, createdAt, updatedAt, authorId, text, audio)
 
     companion object {
         fun newText(

@@ -10,6 +10,7 @@ fun interface UpdateMessagePolicy {
     fun isAllowed(authorId: User.Id, user: User): Option<Declination>
 
     companion object {
+        // TODO: additionally check that only text messages may be updated
         val forAll = UpdateMessagePolicy { authorId, user ->
             if (authorId == user.id)
                 none()

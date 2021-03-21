@@ -1,22 +1,16 @@
 package kz.azan.askimam.chat.app.usecase
 
 import io.mockk.every
-import io.mockk.mockk
 import io.mockk.verify
 import io.vavr.kotlin.left
 import io.vavr.kotlin.none
 import io.vavr.kotlin.right
-import kz.azan.askimam.chat.app.service.GetCurrentUser
 import kz.azan.askimam.chat.domain.model.ChatFixtures
-import kz.azan.askimam.chat.domain.model.ChatRepository
 import kz.azan.askimam.common.domain.Declination
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 
 internal class DeleteChatTest : ChatFixtures() {
-
-    private val getCurrentUser = mockk<GetCurrentUser>()
-    private val chatRepository = mockk<ChatRepository>()
 
     @Test
     internal fun `should delete a chat by an author`() {

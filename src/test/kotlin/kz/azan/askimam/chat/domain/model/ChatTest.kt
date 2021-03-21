@@ -3,6 +3,7 @@ package kz.azan.askimam.chat.domain.model
 import io.mockk.every
 import io.mockk.verify
 import io.mockk.verifySequence
+import io.vavr.kotlin.none
 import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.event.MessageAdded
 import kz.azan.askimam.chat.domain.event.MessageDeleted
@@ -26,7 +27,8 @@ internal class ChatTest : ChatFixtures() {
     internal fun `should create a chat`() {
         fixtureClock()
 
-        with(fixtureChat()) {
+        val chat = fixtureChat()
+        with(chat) {
             assertThat(type).isEqualTo(Public)
             assertThat(createdAt()).isEqualTo(fixtureNow)
             assertThat(updatedAt()).isEqualTo(fixtureNow)
@@ -34,7 +36,7 @@ internal class ChatTest : ChatFixtures() {
             assertThat(isViewedByImam()).isFalse
             assertThat(isViewedByInquirer()).isTrue
             assertThat(askedBy).isEqualTo(fixtureInquirerId)
-            assertThat(subjectText()).isEqualTo(fixtureSubjectText)
+            assertThat(subject()).isEqualTo(fixtureSubject)
 
             assertThat(messages().size).isEqualTo(1)
             assertThat(messages().first().type).isEqualTo(Text)
@@ -42,9 +44,12 @@ internal class ChatTest : ChatFixtures() {
             assertThat(messages().first().text).isEqualTo(fixtureMessage)
             assertThat(messages().first().createdAt).isEqualTo(fixtureNow)
             assertThat(messages().first().updatedAt).isNull()
+
         }
 
-        verify {
+        verifySequence {
+            chatRepository.create(chat)
+            messageRepository.add(fixtureSavedMessage())
             eventPublisher.publish(ChatCreated(fixtureSubject, fixtureMessage))
         }
     }
@@ -53,16 +58,21 @@ internal class ChatTest : ChatFixtures() {
     internal fun `should create a chat without a subject`() {
         fixtureClock()
         every { eventPublisher.publish(ChatCreated(null, fixtureMessage)) } returns Unit
+        every { chatRepository.create(any()) } returns none()
+        every { messageRepository.add(any()) } returns none()
 
         Chat.new(
             clock,
             eventPublisher,
+            chatRepository,
+            messageRepository,
+            fixtureChatId,
             Private,
             fixtureInquirerId,
-            fixtureMessageId,
+            fixtureMessageId1,
             fixtureMessage,
         ).run {
-            assertThat(subjectText()).isEqualTo(fixtureMessage)
+            assertThat(subject()).isNull()
         }
 
         verify {
@@ -73,8 +83,10 @@ internal class ChatTest : ChatFixtures() {
     @Test
     internal fun `should update a subject by an author`() {
         fixtureClock()
+        val chat = fixtureChat()
+        every { chatRepository.update(chat) } returns none()
 
-        fixtureChat().run {
+        chat.run {
             val option = updateSubject(
                 Subject.from("New subject"),
                 UpdateChatPolicy.forInquirer,
@@ -82,30 +94,44 @@ internal class ChatTest : ChatFixtures() {
             )
 
             assertThat(option.isEmpty).isTrue
-            assertThat(subjectText()).isEqualTo(NotBlankString.of("New subject"))
+            assertThat(subject()).isEqualTo(Subject.from("New subject"))
+        }
+
+        verifySequence {
+            chatRepository.create(chat)
+            chatRepository.update(chat)
         }
     }
 
     @Test
     internal fun `should update a subject by an imam`() {
         fixtureClock()
+        val chat = fixtureChat()
+        every { chatRepository.update(chat) } returns none()
 
-        fixtureChat().run {
+        chat.run {
             val option = updateSubject(Subject.from("New subject"), UpdateChatPolicy.forImam, fixtureImam)
 
             assertThat(option.isEmpty).isTrue
-            assertThat(subjectText()).isEqualTo(NotBlankString.of("New subject"))
+            assertThat(subject()).isEqualTo(Subject.from("New subject"))
+        }
+
+        verifySequence {
+            chatRepository.create(chat)
+            chatRepository.update(chat)
         }
     }
 
     @Test
     internal fun `should add a new message`() {
         fixtureClockAndThen(30)
+        every { messageRepository.add(fixtureSavedMessage(fixtureMessageId1)) } returns none()
+        val chat = fixtureChat()
 
-        fixtureChat().run {
+        chat.run {
             val result = addTextMessage(
                 AddMessagePolicy.forInquirer,
-                fixtureMessageId,
+                fixtureMessageId1,
                 fixtureNewMessage,
                 fixtureInquirer
             )
@@ -121,7 +147,11 @@ internal class ChatTest : ChatFixtures() {
         }
 
         verifySequence {
+            chatRepository.create(chat)
+            messageRepository.add(fixtureSavedMessage())
             eventPublisher.publish(ChatCreated(fixtureSubject, fixtureMessage))
+            chatRepository.update(chat)
+            messageRepository.add(fixtureSavedMessage(fixtureMessageId1))
             eventPublisher.publish(MessageAdded(fixtureSubject, fixtureNewMessage))
         }
     }
@@ -129,25 +159,34 @@ internal class ChatTest : ChatFixtures() {
     @Test
     internal fun `should be viewed by an imam`() {
         fixtureClock()
+        val chat = fixtureChat()
+        every { chatRepository.update(chat) } returns none()
 
-        fixtureChat().run {
+        chat.run {
             assertThat(isViewedByImam()).isFalse
 
             viewedByImam()
 
             assertThat(isViewedByImam()).isTrue
         }
+
+        verify {
+            chatRepository.update(chat)
+        }
     }
 
     @Test
     internal fun `should reset Is viewed by an imam flag after a new message`() {
         fixtureClock()
+        val chat = fixtureChat()
+        every { chatRepository.update(chat) } returns none()
+        every { messageRepository.add(fixtureSavedMessage(fixtureMessageId2)) } returns none()
 
-        fixtureChat().run {
+        chat.run {
             viewedByImam()
             val result = addTextMessage(
                 AddMessagePolicy.forInquirer,
-                Message.Id(2),
+                fixtureMessageId2,
                 fixtureNewMessage,
                 fixtureInquirer
             )
@@ -160,9 +199,10 @@ internal class ChatTest : ChatFixtures() {
     @Test
     internal fun `should add a new reply by an imam`() {
         fixtureClockAndThen(31)
+        every { messageRepository.add(fixtureSavedMessage(fixtureMessageId2)) } returns none()
 
         fixtureChat(fixtureNewReply).run {
-            val option = addTextMessage(AddMessagePolicy.forImam, Message.Id(2), fixtureNewReply, fixtureImam)
+            val option = addTextMessage(AddMessagePolicy.forImam, fixtureMessageId2, fixtureNewReply, fixtureImam)
 
             assertThat(option.isEmpty).isTrue
             assertThat(isVisibleToPublic()).isTrue
@@ -180,9 +220,10 @@ internal class ChatTest : ChatFixtures() {
     @Test
     internal fun `should not make a message visible to public if it's private`() {
         fixtureClockAndThen(31)
+        every { messageRepository.add(fixtureSavedMessage(fixtureMessageId2)) } returns none()
 
         fixtureChat(fixtureNewReply, Private).run {
-            val option = addTextMessage(AddMessagePolicy.forImam, Message.Id(2), fixtureNewReply, fixtureImam)
+            val option = addTextMessage(AddMessagePolicy.forImam, fixtureMessageId2, fixtureNewReply, fixtureImam)
 
             assertThat(option.isEmpty).isTrue
             assertThat(isVisibleToPublic()).isFalse
@@ -192,14 +233,20 @@ internal class ChatTest : ChatFixtures() {
     @Test
     internal fun `should set Is viewed by an inquirer flag`() {
         fixtureClock()
+        every { messageRepository.add(fixtureSavedMessage(fixtureMessageId2)) } returns none()
+        val chat = fixtureChat(fixtureNewReply)
 
-        fixtureChat(fixtureNewReply).run {
-            addTextMessage(AddMessagePolicy.forImam, Message.Id(2), fixtureNewReply, fixtureImam)
+        chat.run {
+            addTextMessage(AddMessagePolicy.forImam, fixtureMessageId2, fixtureNewReply, fixtureImam)
             assertThat(isViewedByInquirer()).isFalse
 
             viewedByInquirer()
 
             assertThat(isViewedByInquirer()).isTrue
+        }
+
+        verify(exactly = 2) {
+            chatRepository.update(chat)
         }
     }
 
@@ -207,6 +254,8 @@ internal class ChatTest : ChatFixtures() {
     internal fun `should add a new audio`() {
         val audio = NotBlankString.of("Аудио")
         fixtureClock()
+        every { messageRepository.add(fixtureSavedAudioMessage()) } returns none()
+
         fixtureChat(audio).run {
             val option = addAudioMessage(AddMessagePolicy.forImam, Message.Id(2), fixtureAudio, fixtureImam)
 
@@ -224,34 +273,39 @@ internal class ChatTest : ChatFixtures() {
     @Test
     internal fun `should delete a message by an inquirer`() {
         fixtureClock()
-        every { eventPublisher.publish(MessageDeleted(fixtureMessageId)) } returns Unit
+        every { messageRepository.delete(fixtureSavedMessage()) } returns none()
+        every { eventPublisher.publish(MessageDeleted(fixtureMessageId1)) } returns Unit
 
         with(fixtureChat()) {
-            val option = deleteMessage(fixtureMessageId, DeleteMessagePolicy.forInquirer, fixtureInquirer)
+            val option = deleteMessage(fixtureMessageId1, DeleteMessagePolicy.forInquirer, fixtureInquirer)
 
             assertThat(option.isEmpty).isTrue
             assertThat(messages().size).isZero
         }
 
-        verify {
-            eventPublisher.publish(MessageDeleted(fixtureMessageId))
+        verifySequence {
+            messageRepository.add(fixtureSavedMessage())
+            eventPublisher.publish(ChatCreated(fixtureSubject, fixtureMessage))
+            messageRepository.delete(fixtureSavedMessage())
+            eventPublisher.publish(MessageDeleted(fixtureMessageId1))
         }
     }
 
     @Test
     internal fun `should delete a message by an imam`() {
         fixtureClock()
-        every { eventPublisher.publish(MessageDeleted(fixtureMessageId)) } returns Unit
+        every { messageRepository.delete(fixtureSavedMessage()) } returns none()
+        every { eventPublisher.publish(MessageDeleted(fixtureMessageId1)) } returns Unit
 
         with(fixtureChat()) {
-            val option = deleteMessage(fixtureMessageId, DeleteMessagePolicy.forImam, fixtureImam)
+            val option = deleteMessage(fixtureMessageId1, DeleteMessagePolicy.forImam, fixtureImam)
 
             assertThat(option.isEmpty).isTrue
             assertThat(messages().size).isZero
         }
 
         verify {
-            eventPublisher.publish(MessageDeleted(fixtureMessageId))
+            eventPublisher.publish(MessageDeleted(fixtureMessageId1))
         }
     }
 
@@ -259,9 +313,17 @@ internal class ChatTest : ChatFixtures() {
     internal fun `should update a message by an inquirer`() {
         fixtureClockAndThen(10)
         every {
+            messageRepository.update(
+                fixtureSavedMessage(
+                    updatedAt = timeAfter(10),
+                    text = fixtureNewMessage
+                )
+            )
+        } returns none()
+        every {
             eventPublisher.publish(
                 MessageUpdated(
-                    fixtureMessageId,
+                    fixtureMessageId1,
                     fixtureNewMessage,
                     timeAfter(10)
                 )
@@ -270,7 +332,7 @@ internal class ChatTest : ChatFixtures() {
 
         with(fixtureChat()) {
             val option = updateTextMessage(
-                fixtureMessageId,
+                fixtureMessageId1,
                 fixtureInquirer,
                 fixtureNewMessage,
                 UpdateMessagePolicy.forAll
@@ -281,18 +343,23 @@ internal class ChatTest : ChatFixtures() {
             assertThat(messages().first().updatedAt).isEqualTo(timeAfter(10))
         }
 
-        verify {
-            eventPublisher.publish(MessageUpdated(fixtureMessageId, fixtureNewMessage, timeAfter(10)))
+        verifySequence {
+            messageRepository.add(fixtureSavedMessage())
+            eventPublisher.publish(ChatCreated(fixtureSubject, fixtureMessage))
+            messageRepository.update(fixtureSavedMessage(text = fixtureNewMessage, updatedAt = timeAfter(10)))
+            eventPublisher.publish(MessageUpdated(fixtureMessageId1, fixtureNewMessage, timeAfter(10)))
         }
     }
 
     @Test
     internal fun `should update a message by an imam`() {
         fixtureClockAndThen(11, 15)
+        every { messageRepository.add(fixtureSavedMessage(fixtureMessageId2)) } returns none()
+        every { messageRepository.update(fixtureSavedMessage(id = fixtureMessageId2)) } returns none()
         every {
             eventPublisher.publish(
                 MessageUpdated(
-                    Message.Id(2),
+                    fixtureMessageId2,
                     NotBlankString.of("Update"),
                     timeAfter(15)
                 )
@@ -300,9 +367,9 @@ internal class ChatTest : ChatFixtures() {
         } returns Unit
 
         with(fixtureChat(fixtureNewReply)) {
-            addTextMessage(AddMessagePolicy.forImam, Message.Id(2), fixtureNewReply, fixtureImam)
+            addTextMessage(AddMessagePolicy.forImam, fixtureMessageId2, fixtureNewReply, fixtureImam)
             val option = updateTextMessage(
-                Message.Id(2),
+                fixtureMessageId2,
                 fixtureImam,
                 NotBlankString.of("Update"),
                 UpdateMessagePolicy.forAll
@@ -314,7 +381,7 @@ internal class ChatTest : ChatFixtures() {
         }
 
         verify {
-            eventPublisher.publish(MessageUpdated(Message.Id(2), NotBlankString.of("Update"), timeAfter(15)))
+            eventPublisher.publish(MessageUpdated(fixtureMessageId2, NotBlankString.of("Update"), timeAfter(15)))
         }
     }
 
@@ -325,7 +392,7 @@ internal class ChatTest : ChatFixtures() {
         val messages =
             listOf(
                 Message(
-                    fixtureMessageId,
+                    fixtureMessageId1,
                     Text,
                     now,
                     null,
@@ -339,6 +406,9 @@ internal class ChatTest : ChatFixtures() {
             Chat.restore(
                 clock,
                 eventPublisher,
+                chatRepository,
+                messageRepository,
+                fixtureChatId,
                 Public,
                 fixtureInquirerId,
                 now,
@@ -354,12 +424,19 @@ internal class ChatTest : ChatFixtures() {
             assertThat(askedBy).isEqualTo(fixtureInquirerId)
             assertThat(createdAt()).isEqualTo(now)
             assertThat(updatedAt()).isEqualTo(now.plusMinutes(10))
-            assertThat(subjectText()).isEqualTo(fixtureSubjectText)
+            assertThat(subject()).isEqualTo(fixtureSubject)
             assertThat(isVisibleToPublic()).isTrue
             assertThat(isViewedByImam()).isTrue
             assertThat(isViewedByInquirer()).isFalse
             assertThat(messages()).hasSize(1)
             assertThat(messages()).isEqualTo(messages)
+        }
+
+        verify(exactly = 0) {
+            chatRepository.create(any())
+            chatRepository.update(any())
+            messageRepository.add(any())
+            messageRepository.update(any())
         }
     }
 }
