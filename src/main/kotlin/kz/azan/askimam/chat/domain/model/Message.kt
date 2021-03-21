@@ -6,9 +6,9 @@ import java.time.ZonedDateTime
 
 data class Message(
     val id: Id,
+    val type: Type,
     val createdAt: ZonedDateTime,
     val updatedAt: ZonedDateTime?,
-    val type: Type,
     val authorId: User.Id,
     val text: NotBlankString,
     val audio: NotBlankString?,

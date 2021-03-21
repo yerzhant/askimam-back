@@ -18,6 +18,7 @@ import kz.azan.askimam.chat.domain.policy.UpdateMessagePolicy
 import kz.azan.askimam.common.type.NotBlankString
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import java.time.ZonedDateTime
 
 internal class ChatTest : ChatFixtures() {
 
@@ -310,6 +311,51 @@ internal class ChatTest : ChatFixtures() {
 
         verify {
             eventPublisher.publish(MessageUpdated(Message.Id(2), NotBlankString.of("Update"), timeAfter(15)))
+        }
+    }
+
+    @Test
+    internal fun `should restore a saved chat`() {
+        fixtureClock()
+        val now = ZonedDateTime.now(clock)
+        val messages =
+            mutableListOf(
+                Message(
+                    fixtureMessageId,
+                    Text,
+                    now,
+                    null,
+                    fixtureInquirerId,
+                    fixtureMessage,
+                    null
+                )
+            )
+
+        with(
+            Chat.restore(
+                clock,
+                eventPublisher,
+                Public,
+                fixtureInquirerId,
+                now,
+                now.plusMinutes(10),
+                fixtureSubject,
+                messages,
+                isVisibleToPublic = true,
+                isViewedByImam = true,
+                isViewedByInquirer = false,
+            )
+        ) {
+            assertThat(type).isEqualTo(Public)
+            assertThat(askedBy).isEqualTo(fixtureInquirerId)
+            assertThat(createdAt()).isEqualTo(now)
+            assertThat(updatedAt()).isEqualTo(now.plusMinutes(10))
+            assertThat(subject()).isEqualTo(fixtureSubject)
+            assertThat(isVisibleToPublic()).isTrue
+            assertThat(isViewedByImam()).isTrue
+            assertThat(isViewedByInquirer()).isFalse
+            assertThat(messages()).hasSize(1)
+            assertThat(messages()).isEqualTo(messages)
         }
     }
 }

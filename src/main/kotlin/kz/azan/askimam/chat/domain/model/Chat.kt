@@ -70,9 +70,9 @@ class Chat private constructor(
     fun messages() = messages.map {
         Message(
             it.id,
+            it.type,
             it.createdAt,
             it.updatedAt(),
-            it.type,
             it.authorId,
             it.text(),
             it.audio,
@@ -168,6 +168,32 @@ class Chat private constructor(
                 init(messageId, messageText)
             }
         }
+
+        fun restore(
+            clock: Clock,
+            eventPublisher: EventPublisher,
+            type: Type,
+            askedBy: User.Id,
+            createdAt: ZonedDateTime,
+            updatedAt: ZonedDateTime,
+            subject: NotBlankString?,
+            messages: List<Message>,
+            isVisibleToPublic: Boolean,
+            isViewedByImam: Boolean,
+            isViewedByInquirer: Boolean,
+        ) = Chat(
+            clock,
+            eventPublisher,
+            type,
+            askedBy,
+            createdAt,
+            updatedAt,
+            subject,
+            messages.map { MessageEntity.restore(clock, it) }.toMutableList(),
+            isVisibleToPublic,
+            isViewedByImam,
+            isViewedByInquirer,
+        )
     }
 
     enum class Type { Public, Private }
@@ -213,5 +239,17 @@ private class MessageEntity private constructor(
             val text = NotBlankString.of("Аудио")
             return MessageEntity(clock, id, Audio, authorId, text, audio)
         }
+
+        fun restore(clock: Clock, message: Message) =
+            MessageEntity(
+                clock,
+                message.id,
+                message.type,
+                message.authorId,
+                message.text,
+                message.audio,
+                message.createdAt,
+                message.updatedAt
+            )
     }
 }
