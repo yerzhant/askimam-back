@@ -25,21 +25,15 @@ class Chat private constructor(
     private val eventPublisher: EventPublisher,
     val type: Type,
     val askedBy: User.Id,
+    private val createdAt: ZonedDateTime,
+    private var updatedAt: ZonedDateTime,
     private var subject: NotBlankString? = null,
+    private var isVisibleToPublic: Boolean = false,
+    private var isViewedByImam: Boolean = false,
+    private var isViewedByInquirer: Boolean = true,
+    private val messages: MutableList<MessageEntity> = mutableListOf(),
 ) {
-    private lateinit var createdAt: ZonedDateTime
-    private lateinit var updatedAt: ZonedDateTime
-
-    private var isVisibleToPublic = false
-    private var isViewedByImam = false
-    private var isViewedByInquirer = true
-
-    private val messages = mutableListOf<MessageEntity>()
-
     private fun init(messageId: Message.Id, messageText: NotBlankString) {
-        createdAt = ZonedDateTime.now(clock)
-        updatedAt = createdAt
-
         messages.add(
             MessageEntity(
                 clock,
@@ -148,10 +142,12 @@ class Chat private constructor(
             subject: NotBlankString,
             messageId: Message.Id,
             messageText: NotBlankString,
-        ) =
-            Chat(clock, eventPublisher, type, askedBy, subject).apply {
+        ): Chat {
+            val now = ZonedDateTime.now(clock)
+            return Chat(clock, eventPublisher, type, askedBy, now, now, subject).apply {
                 init(messageId, messageText)
             }
+        }
 
         fun new(
             clock: Clock,
@@ -160,10 +156,12 @@ class Chat private constructor(
             askedBy: User.Id,
             messageId: Message.Id,
             messageText: NotBlankString,
-        ) =
-            Chat(clock, eventPublisher, type, askedBy).apply {
+        ): Chat {
+            val now = ZonedDateTime.now(clock)
+            return Chat(clock, eventPublisher, type, askedBy, now, now).apply {
                 init(messageId, messageText)
             }
+        }
     }
 
     enum class Type { Public, Private }
