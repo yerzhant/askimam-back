@@ -158,16 +158,11 @@ class Chat private constructor(
         }
     }
 
-    fun updateTextMessage(
-        id: Message.Id,
-        user: User,
-        text: NotBlankString,
-        policy: UpdateMessagePolicy
-    ): Option<Declination> {
+    fun updateTextMessage(id: Message.Id, user: User, text: NotBlankString): Option<Declination> {
         val messageEntity = messages.find { it.id == id } ?: return some(Declination.withReason("Invalid id"))
 
         return messageEntity.run {
-            policy.isAllowed(authorId, user).orElse {
+            UpdateMessagePolicy.forAll.isAllowed(authorId, user).orElse {
                 updateText(text)
                 messageRepository.update(this.toMessage()).onEmpty {
                     eventPublisher.publish(MessageUpdated(id, text, this.updatedAt()!!))

@@ -10,7 +10,6 @@ import kz.azan.askimam.chat.domain.event.MessageAdded
 import kz.azan.askimam.chat.domain.event.MessageDeleted
 import kz.azan.askimam.chat.domain.event.MessageUpdated
 import kz.azan.askimam.chat.domain.model.Chat.Type.Private
-import kz.azan.askimam.chat.domain.policy.UpdateMessagePolicy
 import kz.azan.askimam.common.domain.Declination
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -298,12 +297,7 @@ class ChatRepositoryTest : ChatFixtures() {
         fixtureClockAndThen(10)
 
         with(fixtureChat()) {
-            val option = updateTextMessage(
-                fixtureMessageId2,
-                fixtureInquirer,
-                fixtureNewMessage,
-                UpdateMessagePolicy.forAll
-            )
+            val option = updateTextMessage(fixtureMessageId2, fixtureInquirer, fixtureNewMessage)
 
             assertThat(option).isEqualTo(some(Declination.withReason("Invalid id")))
             assertThat(messages().first().text).isEqualTo(fixtureMessage)
@@ -322,12 +316,7 @@ class ChatRepositoryTest : ChatFixtures() {
         every { messageRepository.update(any()) } returns some(Declination.withReason("update error"))
 
         with(fixtureChat()) {
-            val option = updateTextMessage(
-                fixtureMessageId1,
-                fixtureInquirer,
-                fixtureNewMessage,
-                UpdateMessagePolicy.forAll
-            )
+            val option = updateTextMessage(fixtureMessageId1, fixtureInquirer, fixtureNewMessage)
 
             assertThat(option).isEqualTo(some(Declination.withReason("update error")))
         }

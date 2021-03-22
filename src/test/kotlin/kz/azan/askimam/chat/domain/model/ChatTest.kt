@@ -13,7 +13,6 @@ import kz.azan.askimam.chat.domain.model.Chat.Type.Private
 import kz.azan.askimam.chat.domain.model.Chat.Type.Public
 import kz.azan.askimam.chat.domain.model.Message.Type.Audio
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
-import kz.azan.askimam.chat.domain.policy.UpdateMessagePolicy
 import kz.azan.askimam.common.type.NotBlankString
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -315,12 +314,7 @@ internal class ChatTest : ChatFixtures() {
         } returns Unit
 
         with(fixtureChat()) {
-            val option = updateTextMessage(
-                fixtureMessageId1,
-                fixtureInquirer,
-                fixtureNewMessage,
-                UpdateMessagePolicy.forAll
-            )
+            val option = updateTextMessage(fixtureMessageId1, fixtureInquirer, fixtureNewMessage)
 
             assertThat(option.isEmpty).isTrue
             assertThat(messages().first().text).isEqualTo(fixtureNewMessage)
@@ -353,12 +347,7 @@ internal class ChatTest : ChatFixtures() {
 
         with(fixtureChat(fixtureNewReply)) {
             addTextMessage(fixtureNewReply, fixtureImam)
-            val option = updateTextMessage(
-                fixtureMessageId2,
-                fixtureImam,
-                NotBlankString.of("Update"),
-                UpdateMessagePolicy.forAll
-            )
+            val option = updateTextMessage(fixtureMessageId2, fixtureImam, NotBlankString.of("Update"))
 
             assertThat(option.isEmpty).isTrue
             assertThat(messages().last().text).isEqualTo(NotBlankString.of("Update"))

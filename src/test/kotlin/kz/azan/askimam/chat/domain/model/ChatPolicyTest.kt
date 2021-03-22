@@ -5,7 +5,6 @@ import io.mockk.verify
 import io.vavr.kotlin.none
 import kz.azan.askimam.chat.domain.event.MessageDeleted
 import kz.azan.askimam.chat.domain.event.MessageUpdated
-import kz.azan.askimam.chat.domain.policy.UpdateMessagePolicy
 import kz.azan.askimam.common.type.NotBlankString
 import kz.azan.askimam.user.domain.model.User
 import org.assertj.core.api.Assertions.assertThat
@@ -92,12 +91,7 @@ class ChatPolicyTest : ChatFixtures() {
         fixtureClockAndThen(10)
 
         with(fixtureChat()) {
-            val option = updateTextMessage(
-                fixtureMessageId1,
-                fixtureAnotherInquirer,
-                fixtureNewMessage,
-                UpdateMessagePolicy.forAll
-            )
+            val option = updateTextMessage(fixtureMessageId1, fixtureAnotherInquirer, fixtureNewMessage)
 
             assertThat(option.isDefined).isTrue
             assertThat(messages().first().text).isEqualTo(fixtureMessage)
