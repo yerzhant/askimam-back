@@ -4,7 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.vavr.kotlin.none
 import io.vavr.kotlin.right
-import kz.azan.askimam.chat.app.service.GetCurrentUser
+import kz.azan.askimam.chat.domain.service.GetCurrentUser
 import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.event.MessageAdded
 import kz.azan.askimam.chat.domain.model.Chat.Type.Public

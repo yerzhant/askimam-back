@@ -1,7 +1,7 @@
 package kz.azan.askimam.chat.app.usecase
 
 import io.vavr.control.Either
-import kz.azan.askimam.chat.app.service.GetCurrentUser
+import kz.azan.askimam.chat.domain.service.GetCurrentUser
 import kz.azan.askimam.chat.domain.model.Chat
 import kz.azan.askimam.chat.domain.model.ChatRepository
 import kz.azan.askimam.chat.domain.policy.GetChatPolicy
