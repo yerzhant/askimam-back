@@ -5,6 +5,7 @@ import io.vavr.control.Option
 import io.vavr.kotlin.left
 import io.vavr.kotlin.right
 import io.vavr.kotlin.some
+import kz.azan.askimam.chat.app.service.GetCurrentUser
 import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.event.MessageAdded
 import kz.azan.askimam.chat.domain.event.MessageDeleted
@@ -28,6 +29,7 @@ import java.time.ZonedDateTime
 class Chat private constructor(
     private val clock: Clock,
     private val eventPublisher: EventPublisher,
+    private val getCurrentUser: GetCurrentUser,
     private val chatRepository: ChatRepository,
     private val messageRepository: MessageRepository,
 
@@ -67,14 +69,14 @@ class Chat private constructor(
     fun isViewedByImam() = isViewedByImam
     fun isViewedByInquirer() = isViewedByInquirer
 
-    fun viewedByImam(user: User): Option<Declination> =
-        UpdateChatPolicy.forImam.isAllowed(this, user).orElse {
+    fun viewedByImam(): Option<Declination> =
+        UpdateChatPolicy.forImam.isAllowed(this, getCurrentUser()).orElse {
             isViewedByImam = true
             chatRepository.update(this)
         }
 
-    fun viewedByInquirer(user: User): Option<Declination> =
-        UpdateChatPolicy.forInquirer.isAllowed(this, user).orElse {
+    fun viewedByInquirer(): Option<Declination> =
+        UpdateChatPolicy.forInquirer.isAllowed(this, getCurrentUser()).orElse {
             isViewedByInquirer = true
             chatRepository.update(this)
         }
@@ -93,29 +95,27 @@ class Chat private constructor(
         )
     }.toList()
 
-    fun updateSubject(newSubject: Subject, user: User): Option<Declination> =
-        UpdateChatPolicy.getFor(user).isAllowed(this, user).orElse {
+    fun updateSubject(newSubject: Subject): Option<Declination> {
+        val user = getCurrentUser()
+        return UpdateChatPolicy.getFor(user).isAllowed(this, user).orElse {
             subject = newSubject
             chatRepository.update(this)
         }
+    }
 
-    fun addTextMessage(
-        text: NonBlankString,
-        author: User
-    ): Option<Declination> = messageRepository.generateId().fold(
+    fun addTextMessage(text: NonBlankString): Option<Declination> = messageRepository.generateId().fold(
         { some(it) },
         {
+            val author = getCurrentUser()
             val message = MessageEntity.newText(clock, it, author.id, text)
             addMessage(message, AddMessagePolicy.getFor(author), author)
         }
     )
 
-    fun addAudioMessage(
-        audio: NonBlankString,
-        imam: User
-    ): Option<Declination> = messageRepository.generateId().fold(
+    fun addAudioMessage(audio: NonBlankString): Option<Declination> = messageRepository.generateId().fold(
         { some(it) },
         {
+            val imam = getCurrentUser()
             val message = MessageEntity.newAudio(clock, it, imam.id, audio)
             addMessage(message, AddMessagePolicy.forImam, imam)
         }
@@ -145,10 +145,11 @@ class Chat private constructor(
             }
         }
 
-    fun deleteMessage(id: Message.Id, user: User): Option<Declination> {
+    fun deleteMessage(id: Message.Id): Option<Declination> {
         val messageEntity = messages.find { it.id == id } ?: return some(Declination.withReason("Invalid id"))
 
         return messageEntity.run {
+            val user = getCurrentUser()
             DeleteMessagePolicy.forThe(user).isAllowed(authorId, user).orElse {
                 messageRepository.delete(this.toMessage()).onEmpty {
                     messages.remove(this)
@@ -158,11 +159,11 @@ class Chat private constructor(
         }
     }
 
-    fun updateTextMessage(id: Message.Id, user: User, text: NonBlankString): Option<Declination> {
+    fun updateTextMessage(id: Message.Id, text: NonBlankString): Option<Declination> {
         val messageEntity = messages.find { it.id == id } ?: return some(Declination.withReason("Invalid id"))
 
         return messageEntity.run {
-            UpdateMessagePolicy.forAll.isAllowed(authorId, user, type).orElse {
+            UpdateMessagePolicy.forAll.isAllowed(authorId, getCurrentUser(), type).orElse {
                 updateText(text)
                 messageRepository.update(this.toMessage()).onEmpty {
                     eventPublisher.publish(MessageUpdated(id, text, this.updatedAt()!!))
@@ -175,10 +176,10 @@ class Chat private constructor(
         fun newWithSubject(
             clock: Clock,
             eventPublisher: EventPublisher,
+            getCurrentUser: GetCurrentUser,
             chatRepository: ChatRepository,
             messageRepository: MessageRepository,
             type: Type,
-            askedBy: User.Id,
             subject: Subject,
             messageText: NonBlankString,
         ): Either<Declination, Chat> = chatRepository.generateId().flatMap { id ->
@@ -186,11 +187,12 @@ class Chat private constructor(
             val chat = Chat(
                 clock,
                 eventPublisher,
+                getCurrentUser,
                 chatRepository,
                 messageRepository,
                 id,
                 type,
-                askedBy,
+                getCurrentUser().id,
                 now,
                 now,
                 subject
@@ -205,21 +207,22 @@ class Chat private constructor(
         fun new(
             clock: Clock,
             eventPublisher: EventPublisher,
+            getCurrentUser: GetCurrentUser,
             chatRepository: ChatRepository,
             messageRepository: MessageRepository,
             type: Type,
-            askedBy: User.Id,
             messageText: NonBlankString,
         ): Either<Declination, Chat> = chatRepository.generateId().flatMap { id ->
             val now = ZonedDateTime.now(clock)
             val chat = Chat(
                 clock,
                 eventPublisher,
+                getCurrentUser,
                 chatRepository,
                 messageRepository,
                 id,
                 type,
-                askedBy,
+                getCurrentUser().id,
                 now,
                 now
             )
@@ -233,6 +236,7 @@ class Chat private constructor(
         fun restore(
             clock: Clock,
             eventPublisher: EventPublisher,
+            getCurrentUser: GetCurrentUser,
             chatRepository: ChatRepository,
             messageRepository: MessageRepository,
             id: Id,
@@ -248,6 +252,7 @@ class Chat private constructor(
         ) = Chat(
             clock,
             eventPublisher,
+            getCurrentUser,
             chatRepository,
             messageRepository,
             id,
@@ -279,7 +284,7 @@ class Chat private constructor(
     }
 
     override fun toString(): String {
-        return "Chat(clock=$clock, eventPublisher=$eventPublisher, chatRepository=$chatRepository, messageRepository=$messageRepository, id=$id, type=$type, askedBy=$askedBy, createdAt=$createdAt, updatedAt=$updatedAt, subject=$subject, messages=$messages, isVisibleToPublic=$isVisibleToPublic, isViewedByImam=$isViewedByImam, isViewedByInquirer=$isViewedByInquirer)"
+        return "Chat(id=$id, type=$type, askedBy=$askedBy, createdAt=$createdAt, updatedAt=$updatedAt, subject=$subject, messages=$messages, isVisibleToPublic=$isVisibleToPublic, isViewedByImam=$isViewedByImam, isViewedByInquirer=$isViewedByInquirer)"
     }
 
     data class Id(val value: Long)
