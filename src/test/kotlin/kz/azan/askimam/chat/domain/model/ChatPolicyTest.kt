@@ -125,8 +125,8 @@ class ChatPolicyTest : ChatFixtures() {
             val option = updateTextMessage(fixtureMessageId1, fixtureNewMessage)
 
             assertThat(option.isDefined).isTrue
-            assertThat(messages().first().text).isEqualTo(fixtureMessage)
-            assertThat(messages().first().updatedAt).isNull()
+            assertThat(messages().first().text()).isEqualTo(fixtureMessage)
+            assertThat(messages().first().updatedAt()).isNull()
         }
 
         verify(exactly = 0) {
@@ -149,7 +149,7 @@ class ChatPolicyTest : ChatFixtures() {
             val option = updateTextMessage(fixtureMessageId2, fixtureNewReply)
 
             assertThat(option).isEqualTo(some(Declination.withReason("An audio message may not be edited")))
-            assertThat(messages().first().updatedAt).isNull()
+            assertThat(messages().first().updatedAt()).isNull()
         }
     }
 }

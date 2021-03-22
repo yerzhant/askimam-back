@@ -365,8 +365,8 @@ class ChatRepositoryTest : ChatFixtures() {
             val option = updateTextMessage(fixtureMessageId2, fixtureNewMessage)
 
             assertThat(option).isEqualTo(some(Declination.withReason("Invalid id")))
-            assertThat(messages().first().text).isEqualTo(fixtureMessage)
-            assertThat(messages().first().updatedAt).isNull()
+            assertThat(messages().first().text()).isEqualTo(fixtureMessage)
+            assertThat(messages().first().updatedAt()).isNull()
         }
 
         verify(exactly = 0) {

@@ -41,9 +41,9 @@ internal class ChatTest : ChatFixtures() {
             assertThat(messages().size).isEqualTo(1)
             assertThat(messages().first().type).isEqualTo(Text)
             assertThat(messages().first().authorId).isEqualTo(fixtureInquirerId)
-            assertThat(messages().first().text).isEqualTo(fixtureMessage)
+            assertThat(messages().first().text()).isEqualTo(fixtureMessage)
             assertThat(messages().first().createdAt).isEqualTo(fixtureNow)
-            assertThat(messages().first().updatedAt).isNull()
+            assertThat(messages().first().updatedAt()).isNull()
 
         }
 
@@ -149,9 +149,9 @@ internal class ChatTest : ChatFixtures() {
 
             assertThat(messages().size).isEqualTo(2)
             assertThat(messages().last().createdAt).isEqualTo(timeAfter(30))
-            assertThat(messages().last().updatedAt).isNull()
+            assertThat(messages().last().updatedAt()).isNull()
             assertThat(messages().last().type).isEqualTo(Text)
-            assertThat(messages().last().text).isEqualTo(fixtureNewMessage)
+            assertThat(messages().last().text()).isEqualTo(fixtureNewMessage)
         }
 
         verifySequence {
@@ -229,7 +229,7 @@ internal class ChatTest : ChatFixtures() {
             assertThat(messages().size).isEqualTo(2)
             assertThat(messages().last().createdAt).isEqualTo(timeAfter(31))
             assertThat(messages().last().type).isEqualTo(Text)
-            assertThat(messages().last().text).isEqualTo(fixtureNewReply)
+            assertThat(messages().last().text()).isEqualTo(fixtureNewReply)
             assertThat(messages().last().authorId).isEqualTo(fixtureImamId)
         }
     }
@@ -289,7 +289,7 @@ internal class ChatTest : ChatFixtures() {
 
             assertThat(option.isEmpty).isTrue
             assertThat(messages().last().type).isEqualTo(Audio)
-            assertThat(messages().last().text).isEqualTo(audio)
+            assertThat(messages().last().text()).isEqualTo(audio)
             assertThat(messages().last().audio).isEqualTo(fixtureAudio)
         }
 
@@ -373,8 +373,8 @@ internal class ChatTest : ChatFixtures() {
             val option = updateTextMessage(fixtureMessageId1, fixtureNewMessage)
 
             assertThat(option.isEmpty).isTrue
-            assertThat(messages().first().text).isEqualTo(fixtureNewMessage)
-            assertThat(messages().first().updatedAt).isEqualTo(timeAfter(10))
+            assertThat(messages().first().text()).isEqualTo(fixtureNewMessage)
+            assertThat(messages().first().updatedAt()).isEqualTo(timeAfter(10))
         }
 
         verifySequence {
@@ -411,8 +411,8 @@ internal class ChatTest : ChatFixtures() {
             val option = updateTextMessage(fixtureMessageId2, NonBlankString.of("Update"))
 
             assertThat(option.isEmpty).isTrue
-            assertThat(messages().last().text).isEqualTo(NonBlankString.of("Update"))
-            assertThat(messages().last().updatedAt).isEqualTo(timeAfter(15))
+            assertThat(messages().last().text()).isEqualTo(NonBlankString.of("Update"))
+            assertThat(messages().last().updatedAt()).isEqualTo(timeAfter(15))
         }
 
         verify {
@@ -426,14 +426,15 @@ internal class ChatTest : ChatFixtures() {
         val now = ZonedDateTime.now(clock)
         val messages =
             listOf(
-                Message(
+                Message.restore(
+                    clock,
                     fixtureMessageId1,
                     Text,
-                    now,
-                    null,
                     fixtureInquirerId,
                     fixtureMessage,
-                    null
+                    null,
+                    now,
+                    null,
                 )
             )
 

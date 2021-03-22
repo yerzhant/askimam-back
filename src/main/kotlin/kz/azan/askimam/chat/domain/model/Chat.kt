@@ -5,18 +5,16 @@ import io.vavr.control.Option
 import io.vavr.kotlin.left
 import io.vavr.kotlin.right
 import io.vavr.kotlin.some
-import kz.azan.askimam.chat.domain.service.GetCurrentUser
 import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.event.MessageAdded
 import kz.azan.askimam.chat.domain.event.MessageDeleted
 import kz.azan.askimam.chat.domain.event.MessageUpdated
 import kz.azan.askimam.chat.domain.model.Chat.Type.Public
-import kz.azan.askimam.chat.domain.model.Message.Type.Audio
-import kz.azan.askimam.chat.domain.model.Message.Type.Text
 import kz.azan.askimam.chat.domain.policy.AddMessagePolicy
 import kz.azan.askimam.chat.domain.policy.DeleteMessagePolicy
 import kz.azan.askimam.chat.domain.policy.UpdateChatPolicy
 import kz.azan.askimam.chat.domain.policy.UpdateMessagePolicy
+import kz.azan.askimam.chat.domain.service.GetCurrentUser
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.common.domain.EventPublisher
 import kz.azan.askimam.common.type.NonBlankString
@@ -42,7 +40,7 @@ class Chat private constructor(
 
     private var subject: Subject? = null,
 
-    private val messages: MutableList<MessageEntity> = mutableListOf(),
+    private val messages: MutableList<Message> = mutableListOf(),
 
     private var isVisibleToPublic: Boolean = false,
     private var isViewedByImam: Boolean = false,
@@ -52,9 +50,9 @@ class Chat private constructor(
         { some(it) },
         {
             chatRepository.create(this).orElse {
-                val message = MessageEntity.newText(clock, it, askedBy, messageText)
+                val message = Message.newText(clock, it, askedBy, messageText)
 
-                messageRepository.add(message.toMessage()).onEmpty {
+                messageRepository.add(message).onEmpty {
                     messages.add(message)
                     eventPublisher.publish(ChatCreated(subject, messageText))
                 }
@@ -83,17 +81,7 @@ class Chat private constructor(
 
     fun subject() = subject
 
-    fun messages() = messages.map {
-        Message(
-            it.id,
-            it.type,
-            it.createdAt,
-            it.updatedAt(),
-            it.authorId,
-            it.text(),
-            it.audio,
-        )
-    }.toList()
+    fun messages() = messages.toList()
 
     fun updateSubject(newSubject: Subject): Option<Declination> {
         val user = getCurrentUser()
@@ -107,7 +95,7 @@ class Chat private constructor(
         { some(it) },
         {
             val author = getCurrentUser()
-            val message = MessageEntity.newText(clock, it, author.id, text)
+            val message = Message.newText(clock, it, author.id, text)
             addMessage(message, AddMessagePolicy.getFor(author), author)
         }
     )
@@ -116,13 +104,13 @@ class Chat private constructor(
         { some(it) },
         {
             val imam = getCurrentUser()
-            val message = MessageEntity.newAudio(clock, it, imam.id, audio)
+            val message = Message.newAudio(clock, it, imam.id, audio)
             addMessage(message, AddMessagePolicy.forImam, imam)
         }
     )
 
     private fun addMessage(
-        messageEntity: MessageEntity,
+        message: Message,
         policy: AddMessagePolicy,
         user: User
     ): Option<Declination> =
@@ -138,9 +126,9 @@ class Chat private constructor(
             }
 
             chatRepository.update(this).orElse {
-                messageRepository.add(messageEntity.toMessage()).onEmpty {
-                    messages.add(messageEntity)
-                    eventPublisher.publish(MessageAdded(subject, messageEntity.text()))
+                messageRepository.add(message).onEmpty {
+                    messages.add(message)
+                    eventPublisher.publish(MessageAdded(subject, message.text()))
                 }
             }
         }
@@ -151,7 +139,7 @@ class Chat private constructor(
         return messageEntity.run {
             val user = getCurrentUser()
             DeleteMessagePolicy.forThe(user).isAllowed(authorId, user).orElse {
-                messageRepository.delete(this.toMessage()).onEmpty {
+                messageRepository.delete(this).onEmpty {
                     messages.remove(this)
                     eventPublisher.publish(MessageDeleted(id))
                 }
@@ -165,7 +153,7 @@ class Chat private constructor(
         return messageEntity.run {
             UpdateMessagePolicy.forAll.isAllowed(authorId, getCurrentUser(), type).orElse {
                 updateText(text)
-                messageRepository.update(this.toMessage()).onEmpty {
+                messageRepository.update(this).onEmpty {
                     eventPublisher.publish(MessageUpdated(id, text, this.updatedAt()!!))
                 }
             }
@@ -261,7 +249,7 @@ class Chat private constructor(
             createdAt,
             updatedAt,
             subject,
-            messages.map { MessageEntity.restore(clock, it) }.toMutableList(),
+            messages.toMutableList(),
             isVisibleToPublic,
             isViewedByImam,
             isViewedByInquirer,
@@ -289,61 +277,4 @@ class Chat private constructor(
 
     data class Id(val value: Long)
     enum class Type { Public, Private }
-}
-
-private class MessageEntity private constructor(
-    private val clock: Clock,
-
-    val id: Message.Id,
-    val type: Message.Type,
-    val authorId: User.Id,
-
-    private var text: NonBlankString,
-
-    val audio: NonBlankString? = null,
-
-    val createdAt: ZonedDateTime = ZonedDateTime.now(clock),
-    private var updatedAt: ZonedDateTime? = null,
-) {
-    fun updatedAt() = updatedAt
-
-    fun text() = text
-
-    fun updateText(text: NonBlankString) {
-        this.text = text
-        updatedAt = ZonedDateTime.now(clock)
-    }
-
-    fun toMessage() = Message(id, type, createdAt, updatedAt, authorId, text, audio)
-
-    companion object {
-        fun newText(
-            clock: Clock,
-            id: Message.Id,
-            authorId: User.Id,
-            text: NonBlankString,
-        ) = MessageEntity(clock, id, Text, authorId, text)
-
-        fun newAudio(
-            clock: Clock,
-            id: Message.Id,
-            authorId: User.Id,
-            audio: NonBlankString,
-        ): MessageEntity {
-            val text = NonBlankString.of("Аудио")
-            return MessageEntity(clock, id, Audio, authorId, text, audio)
-        }
-
-        fun restore(clock: Clock, message: Message) =
-            MessageEntity(
-                clock,
-                message.id,
-                message.type,
-                message.authorId,
-                message.text,
-                message.audio,
-                message.createdAt,
-                message.updatedAt
-            )
-    }
 }

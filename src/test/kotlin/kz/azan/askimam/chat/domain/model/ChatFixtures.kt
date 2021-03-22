@@ -4,12 +4,12 @@ import io.mockk.every
 import io.mockk.mockk
 import io.vavr.kotlin.none
 import io.vavr.kotlin.right
-import kz.azan.askimam.chat.domain.service.GetCurrentUser
 import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.event.MessageAdded
 import kz.azan.askimam.chat.domain.model.Chat.Type.Public
 import kz.azan.askimam.chat.domain.model.Message.Type.Audio
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
+import kz.azan.askimam.chat.domain.service.GetCurrentUser
 import kz.azan.askimam.common.domain.EventPublisher
 import kz.azan.askimam.common.type.NonBlankString
 import kz.azan.askimam.user.domain.model.User
@@ -85,13 +85,14 @@ open class ChatFixtures {
             now,
             subject,
             listOf(
-                Message(
+                Message.restore(
+                    clock,
                     fixtureMessageId1,
                     Text,
-                    now,
-                    null,
                     fixtureInquirerId,
                     fixtureMessage,
+                    null,
+                    now,
                     null
                 )
             ),
@@ -108,24 +109,26 @@ open class ChatFixtures {
         createdAt: ZonedDateTime = timeAfter(0),
         updatedAt: ZonedDateTime? = null,
     ) =
-        Message(
+        Message.restore(
+            clock,
             id,
             Text,
-            createdAt,
-            updatedAt,
             userId,
             text,
             null,
+            createdAt,
+            updatedAt,
         )
 
-    fun fixtureSavedAudioMessage() = Message(
+    fun fixtureSavedAudioMessage() = Message.restore(
+        clock,
         fixtureMessageId2,
         Audio,
-        timeAfter(0),
-        null,
         fixtureImamId,
         NonBlankString.of("Аудио"),
         fixtureAudio,
+        timeAfter(0),
+        null,
     )
 
     val fixtureImam = User(User.Id(1), User.Type.Imam, NonBlankString.of("Imam"))
