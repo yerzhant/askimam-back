@@ -1,5 +1,6 @@
 package kz.azan.askimam.chat.domain.policy
 
+import io.mockk.every
 import io.vavr.kotlin.some
 import kz.azan.askimam.chat.domain.model.ChatFixtures
 import kz.azan.askimam.chat.domain.policy.AddMessagePolicy.Companion.forImam
@@ -17,12 +18,20 @@ class AddMessagePolicyTest : ChatFixtures() {
     @Test
     internal fun `should allow to add a new message by an imam`() {
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer
+        )
+
         assertThat(forImam.isAllowed(fixtureChat(), User(fixtureImamId, Imam)).isEmpty).isTrue
     }
 
     @Test
     internal fun `should not allow to add a new message as it's not an imam`() {
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer
+        )
+
         assertThat(
             forImam.isAllowed(
                 fixtureChat(),
@@ -34,12 +43,20 @@ class AddMessagePolicyTest : ChatFixtures() {
     @Test
     internal fun `should allow an inquirer to add a message to his own chat`() {
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer
+        )
+
         assertThat(forInquirer.isAllowed(fixtureChat(), User(fixtureInquirerId, Inquirer)).isEmpty).isTrue
     }
 
     @Test
     internal fun `should not allow an inquirer to add a message to someone else's chat`() {
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer
+        )
+
         assertThat(
             forInquirer.isAllowed(
                 fixtureChat(),
