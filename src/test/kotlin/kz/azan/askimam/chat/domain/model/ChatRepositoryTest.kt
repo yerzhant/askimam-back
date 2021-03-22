@@ -24,10 +24,10 @@ class ChatRepositoryTest : ChatFixtures() {
         val chat = Chat.new(
             clock,
             eventPublisher,
+            getCurrentUser,
             chatRepository,
             messageRepository,
             Private,
-            fixtureInquirerId,
             fixtureMessage,
         )
 
@@ -44,16 +44,19 @@ class ChatRepositoryTest : ChatFixtures() {
     @Test
     internal fun `should not create a chat - message id generation issue`() {
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer
+        )
         every { chatRepository.generateId() } returns right(fixtureChatId)
         every { messageRepository.generateId() } returns left(Declination.withReason("msg id error"))
 
         val chat = Chat.new(
             clock,
             eventPublisher,
+            getCurrentUser,
             chatRepository,
             messageRepository,
             Private,
-            fixtureInquirerId,
             fixtureMessage,
         )
 
@@ -69,6 +72,9 @@ class ChatRepositoryTest : ChatFixtures() {
     @Test
     internal fun `should not create a chat - chat repo error`() {
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer
+        )
         every { chatRepository.generateId() } returns right(fixtureChatId)
         every { messageRepository.generateId() } returns right(fixtureMessageId1)
         every { chatRepository.create(any()) } returns some(Declination.withReason("chat create error"))
@@ -76,10 +82,10 @@ class ChatRepositoryTest : ChatFixtures() {
         val chat = Chat.new(
             clock,
             eventPublisher,
+            getCurrentUser,
             chatRepository,
             messageRepository,
             Private,
-            fixtureInquirerId,
             fixtureMessage,
         )
 
@@ -94,6 +100,9 @@ class ChatRepositoryTest : ChatFixtures() {
     @Test
     internal fun `should not create a chat - message repo error`() {
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer
+        )
         every { chatRepository.generateId() } returns right(fixtureChatId)
         every { messageRepository.generateId() } returns right(fixtureMessageId1)
         every { chatRepository.create(any()) } returns none()
@@ -102,10 +111,10 @@ class ChatRepositoryTest : ChatFixtures() {
         val chat = Chat.new(
             clock,
             eventPublisher,
+            getCurrentUser,
             chatRepository,
             messageRepository,
             Private,
-            fixtureInquirerId,
             fixtureMessage,
         )
 
@@ -119,6 +128,9 @@ class ChatRepositoryTest : ChatFixtures() {
     @Test
     internal fun `should create a chat`() {
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer
+        )
         every { chatRepository.generateId() } returns right(fixtureChatId)
         every { messageRepository.generateId() } returns right(fixtureMessageId1)
         every { chatRepository.create(any()) } returns none()
@@ -128,10 +140,10 @@ class ChatRepositoryTest : ChatFixtures() {
         val chat = Chat.new(
             clock,
             eventPublisher,
+            getCurrentUser,
             chatRepository,
             messageRepository,
             Private,
-            fixtureInquirerId,
             fixtureMessage,
         )
 
@@ -141,11 +153,14 @@ class ChatRepositoryTest : ChatFixtures() {
     @Test
     internal fun `should not update a subject - chat repo error`() {
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer
+        )
         val chat = fixtureChat()
         every { chatRepository.update(chat) } returns some(Declination.withReason("chat error"))
 
         chat.run {
-            val option = updateSubject(Subject.from("New subject"), fixtureInquirer)
+            val option = updateSubject(Subject.from("New subject"))
 
             assertThat(option).isEqualTo(some(Declination.withReason("chat error")))
         }
@@ -154,6 +169,9 @@ class ChatRepositoryTest : ChatFixtures() {
     @Test
     internal fun `should not add a new message - msg id generation error`() {
         fixtureClockAndThen(30)
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer
+        )
         every { chatRepository.generateId() } returns right(fixtureChatId)
         every { messageRepository.generateId() } returnsMany listOf(
             right(fixtureMessageId1),
@@ -165,15 +183,15 @@ class ChatRepositoryTest : ChatFixtures() {
         val chat = Chat.new(
             clock,
             eventPublisher,
+            getCurrentUser,
             chatRepository,
             messageRepository,
             Private,
-            fixtureInquirerId,
             fixtureMessage,
         ).get()
 
         chat.run {
-            val result = addTextMessage(fixtureNewMessage, fixtureInquirer)
+            val result = addTextMessage(fixtureNewMessage)
 
             assertThat(result).isEqualTo(some(Declination.withReason("msg id error")))
             assertThat(messages()).hasSize(1)
@@ -189,6 +207,9 @@ class ChatRepositoryTest : ChatFixtures() {
     @Test
     internal fun `should not add a new message - chat update error`() {
         fixtureClockAndThen(30)
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer
+        )
         every { chatRepository.generateId() } returns right(fixtureChatId)
         every { messageRepository.generateId() } returnsMany listOf(
             right(fixtureMessageId1),
@@ -201,15 +222,15 @@ class ChatRepositoryTest : ChatFixtures() {
         val chat = Chat.new(
             clock,
             eventPublisher,
+            getCurrentUser,
             chatRepository,
             messageRepository,
             Private,
-            fixtureInquirerId,
             fixtureMessage,
         ).get()
 
         chat.run {
-            val result = addTextMessage(fixtureNewMessage, fixtureInquirer)
+            val result = addTextMessage(fixtureNewMessage)
 
             assertThat(result).isEqualTo(some(Declination.withReason("chat update error")))
             assertThat(messages()).hasSize(1)
@@ -224,6 +245,9 @@ class ChatRepositoryTest : ChatFixtures() {
     @Test
     internal fun `should not add a new message - msg add error`() {
         fixtureClockAndThen(30)
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer
+        )
         every { chatRepository.generateId() } returns right(fixtureChatId)
         every { messageRepository.generateId() } returnsMany listOf(
             right(fixtureMessageId1),
@@ -242,15 +266,15 @@ class ChatRepositoryTest : ChatFixtures() {
         val chat = Chat.new(
             clock,
             eventPublisher,
+            getCurrentUser,
             chatRepository,
             messageRepository,
             Private,
-            fixtureInquirerId,
             fixtureMessage,
         ).get()
 
         chat.run {
-            val result = addTextMessage(fixtureNewMessage, fixtureInquirer)
+            val result = addTextMessage(fixtureNewMessage)
 
             assertThat(result).isEqualTo(some(Declination.withReason("msg add error")))
             assertThat(messages()).hasSize(1)
@@ -264,31 +288,41 @@ class ChatRepositoryTest : ChatFixtures() {
     @Test
     internal fun `should occur an error when viewed by an imam`() {
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer,
+            fixtureImam
+        )
         val chat = fixtureChat()
         every { chatRepository.update(chat) } returns some(Declination.withReason("update error"))
 
         chat.run {
-            assertThat(viewedByImam(fixtureImam)).isEqualTo(some(Declination.withReason("update error")))
+            assertThat(viewedByImam()).isEqualTo(some(Declination.withReason("update error")))
         }
     }
 
     @Test
     internal fun `should set Is viewed by an inquirer flag`() {
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer
+        )
         val chat = fixtureChat(fixtureNewReply)
         every { chatRepository.update(any()) } returns some(Declination.withReason("update error"))
 
         chat.run {
-            assertThat(viewedByInquirer(fixtureInquirer)).isEqualTo(some(Declination.withReason("update error")))
+            assertThat(viewedByInquirer()).isEqualTo(some(Declination.withReason("update error")))
         }
     }
 
     @Test
     internal fun `should not delete a message - id not found`() {
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer
+        )
 
         with(fixtureChat()) {
-            val option = deleteMessage(fixtureMessageId2, fixtureInquirer)
+            val option = deleteMessage(fixtureMessageId2)
 
             assertThat(option).isEqualTo(some(Declination.withReason("Invalid id")))
             assertThat(messages().size).isEqualTo(1)
@@ -303,10 +337,13 @@ class ChatRepositoryTest : ChatFixtures() {
     @Test
     internal fun `should not delete a message - delete error`() {
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer
+        )
         every { messageRepository.delete(fixtureSavedMessage()) } returns some(Declination.withReason("delete error"))
 
         with(fixtureChat()) {
-            val option = deleteMessage(fixtureMessageId1, fixtureInquirer)
+            val option = deleteMessage(fixtureMessageId1)
 
             assertThat(option).isEqualTo(some(Declination.withReason("delete error")))
             assertThat(messages().size).isEqualTo(1)
@@ -320,9 +357,12 @@ class ChatRepositoryTest : ChatFixtures() {
     @Test
     internal fun `should not update a message - invalid id`() {
         fixtureClockAndThen(10)
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer
+        )
 
         with(fixtureChat()) {
-            val option = updateTextMessage(fixtureMessageId2, fixtureInquirer, fixtureNewMessage)
+            val option = updateTextMessage(fixtureMessageId2, fixtureNewMessage)
 
             assertThat(option).isEqualTo(some(Declination.withReason("Invalid id")))
             assertThat(messages().first().text).isEqualTo(fixtureMessage)
@@ -338,10 +378,13 @@ class ChatRepositoryTest : ChatFixtures() {
     @Test
     internal fun `should not update a message - update error`() {
         fixtureClockAndThen(10)
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer
+        )
         every { messageRepository.update(any()) } returns some(Declination.withReason("update error"))
 
         with(fixtureChat()) {
-            val option = updateTextMessage(fixtureMessageId1, fixtureInquirer, fixtureNewMessage)
+            val option = updateTextMessage(fixtureMessageId1, fixtureNewMessage)
 
             assertThat(option).isEqualTo(some(Declination.withReason("update error")))
         }
