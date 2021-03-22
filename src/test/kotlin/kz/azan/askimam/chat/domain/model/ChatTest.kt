@@ -13,7 +13,7 @@ import kz.azan.askimam.chat.domain.model.Chat.Type.Private
 import kz.azan.askimam.chat.domain.model.Chat.Type.Public
 import kz.azan.askimam.chat.domain.model.Message.Type.Audio
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
-import kz.azan.askimam.common.type.NotBlankString
+import kz.azan.askimam.common.type.NonBlankString
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
@@ -234,7 +234,7 @@ internal class ChatTest : ChatFixtures() {
 
     @Test
     internal fun `should add a new audio`() {
-        val audio = NotBlankString.of("Аудио")
+        val audio = NonBlankString.of("Аудио")
         fixtureClock()
         every { messageRepository.add(fixtureSavedAudioMessage()) } returns none()
 
@@ -339,7 +339,7 @@ internal class ChatTest : ChatFixtures() {
             eventPublisher.publish(
                 MessageUpdated(
                     fixtureMessageId2,
-                    NotBlankString.of("Update"),
+                    NonBlankString.of("Update"),
                     timeAfter(15)
                 )
             )
@@ -347,15 +347,15 @@ internal class ChatTest : ChatFixtures() {
 
         with(fixtureChat(fixtureNewReply)) {
             addTextMessage(fixtureNewReply, fixtureImam)
-            val option = updateTextMessage(fixtureMessageId2, fixtureImam, NotBlankString.of("Update"))
+            val option = updateTextMessage(fixtureMessageId2, fixtureImam, NonBlankString.of("Update"))
 
             assertThat(option.isEmpty).isTrue
-            assertThat(messages().last().text).isEqualTo(NotBlankString.of("Update"))
+            assertThat(messages().last().text).isEqualTo(NonBlankString.of("Update"))
             assertThat(messages().last().updatedAt).isEqualTo(timeAfter(15))
         }
 
         verify {
-            eventPublisher.publish(MessageUpdated(fixtureMessageId2, NotBlankString.of("Update"), timeAfter(15)))
+            eventPublisher.publish(MessageUpdated(fixtureMessageId2, NonBlankString.of("Update"), timeAfter(15)))
         }
     }
 

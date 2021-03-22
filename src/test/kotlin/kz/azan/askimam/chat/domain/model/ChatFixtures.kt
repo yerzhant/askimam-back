@@ -11,7 +11,7 @@ import kz.azan.askimam.chat.domain.model.Chat.Type.Public
 import kz.azan.askimam.chat.domain.model.Message.Type.Audio
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
 import kz.azan.askimam.common.domain.EventPublisher
-import kz.azan.askimam.common.type.NotBlankString
+import kz.azan.askimam.common.type.NonBlankString
 import kz.azan.askimam.user.domain.model.User
 import java.time.*
 
@@ -40,7 +40,7 @@ open class ChatFixtures {
         )
     }
 
-    fun fixtureChat(newMessage: NotBlankString = fixtureNewMessage, type: Chat.Type = Public): Chat {
+    fun fixtureChat(newMessage: NonBlankString = fixtureNewMessage, type: Chat.Type = Public): Chat {
         val subject = fixtureSubject
         val firstMessage = fixtureMessage
 
@@ -102,7 +102,7 @@ open class ChatFixtures {
 
     fun fixtureSavedMessage(
         id: Message.Id = fixtureMessageId1,
-        text: NotBlankString = fixtureMessage,
+        text: NonBlankString = fixtureMessage,
         userId: User.Id = fixtureInquirerId,
         createdAt: ZonedDateTime = timeAfter(0),
         updatedAt: ZonedDateTime? = null,
@@ -123,7 +123,7 @@ open class ChatFixtures {
         timeAfter(0),
         null,
         fixtureImamId,
-        NotBlankString.of("Аудио"),
+        NonBlankString.of("Аудио"),
         fixtureAudio,
     )
 
@@ -138,16 +138,16 @@ open class ChatFixtures {
 
     val fixtureChatId = Chat.Id(1)
 
-    val fixtureSubject = Subject(NotBlankString.of("Subject"))
+    val fixtureSubject = Subject(NonBlankString.of("Subject"))
 
     val fixtureMessageId1 = Message.Id(1)
     val fixtureMessageId2 = Message.Id(2)
 
-    val fixtureMessage = NotBlankString.of("A message")
-    val fixtureNewMessage = NotBlankString.of("A new message")
-    val fixtureNewReply = NotBlankString.of("A new reply")
+    val fixtureMessage = NonBlankString.of("A message")
+    val fixtureNewMessage = NonBlankString.of("A new message")
+    val fixtureNewReply = NonBlankString.of("A new reply")
 
-    val fixtureAudio = NotBlankString.of("audio.mp3")
+    val fixtureAudio = NonBlankString.of("audio.mp3")
 
     val fixtureNow: ZonedDateTime = ZonedDateTime.now(fixedClock)
 

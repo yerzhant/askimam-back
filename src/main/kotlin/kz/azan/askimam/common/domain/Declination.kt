@@ -1,9 +1,9 @@
 package kz.azan.askimam.common.domain
 
-import kz.azan.askimam.common.type.NotBlankString
+import kz.azan.askimam.common.type.NonBlankString
 
-data class Declination(val reason: NotBlankString) {
+data class Declination(val reason: NonBlankString) {
     companion object {
-        fun withReason(reason: String) = Declination(NotBlankString.of(reason))
+        fun withReason(reason: String) = Declination(NonBlankString.of(reason))
     }
 }

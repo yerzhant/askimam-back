@@ -18,7 +18,7 @@ import kz.azan.askimam.chat.domain.policy.UpdateChatPolicy
 import kz.azan.askimam.chat.domain.policy.UpdateMessagePolicy
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.common.domain.EventPublisher
-import kz.azan.askimam.common.type.NotBlankString
+import kz.azan.askimam.common.type.NonBlankString
 import kz.azan.askimam.user.domain.model.User
 import kz.azan.askimam.user.domain.model.User.Type.Imam
 import kz.azan.askimam.user.domain.model.User.Type.Inquirer
@@ -46,7 +46,7 @@ class Chat private constructor(
     private var isViewedByImam: Boolean = false,
     private var isViewedByInquirer: Boolean = true,
 ) {
-    private fun init(messageText: NotBlankString) = messageRepository.generateId().fold(
+    private fun init(messageText: NonBlankString) = messageRepository.generateId().fold(
         { some(it) },
         {
             chatRepository.create(this).orElse {
@@ -100,7 +100,7 @@ class Chat private constructor(
         }
 
     fun addTextMessage(
-        text: NotBlankString,
+        text: NonBlankString,
         author: User
     ): Option<Declination> = messageRepository.generateId().fold(
         { some(it) },
@@ -111,7 +111,7 @@ class Chat private constructor(
     )
 
     fun addAudioMessage(
-        audio: NotBlankString,
+        audio: NonBlankString,
         imam: User
     ): Option<Declination> = messageRepository.generateId().fold(
         { some(it) },
@@ -158,7 +158,7 @@ class Chat private constructor(
         }
     }
 
-    fun updateTextMessage(id: Message.Id, user: User, text: NotBlankString): Option<Declination> {
+    fun updateTextMessage(id: Message.Id, user: User, text: NonBlankString): Option<Declination> {
         val messageEntity = messages.find { it.id == id } ?: return some(Declination.withReason("Invalid id"))
 
         return messageEntity.run {
@@ -181,7 +181,7 @@ class Chat private constructor(
             type: Type,
             askedBy: User.Id,
             subject: Subject,
-            messageText: NotBlankString,
+            messageText: NonBlankString,
         ): Either<Declination, Chat> {
             val now = ZonedDateTime.now(clock)
             val chat = Chat(
@@ -211,7 +211,7 @@ class Chat private constructor(
             id: Id,
             type: Type,
             askedBy: User.Id,
-            messageText: NotBlankString,
+            messageText: NonBlankString,
         ): Either<Declination, Chat> {
             val now = ZonedDateTime.now(clock)
             val chat = Chat(
@@ -295,9 +295,9 @@ private class MessageEntity private constructor(
     val type: Message.Type,
     val authorId: User.Id,
 
-    private var text: NotBlankString,
+    private var text: NonBlankString,
 
-    val audio: NotBlankString? = null,
+    val audio: NonBlankString? = null,
 
     val createdAt: ZonedDateTime = ZonedDateTime.now(clock),
     private var updatedAt: ZonedDateTime? = null,
@@ -306,7 +306,7 @@ private class MessageEntity private constructor(
 
     fun text() = text
 
-    fun updateText(text: NotBlankString) {
+    fun updateText(text: NonBlankString) {
         this.text = text
         updatedAt = ZonedDateTime.now(clock)
     }
@@ -318,16 +318,16 @@ private class MessageEntity private constructor(
             clock: Clock,
             id: Message.Id,
             authorId: User.Id,
-            text: NotBlankString,
+            text: NonBlankString,
         ) = MessageEntity(clock, id, Text, authorId, text)
 
         fun newAudio(
             clock: Clock,
             id: Message.Id,
             authorId: User.Id,
-            audio: NotBlankString,
+            audio: NonBlankString,
         ): MessageEntity {
-            val text = NotBlankString.of("Аудио")
+            val text = NonBlankString.of("Аудио")
             return MessageEntity(clock, id, Audio, authorId, text, audio)
         }
 

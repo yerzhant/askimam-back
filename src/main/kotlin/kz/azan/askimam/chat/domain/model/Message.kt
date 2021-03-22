@@ -1,6 +1,6 @@
 package kz.azan.askimam.chat.domain.model
 
-import kz.azan.askimam.common.type.NotBlankString
+import kz.azan.askimam.common.type.NonBlankString
 import kz.azan.askimam.user.domain.model.User
 import java.time.ZonedDateTime
 
@@ -10,8 +10,8 @@ data class Message(
     val createdAt: ZonedDateTime,
     val updatedAt: ZonedDateTime?,
     val authorId: User.Id,
-    val text: NotBlankString,
-    val audio: NotBlankString?,
+    val text: NonBlankString,
+    val audio: NonBlankString?,
 ) {
 
     data class Id(val value: Long)

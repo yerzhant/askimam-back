@@ -1,12 +1,11 @@
 package kz.azan.askimam.common.type
 
-//TODO rename to NonBlank...
-class NotBlankString private constructor(val value: String) {
+class NonBlankString private constructor(val value: String) {
 
     companion object {
-        fun of(value: String): NotBlankString {
+        fun of(value: String): NonBlankString {
             require(value.isNotBlank())
-            return NotBlankString(value.trim())
+            return NonBlankString(value.trim())
         }
     }
 
@@ -14,7 +13,7 @@ class NotBlankString private constructor(val value: String) {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as NotBlankString
+        other as NonBlankString
 
         if (value != other.value) return false
 
