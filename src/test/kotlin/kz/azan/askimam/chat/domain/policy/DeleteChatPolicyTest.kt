@@ -1,5 +1,6 @@
 package kz.azan.askimam.chat.domain.policy
 
+import io.mockk.every
 import io.vavr.kotlin.some
 import kz.azan.askimam.chat.domain.model.ChatFixtures
 import kz.azan.askimam.chat.domain.policy.DeleteChatPolicy.Companion.forImam
@@ -24,12 +25,20 @@ internal class DeleteChatPolicyTest : ChatFixtures() {
     @Test
     internal fun `should allow to delete a chat by any imam`() {
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer
+        )
+
         assertThat(forImam.isAllowed(fixtureChat(), fixtureImam).isEmpty).isTrue
     }
 
     @Test
     internal fun `should not allow to delete a chat by not an imam through the imam's policy`() {
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer
+        )
+
         assertThat(
             forImam.isAllowed(
                 fixtureChat(),
@@ -41,12 +50,20 @@ internal class DeleteChatPolicyTest : ChatFixtures() {
     @Test
     internal fun `should allow to delete a chat by its author`() {
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer
+        )
+
         assertThat(forInquirer.isAllowed(fixtureChat(), fixtureInquirer).isEmpty).isTrue
     }
 
     @Test
     internal fun `should not allow to delete a chat by not its author`() {
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer
+        )
+
         assertThat(
             forInquirer.isAllowed(
                 fixtureChat(),
