@@ -1,5 +1,6 @@
 package kz.azan.askimam.chat.domain.policy
 
+import io.mockk.every
 import io.vavr.kotlin.some
 import kz.azan.askimam.chat.domain.model.ChatFixtures
 import kz.azan.askimam.chat.domain.policy.UpdateChatPolicy.Companion.forImam
@@ -13,12 +14,18 @@ internal class UpdateChatPolicyTest : ChatFixtures() {
     @Test
     internal fun `should allow to edit a chat by any imam`() {
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer
+        )
         assertThat(forImam.isAllowed(fixtureChat(), fixtureImam).isEmpty).isTrue
     }
 
     @Test
     internal fun `should not allow to edit a chat by anyone when used in conjunction with imam's policy`() {
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer
+        )
         assertThat(
             forImam.isAllowed(
                 fixtureChat(),
@@ -30,12 +37,18 @@ internal class UpdateChatPolicyTest : ChatFixtures() {
     @Test
     internal fun `should allow to edit a chat by its author`() {
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer
+        )
         assertThat(forInquirer.isAllowed(fixtureChat(), fixtureInquirer).isEmpty).isTrue
     }
 
     @Test
     internal fun `should not allow not an author to edit a chat`() {
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer
+        )
         assertThat(
             forInquirer.isAllowed(
                 fixtureChat(),
