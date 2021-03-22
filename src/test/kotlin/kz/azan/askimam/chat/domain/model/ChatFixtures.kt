@@ -58,10 +58,10 @@ open class ChatFixtures {
         return Chat.newWithSubject(
             clock,
             eventPublisher,
+            getCurrentUser,
             chatRepository,
             messageRepository,
             type,
-            fixtureInquirerId,
             subject,
             firstMessage,
         ).get()
@@ -75,6 +75,7 @@ open class ChatFixtures {
         return Chat.restore(
             clock,
             eventPublisher,
+            getCurrentUser,
             chatRepository,
             messageRepository,
             fixtureChatId,
