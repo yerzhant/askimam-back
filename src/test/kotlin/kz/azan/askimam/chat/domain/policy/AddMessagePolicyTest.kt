@@ -6,9 +6,8 @@ import kz.azan.askimam.chat.domain.model.ChatFixtures
 import kz.azan.askimam.chat.domain.policy.AddMessagePolicy.Companion.forImam
 import kz.azan.askimam.chat.domain.policy.AddMessagePolicy.Companion.forInquirer
 import kz.azan.askimam.common.domain.Declination
+import kz.azan.askimam.common.type.NonBlankString
 import kz.azan.askimam.user.domain.model.User
-import kz.azan.askimam.user.domain.model.User.Id
-import kz.azan.askimam.user.domain.model.User.Type.Imam
 import kz.azan.askimam.user.domain.model.User.Type.Inquirer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -22,7 +21,7 @@ class AddMessagePolicyTest : ChatFixtures() {
             fixtureInquirer
         )
 
-        assertThat(forImam.isAllowed(fixtureChat(), User(fixtureImamId, Imam)).isEmpty).isTrue
+        assertThat(forImam.isAllowed(fixtureChat(), fixtureImam).isEmpty).isTrue
     }
 
     @Test
@@ -35,7 +34,7 @@ class AddMessagePolicyTest : ChatFixtures() {
         assertThat(
             forImam.isAllowed(
                 fixtureChat(),
-                User(fixtureImamId, Inquirer)
+                User(fixtureImamId, Inquirer, NonBlankString.of("A name"))
             )
         ).isEqualTo(some(Declination.withReason("This operation is only allowed to imams")))
     }
@@ -47,7 +46,7 @@ class AddMessagePolicyTest : ChatFixtures() {
             fixtureInquirer
         )
 
-        assertThat(forInquirer.isAllowed(fixtureChat(), User(fixtureInquirerId, Inquirer)).isEmpty).isTrue
+        assertThat(forInquirer.isAllowed(fixtureChat(), fixtureInquirer).isEmpty).isTrue
     }
 
     @Test
@@ -58,10 +57,7 @@ class AddMessagePolicyTest : ChatFixtures() {
         )
 
         assertThat(
-            forInquirer.isAllowed(
-                fixtureChat(),
-                User(Id(3), Inquirer)
-            )
+            forInquirer.isAllowed(fixtureChat(), fixtureAnotherInquirer)
         ).isEqualTo(some(Declination.withReason("You're not allowed to add a message to someone else's chat")))
     }
 }

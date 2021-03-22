@@ -128,14 +128,14 @@ open class ChatFixtures {
         fixtureAudio,
     )
 
-    val fixtureImam = User(User.Id(1), User.Type.Imam)
+    val fixtureImam = User(User.Id(1), User.Type.Imam, NonBlankString.of("Imam"))
     val fixtureImamId = fixtureImam.id
 
-    val fixtureInquirer = User(User.Id(2), User.Type.Inquirer)
+    val fixtureInquirer = User(User.Id(2), User.Type.Inquirer, NonBlankString.of("Inquirer"))
     val fixtureInquirerId = fixtureInquirer.id
 
-    val fixtureAnotherInquirer = User(User.Id(20), User.Type.Inquirer)
-    val fixtureAnotherImam = User(User.Id(30), User.Type.Imam)
+    val fixtureAnotherInquirer = User(User.Id(20), User.Type.Inquirer, NonBlankString.of("Some guy"))
+    val fixtureAnotherImam = User(User.Id(30), User.Type.Imam, NonBlankString.of("Some imam"))
 
     val fixtureChatId = Chat.Id(1)
 

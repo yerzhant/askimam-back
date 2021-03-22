@@ -8,7 +8,6 @@ import kz.azan.askimam.chat.domain.event.MessageDeleted
 import kz.azan.askimam.chat.domain.event.MessageUpdated
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.common.type.NonBlankString
-import kz.azan.askimam.user.domain.model.User
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
@@ -68,7 +67,7 @@ class ChatPolicyTest : ChatFixtures() {
         fixtureClockAndThen(30)
         every { getCurrentUser() } returnsMany listOf(
             fixtureInquirer,
-            User(User.Id(10), User.Type.Inquirer)
+            fixtureAnotherInquirer,
         )
 
         fixtureChat().run {
