@@ -162,7 +162,7 @@ class Chat private constructor(
         val messageEntity = messages.find { it.id == id } ?: return some(Declination.withReason("Invalid id"))
 
         return messageEntity.run {
-            UpdateMessagePolicy.forAll.isAllowed(authorId, user).orElse {
+            UpdateMessagePolicy.forAll.isAllowed(authorId, user, type).orElse {
                 updateText(text)
                 messageRepository.update(this.toMessage()).onEmpty {
                     eventPublisher.publish(MessageUpdated(id, text, this.updatedAt()!!))

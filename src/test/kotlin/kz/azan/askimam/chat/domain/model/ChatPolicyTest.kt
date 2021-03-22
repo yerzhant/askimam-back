@@ -3,8 +3,10 @@ package kz.azan.askimam.chat.domain.model
 import io.mockk.every
 import io.mockk.verify
 import io.vavr.kotlin.none
+import io.vavr.kotlin.some
 import kz.azan.askimam.chat.domain.event.MessageDeleted
 import kz.azan.askimam.chat.domain.event.MessageUpdated
+import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.common.type.NonBlankString
 import kz.azan.askimam.user.domain.model.User
 import org.assertj.core.api.Assertions.assertThat
@@ -100,6 +102,20 @@ class ChatPolicyTest : ChatFixtures() {
 
         verify(exactly = 0) {
             eventPublisher.publish(MessageUpdated(fixtureMessageId1, fixtureNewMessage, timeAfter(10)))
+        }
+    }
+
+    @Test
+    internal fun `should not update an audio message`() {
+        fixtureClockAndThen(10)
+        every { messageRepository.add(any()) } returns none()
+
+        with(fixtureChat(NonBlankString.of("Аудио"))) {
+            addAudioMessage(fixtureAudio, fixtureImam)
+            val option = updateTextMessage(fixtureMessageId2, fixtureImam, fixtureNewReply)
+
+            assertThat(option).isEqualTo(some(Declination.withReason("An audio message may not be edited")))
+            assertThat(messages().first().updatedAt).isNull()
         }
     }
 }
