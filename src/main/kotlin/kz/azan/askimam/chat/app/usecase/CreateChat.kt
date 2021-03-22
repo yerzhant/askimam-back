@@ -27,10 +27,10 @@ class CreateChat(
     ): Option<Declination> = Chat.new(
         clock,
         eventPublisher,
+        getCurrentUser,
         chatRepository,
         messageRepository,
         type,
-        getCurrentUser().id,
         text,
     ).fold(
         { some(it) },
@@ -44,10 +44,10 @@ class CreateChat(
     ): Option<Declination> = Chat.newWithSubject(
         clock,
         eventPublisher,
+        getCurrentUser,
         chatRepository,
         messageRepository,
         type,
-        getCurrentUser().id,
         subject,
         text,
     ).fold(
