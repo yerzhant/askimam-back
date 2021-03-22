@@ -263,7 +263,7 @@ class ChatRepositoryTest : ChatFixtures() {
         every { chatRepository.update(chat) } returns some(Declination.withReason("update error"))
 
         chat.run {
-            assertThat(viewedByImam()).isEqualTo(some(Declination.withReason("update error")))
+            assertThat(viewedByImam(fixtureImam)).isEqualTo(some(Declination.withReason("update error")))
         }
     }
 
@@ -274,7 +274,7 @@ class ChatRepositoryTest : ChatFixtures() {
         every { chatRepository.update(any()) } returns some(Declination.withReason("update error"))
 
         chat.run {
-            assertThat(viewedByInquirer()).isEqualTo(some(Declination.withReason("update error")))
+            assertThat(viewedByInquirer(fixtureInquirer)).isEqualTo(some(Declination.withReason("update error")))
         }
     }
 

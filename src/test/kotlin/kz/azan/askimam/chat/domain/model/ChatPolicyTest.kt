@@ -1,6 +1,8 @@
 package kz.azan.askimam.chat.domain.model
 
+import io.mockk.every
 import io.mockk.verify
+import io.vavr.kotlin.none
 import kz.azan.askimam.chat.domain.event.MessageDeleted
 import kz.azan.askimam.chat.domain.event.MessageUpdated
 import kz.azan.askimam.chat.domain.policy.AddMessagePolicy
@@ -39,6 +41,30 @@ class ChatPolicyTest : ChatFixtures() {
 
             assertThat(option.isDefined).isTrue
             assertThat(subject()).isEqualTo(fixtureSubject)
+        }
+    }
+
+    @Test
+    internal fun `should not set 'Is viewed by imam' by non imam`() {
+        fixtureClock()
+        val chat = fixtureChat()
+
+        chat.run {
+            assertThat(viewedByImam(fixtureInquirer).isDefined).isTrue
+            assertThat(isViewedByImam()).isFalse
+        }
+    }
+
+    @Test
+    internal fun `should not set 'Is viewed by an inquirer' flag`() {
+        fixtureClock()
+        every { messageRepository.add(fixtureSavedMessage(fixtureMessageId2)) } returns none()
+        val chat = fixtureChat(fixtureNewReply)
+
+        chat.run {
+            addTextMessage(AddMessagePolicy.forImam, fixtureNewReply, fixtureImam)
+            assertThat(viewedByInquirer(fixtureAnotherInquirer).isDefined).isTrue
+            assertThat(isViewedByInquirer()).isFalse
         }
     }
 

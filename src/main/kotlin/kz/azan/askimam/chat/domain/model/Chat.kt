@@ -67,17 +67,17 @@ class Chat private constructor(
     fun isViewedByImam() = isViewedByImam
     fun isViewedByInquirer() = isViewedByInquirer
 
-    // TODO: add update policy check
-    fun viewedByImam(): Option<Declination> {
-        isViewedByImam = true
-        return chatRepository.update(this)
-    }
+    fun viewedByImam(user: User): Option<Declination> =
+        UpdateChatPolicy.forImam.isAllowed(this, user).orElse {
+            isViewedByImam = true
+            chatRepository.update(this)
+        }
 
-    // TODO: add update policy check
-    fun viewedByInquirer(): Option<Declination> {
-        isViewedByInquirer = true
-        return chatRepository.update(this)
-    }
+    fun viewedByInquirer(user: User): Option<Declination> =
+        UpdateChatPolicy.forInquirer.isAllowed(this, user).orElse {
+            isViewedByInquirer = true
+            chatRepository.update(this)
+        }
 
     fun subject() = subject
 

@@ -167,7 +167,7 @@ internal class ChatTest : ChatFixtures() {
 
         chat.run {
             assertThat(isViewedByImam()).isFalse
-            assertThat(viewedByImam().isEmpty).isTrue
+            assertThat(viewedByImam(fixtureImam).isEmpty).isTrue
             assertThat(isViewedByImam()).isTrue
         }
 
@@ -184,7 +184,7 @@ internal class ChatTest : ChatFixtures() {
         every { messageRepository.add(fixtureSavedMessage(fixtureMessageId2)) } returns none()
 
         chat.run {
-            viewedByImam()
+            viewedByImam(fixtureImam)
             val result = addTextMessage(
                 AddMessagePolicy.forInquirer,
                 fixtureNewMessage,
@@ -239,7 +239,7 @@ internal class ChatTest : ChatFixtures() {
         chat.run {
             addTextMessage(AddMessagePolicy.forImam, fixtureNewReply, fixtureImam)
             assertThat(isViewedByInquirer()).isFalse
-            assertThat(viewedByInquirer().isEmpty).isTrue
+            assertThat(viewedByInquirer(fixtureInquirer).isEmpty).isTrue
             assertThat(isViewedByInquirer()).isTrue
         }
 
