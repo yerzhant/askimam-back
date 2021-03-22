@@ -5,13 +5,20 @@ import io.vavr.kotlin.none
 import io.vavr.kotlin.some
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.user.domain.model.User
+import kz.azan.askimam.user.domain.model.User.Type.Imam
+import kz.azan.askimam.user.domain.model.User.Type.Inquirer
 
 fun interface DeleteMessagePolicy {
     fun isAllowed(authorId: User.Id, user: User): Option<Declination>
 
     companion object {
+        fun forThe(user: User) = when (user.type) {
+            Imam -> forImam
+            Inquirer -> forInquirer
+        }
+
         val forImam = DeleteMessagePolicy { _, user ->
-            if (user.type == User.Type.Imam) {
+            if (user.type == Imam) {
                 none()
             } else {
                 some(Declination.withReason("This operation is only allowed to imams"))

@@ -13,7 +13,6 @@ import kz.azan.askimam.chat.domain.model.Chat.Type.Private
 import kz.azan.askimam.chat.domain.model.Chat.Type.Public
 import kz.azan.askimam.chat.domain.model.Message.Type.Audio
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
-import kz.azan.askimam.chat.domain.policy.DeleteMessagePolicy
 import kz.azan.askimam.chat.domain.policy.UpdateMessagePolicy
 import kz.azan.askimam.common.type.NotBlankString
 import org.assertj.core.api.Assertions.assertThat
@@ -261,7 +260,7 @@ internal class ChatTest : ChatFixtures() {
         every { eventPublisher.publish(MessageDeleted(fixtureMessageId1)) } returns Unit
 
         with(fixtureChat()) {
-            val option = deleteMessage(fixtureMessageId1, DeleteMessagePolicy.forInquirer, fixtureInquirer)
+            val option = deleteMessage(fixtureMessageId1, fixtureInquirer)
 
             assertThat(option.isEmpty).isTrue
             assertThat(messages().size).isZero
@@ -283,7 +282,7 @@ internal class ChatTest : ChatFixtures() {
         every { eventPublisher.publish(MessageDeleted(fixtureMessageId1)) } returns Unit
 
         with(fixtureChat()) {
-            val option = deleteMessage(fixtureMessageId1, DeleteMessagePolicy.forImam, fixtureImam)
+            val option = deleteMessage(fixtureMessageId1, fixtureImam)
 
             assertThat(option.isEmpty).isTrue
             assertThat(messages().size).isZero

@@ -5,7 +5,6 @@ import io.mockk.verify
 import io.vavr.kotlin.none
 import kz.azan.askimam.chat.domain.event.MessageDeleted
 import kz.azan.askimam.chat.domain.event.MessageUpdated
-import kz.azan.askimam.chat.domain.policy.DeleteMessagePolicy
 import kz.azan.askimam.chat.domain.policy.UpdateMessagePolicy
 import kz.azan.askimam.common.type.NotBlankString
 import kz.azan.askimam.user.domain.model.User
@@ -77,7 +76,7 @@ class ChatPolicyTest : ChatFixtures() {
         fixtureClock()
 
         with(fixtureChat()) {
-            val option = deleteMessage(fixtureMessageId1, DeleteMessagePolicy.forInquirer, fixtureAnotherInquirer)
+            val option = deleteMessage(fixtureMessageId1, fixtureAnotherInquirer)
 
             assertThat(option.isDefined).isTrue
             assertThat(messages().size).isEqualTo(1)

@@ -10,7 +10,6 @@ import kz.azan.askimam.chat.domain.event.MessageAdded
 import kz.azan.askimam.chat.domain.event.MessageDeleted
 import kz.azan.askimam.chat.domain.event.MessageUpdated
 import kz.azan.askimam.chat.domain.model.Chat.Type.Private
-import kz.azan.askimam.chat.domain.policy.DeleteMessagePolicy.Companion.forInquirer
 import kz.azan.askimam.chat.domain.policy.UpdateMessagePolicy
 import kz.azan.askimam.common.domain.Declination
 import org.assertj.core.api.Assertions.assertThat
@@ -265,7 +264,7 @@ class ChatRepositoryTest : ChatFixtures() {
         fixtureClock()
 
         with(fixtureChat()) {
-            val option = deleteMessage(fixtureMessageId2, forInquirer, fixtureInquirer)
+            val option = deleteMessage(fixtureMessageId2, fixtureInquirer)
 
             assertThat(option).isEqualTo(some(Declination.withReason("Invalid id")))
             assertThat(messages().size).isEqualTo(1)
@@ -283,7 +282,7 @@ class ChatRepositoryTest : ChatFixtures() {
         every { messageRepository.delete(fixtureSavedMessage()) } returns some(Declination.withReason("delete error"))
 
         with(fixtureChat()) {
-            val option = deleteMessage(fixtureMessageId1, forInquirer, fixtureInquirer)
+            val option = deleteMessage(fixtureMessageId1, fixtureInquirer)
 
             assertThat(option).isEqualTo(some(Declination.withReason("delete error")))
             assertThat(messages().size).isEqualTo(1)

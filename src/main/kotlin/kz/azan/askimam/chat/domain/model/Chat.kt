@@ -145,11 +145,11 @@ class Chat private constructor(
             }
         }
 
-    fun deleteMessage(id: Message.Id, policy: DeleteMessagePolicy, user: User): Option<Declination> {
+    fun deleteMessage(id: Message.Id, user: User): Option<Declination> {
         val messageEntity = messages.find { it.id == id } ?: return some(Declination.withReason("Invalid id"))
 
         return messageEntity.run {
-            policy.isAllowed(authorId, user).orElse {
+            DeleteMessagePolicy.forThe(user).isAllowed(authorId, user).orElse {
                 messageRepository.delete(this.toMessage()).onEmpty {
                     messages.remove(this)
                     eventPublisher.publish(MessageDeleted(id))
