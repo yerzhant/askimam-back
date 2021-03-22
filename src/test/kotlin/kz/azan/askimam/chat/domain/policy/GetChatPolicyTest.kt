@@ -26,18 +26,27 @@ internal class GetChatPolicyTest : ChatFixtures() {
     @Test
     internal fun `should return a chat to any imam`() {
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer
+        )
         assertThat(forImam.isAllowed(fixtureChat(), fixtureImam).isRight).isTrue
     }
 
     @Test
     internal fun `should return a private chat to any imam`() {
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer
+        )
         assertThat(forImam.isAllowed(fixtureChat(type = Private), fixtureImam).isRight).isTrue
     }
 
     @Test
     internal fun `should be declined for a non imam`() {
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer
+        )
         assertThat(
             forImam.isAllowed(
                 fixtureChat(),
@@ -49,16 +58,23 @@ internal class GetChatPolicyTest : ChatFixtures() {
     @Test
     internal fun `should return a chat to an author`() {
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer
+        )
         assertThat(forInquirer.isAllowed(fixtureChat(type = Private), fixtureInquirer).isRight).isTrue
     }
 
     @Test
     internal fun `should return a public chat`() {
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer,
+            fixtureImam
+        )
         every { messageRepository.add(fixtureSavedMessage(fixtureMessageId2)) } returns none()
 
         with(fixtureChat(fixtureNewReply)) {
-            addTextMessage(fixtureNewReply, fixtureImam)
+            addTextMessage(fixtureNewReply)
             assertThat(forInquirer.isAllowed(this, fixtureAnotherInquirer).isRight).isTrue
         }
     }
@@ -66,6 +82,9 @@ internal class GetChatPolicyTest : ChatFixtures() {
     @Test
     internal fun `should decline the operation when not an author is trying to get a private chat`() {
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer
+        )
         assertThat(
             forInquirer.isAllowed(
                 fixtureChat(),
