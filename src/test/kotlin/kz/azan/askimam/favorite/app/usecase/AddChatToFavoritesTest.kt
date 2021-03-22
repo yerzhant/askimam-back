@@ -14,7 +14,7 @@ internal class AddChatToFavoritesTest : FavoriteFixtures() {
     internal fun `should add a favorite`() {
         fixtureClock()
         every { getCurrentUser() } returns fixtureInquirer
-        every { favoriteRepository.add(favorite) } returns none()
+        every { favoriteRepository.add(fixtureFavorite) } returns none()
 
         assertThat(AddChatToFavorites(clock, getCurrentUser, favoriteRepository)(fixtureChatId).isEmpty).isTrue
     }
@@ -23,7 +23,7 @@ internal class AddChatToFavoritesTest : FavoriteFixtures() {
     internal fun `should not add a favorite`() {
         fixtureClock()
         every { getCurrentUser() } returns fixtureInquirer
-        every { favoriteRepository.add(favorite) } returns some(Declination.withReason("boom!"))
+        every { favoriteRepository.add(fixtureFavorite) } returns some(Declination.withReason("boom!"))
 
         assertThat(AddChatToFavorites(clock, getCurrentUser, favoriteRepository)(fixtureChatId)).isEqualTo(
             some(Declination.withReason("boom!"))

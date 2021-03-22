@@ -9,5 +9,5 @@ open class FavoriteFixtures : ChatFixtures() {
 
     val favoriteRepository = mockk<FavoriteRepository>()
 
-    val favorite = Favorite(fixtureInquirerId, fixtureChatId, timeAfter(0))
+    val fixtureFavorite = Favorite(fixtureInquirerId, fixtureChatId, timeAfter(0))
 }
