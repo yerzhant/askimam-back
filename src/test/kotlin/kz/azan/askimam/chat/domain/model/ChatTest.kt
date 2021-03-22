@@ -15,7 +15,6 @@ import kz.azan.askimam.chat.domain.model.Message.Type.Audio
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
 import kz.azan.askimam.chat.domain.policy.AddMessagePolicy
 import kz.azan.askimam.chat.domain.policy.DeleteMessagePolicy
-import kz.azan.askimam.chat.domain.policy.UpdateChatPolicy
 import kz.azan.askimam.chat.domain.policy.UpdateMessagePolicy
 import kz.azan.askimam.common.type.NotBlankString
 import org.assertj.core.api.Assertions.assertThat
@@ -89,11 +88,7 @@ internal class ChatTest : ChatFixtures() {
         every { chatRepository.update(chat) } returns none()
 
         chat.run {
-            val option = updateSubject(
-                Subject.from("New subject"),
-                UpdateChatPolicy.forInquirer,
-                fixtureInquirer
-            )
+            val option = updateSubject(Subject.from("New subject"), fixtureInquirer)
 
             assertThat(option.isEmpty).isTrue
             assertThat(subject()).isEqualTo(Subject.from("New subject"))
@@ -112,7 +107,7 @@ internal class ChatTest : ChatFixtures() {
         every { chatRepository.update(chat) } returns none()
 
         chat.run {
-            val option = updateSubject(Subject.from("New subject"), UpdateChatPolicy.forImam, fixtureImam)
+            val option = updateSubject(Subject.from("New subject"), fixtureImam)
 
             assertThat(option.isEmpty).isTrue
             assertThat(subject()).isEqualTo(Subject.from("New subject"))

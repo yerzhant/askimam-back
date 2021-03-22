@@ -7,7 +7,6 @@ import kz.azan.askimam.chat.domain.event.MessageDeleted
 import kz.azan.askimam.chat.domain.event.MessageUpdated
 import kz.azan.askimam.chat.domain.policy.AddMessagePolicy
 import kz.azan.askimam.chat.domain.policy.DeleteMessagePolicy
-import kz.azan.askimam.chat.domain.policy.UpdateChatPolicy
 import kz.azan.askimam.chat.domain.policy.UpdateMessagePolicy
 import kz.azan.askimam.common.type.NotBlankString
 import kz.azan.askimam.user.domain.model.User
@@ -21,23 +20,7 @@ class ChatPolicyTest : ChatFixtures() {
         fixtureClock()
 
         fixtureChat().run {
-            val option = updateSubject(
-                Subject.from("New subject"),
-                UpdateChatPolicy.forInquirer,
-                fixtureAnotherInquirer
-            )
-
-            assertThat(option.isDefined).isTrue
-            assertThat(subject()).isEqualTo(fixtureSubject)
-        }
-    }
-
-    @Test
-    internal fun `should not update a subject by not an imam`() {
-        fixtureClock()
-
-        fixtureChat().run {
-            val option = updateSubject(Subject.from("New subject"), UpdateChatPolicy.forImam, fixtureInquirer)
+            val option = updateSubject(Subject.from("New subject"), fixtureAnotherInquirer)
 
             assertThat(option.isDefined).isTrue
             assertThat(subject()).isEqualTo(fixtureSubject)

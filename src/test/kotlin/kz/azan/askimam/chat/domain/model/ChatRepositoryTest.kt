@@ -12,7 +12,6 @@ import kz.azan.askimam.chat.domain.event.MessageUpdated
 import kz.azan.askimam.chat.domain.model.Chat.Type.Private
 import kz.azan.askimam.chat.domain.policy.AddMessagePolicy
 import kz.azan.askimam.chat.domain.policy.DeleteMessagePolicy.Companion.forInquirer
-import kz.azan.askimam.chat.domain.policy.UpdateChatPolicy
 import kz.azan.askimam.chat.domain.policy.UpdateMessagePolicy
 import kz.azan.askimam.common.domain.Declination
 import org.assertj.core.api.Assertions.assertThat
@@ -124,11 +123,7 @@ class ChatRepositoryTest : ChatFixtures() {
         every { chatRepository.update(chat) } returns some(Declination.withReason("chat error"))
 
         chat.run {
-            val option = updateSubject(
-                Subject.from("New subject"),
-                UpdateChatPolicy.forInquirer,
-                fixtureInquirer
-            )
+            val option = updateSubject(Subject.from("New subject"), fixtureInquirer)
 
             assertThat(option).isEqualTo(some(Declination.withReason("chat error")))
         }

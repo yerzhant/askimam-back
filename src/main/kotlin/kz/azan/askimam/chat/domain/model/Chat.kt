@@ -93,8 +93,8 @@ class Chat private constructor(
         )
     }.toList()
 
-    fun updateSubject(newSubject: Subject, policy: UpdateChatPolicy, user: User): Option<Declination> =
-        policy.isAllowed(this, user).orElse {
+    fun updateSubject(newSubject: Subject, user: User): Option<Declination> =
+        UpdateChatPolicy.getFor(user).isAllowed(this, user).orElse {
             subject = newSubject
             chatRepository.update(this)
         }
