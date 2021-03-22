@@ -3,7 +3,6 @@ package kz.azan.askimam.chat.app.usecase
 import io.mockk.every
 import io.vavr.kotlin.left
 import io.vavr.kotlin.right
-import kz.azan.askimam.chat.domain.model.Chat
 import kz.azan.askimam.chat.domain.model.Chat.Type.Private
 import kz.azan.askimam.chat.domain.model.ChatFixtures
 import kz.azan.askimam.common.domain.Declination
@@ -16,36 +15,36 @@ internal class GetChatTest : ChatFixtures() {
     internal fun `should return a chat`() {
         val chat = fixtureSavedChat()
         every { getCurrentUser() } returns fixtureInquirer
-        every { chatRepository.findById(Chat.Id(1)) } returns right(chat)
+        every { chatRepository.findById(fixtureChatId) } returns right(chat)
 
-        assertThat(GetChat(getCurrentUser, chatRepository)(Chat.Id(1)).get()).isEqualTo(chat)
+        assertThat(GetChat(getCurrentUser, chatRepository)(fixtureChatId).get()).isEqualTo(chat)
     }
 
     @Test
     internal fun `should return a chat to an imam`() {
         val chat = fixtureSavedChat()
         every { getCurrentUser() } returns fixtureImam
-        every { chatRepository.findById(Chat.Id(1)) } returns right(chat)
+        every { chatRepository.findById(fixtureChatId) } returns right(chat)
 
-        assertThat(GetChat(getCurrentUser, chatRepository)(Chat.Id(1)).get()).isEqualTo(chat)
+        assertThat(GetChat(getCurrentUser, chatRepository)(fixtureChatId).get()).isEqualTo(chat)
     }
 
     @Test
     internal fun `chat is not found`() {
         val declination = Declination.withReason("Chat is not found")
         every { getCurrentUser() } returns fixtureImam
-        every { chatRepository.findById(Chat.Id(1)) } returns left(declination)
+        every { chatRepository.findById(fixtureChatId) } returns left(declination)
 
-        assertThat(GetChat(getCurrentUser, chatRepository)(Chat.Id(1)).left).isEqualTo(declination)
+        assertThat(GetChat(getCurrentUser, chatRepository)(fixtureChatId).left).isEqualTo(declination)
     }
 
     @Test
     internal fun `should return a publicly visible chat`() {
         val chat = fixtureSavedChat()
         every { getCurrentUser() } returns fixtureAnotherInquirer
-        every { chatRepository.findById(Chat.Id(1)) } returns right(chat)
+        every { chatRepository.findById(fixtureChatId) } returns right(chat)
 
-        assertThat(GetChat(getCurrentUser, chatRepository)(Chat.Id(1)).get()).isEqualTo(chat)
+        assertThat(GetChat(getCurrentUser, chatRepository)(fixtureChatId).get()).isEqualTo(chat)
     }
 
     @Test
@@ -53,8 +52,8 @@ internal class GetChatTest : ChatFixtures() {
         val chat = fixtureSavedChat(Private)
         val declination = Declination.withReason("The operation is not permitted")
         every { getCurrentUser() } returns fixtureAnotherInquirer
-        every { chatRepository.findById(Chat.Id(1)) } returns right(chat)
+        every { chatRepository.findById(fixtureChatId) } returns right(chat)
 
-        assertThat(GetChat(getCurrentUser, chatRepository)(Chat.Id(1)).left).isEqualTo(declination)
+        assertThat(GetChat(getCurrentUser, chatRepository)(fixtureChatId).left).isEqualTo(declination)
     }
 }
