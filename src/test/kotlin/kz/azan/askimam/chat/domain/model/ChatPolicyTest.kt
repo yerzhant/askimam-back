@@ -17,9 +17,13 @@ class ChatPolicyTest : ChatFixtures() {
     @Test
     internal fun `should not update a subject by not an author`() {
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer,
+            fixtureAnotherInquirer
+        )
 
         fixtureChat().run {
-            val option = updateSubject(Subject.from("New subject"), fixtureAnotherInquirer)
+            val option = updateSubject(Subject.from("New subject"))
 
             assertThat(option.isDefined).isTrue
             assertThat(subject()).isEqualTo(fixtureSubject)
@@ -29,10 +33,14 @@ class ChatPolicyTest : ChatFixtures() {
     @Test
     internal fun `should not set 'Is viewed by imam' by non imam`() {
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer,
+            fixtureInquirer
+        )
         val chat = fixtureChat()
 
         chat.run {
-            assertThat(viewedByImam(fixtureInquirer).isDefined).isTrue
+            assertThat(viewedByImam().isDefined).isTrue
             assertThat(isViewedByImam()).isFalse
         }
     }
@@ -40,12 +48,17 @@ class ChatPolicyTest : ChatFixtures() {
     @Test
     internal fun `should not set 'Is viewed by an inquirer' flag`() {
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer,
+            fixtureImam,
+            fixtureAnotherInquirer
+        )
         every { messageRepository.add(fixtureSavedMessage(fixtureMessageId2)) } returns none()
         val chat = fixtureChat(fixtureNewReply)
 
         chat.run {
-            addTextMessage(fixtureNewReply, fixtureImam)
-            assertThat(viewedByInquirer(fixtureAnotherInquirer).isDefined).isTrue
+            addTextMessage(fixtureNewReply)
+            assertThat(viewedByInquirer().isDefined).isTrue
             assertThat(isViewedByInquirer()).isFalse
         }
     }
@@ -53,9 +66,13 @@ class ChatPolicyTest : ChatFixtures() {
     @Test
     internal fun `should not add a new message`() {
         fixtureClockAndThen(30)
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer,
+            User(User.Id(10), User.Type.Inquirer)
+        )
 
         fixtureChat().run {
-            val option = addTextMessage(fixtureNewMessage, User(User.Id(10), User.Type.Inquirer))
+            val option = addTextMessage(fixtureNewMessage)
 
             assertThat(option.isDefined).isTrue
         }
@@ -65,8 +82,13 @@ class ChatPolicyTest : ChatFixtures() {
     internal fun `should not add a new audio`() {
         val audio = NonBlankString.of("Аудио")
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer,
+            fixtureInquirer
+        )
+
         fixtureChat(audio).run {
-            val option = addAudioMessage(fixtureAudio, fixtureInquirer)
+            val option = addAudioMessage(fixtureAudio)
 
             assertThat(option.isDefined).isTrue
         }
@@ -75,9 +97,13 @@ class ChatPolicyTest : ChatFixtures() {
     @Test
     internal fun `should not delete a message by an inquirer`() {
         fixtureClock()
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer,
+            fixtureAnotherInquirer
+        )
 
         with(fixtureChat()) {
-            val option = deleteMessage(fixtureMessageId1, fixtureAnotherInquirer)
+            val option = deleteMessage(fixtureMessageId1)
 
             assertThat(option.isDefined).isTrue
             assertThat(messages().size).isEqualTo(1)
@@ -91,9 +117,13 @@ class ChatPolicyTest : ChatFixtures() {
     @Test
     internal fun `should not update a message`() {
         fixtureClockAndThen(10)
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer,
+            fixtureAnotherInquirer
+        )
 
         with(fixtureChat()) {
-            val option = updateTextMessage(fixtureMessageId1, fixtureAnotherInquirer, fixtureNewMessage)
+            val option = updateTextMessage(fixtureMessageId1, fixtureNewMessage)
 
             assertThat(option.isDefined).isTrue
             assertThat(messages().first().text).isEqualTo(fixtureMessage)
@@ -108,11 +138,16 @@ class ChatPolicyTest : ChatFixtures() {
     @Test
     internal fun `should not update an audio message`() {
         fixtureClockAndThen(10)
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer,
+            fixtureImam,
+            fixtureImam,
+        )
         every { messageRepository.add(any()) } returns none()
 
         with(fixtureChat(NonBlankString.of("Аудио"))) {
-            addAudioMessage(fixtureAudio, fixtureImam)
-            val option = updateTextMessage(fixtureMessageId2, fixtureImam, fixtureNewReply)
+            addAudioMessage(fixtureAudio)
+            val option = updateTextMessage(fixtureMessageId2, fixtureNewReply)
 
             assertThat(option).isEqualTo(some(Declination.withReason("An audio message may not be edited")))
             assertThat(messages().first().updatedAt).isNull()
