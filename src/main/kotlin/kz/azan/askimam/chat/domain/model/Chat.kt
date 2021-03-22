@@ -170,8 +170,8 @@ class Chat private constructor(
 
         return messageEntity.run {
             policy.isAllowed(authorId, user).orElse {
+                updateText(text)
                 messageRepository.update(this.toMessage()).onEmpty {
-                    updateText(text)
                     eventPublisher.publish(MessageUpdated(id, text, this.updatedAt()!!))
                 }
             }

@@ -18,7 +18,6 @@ import kz.azan.askimam.common.domain.Declination
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-// TODO: Add asserts on the chat aggregate and its message entity
 class ChatRepositoryTest : ChatFixtures() {
 
     @Test
@@ -164,6 +163,7 @@ class ChatRepositoryTest : ChatFixtures() {
             )
 
             assertThat(result).isEqualTo(some(Declination.withReason("msg id error")))
+            assertThat(messages()).hasSize(1)
         }
 
         verify(exactly = 0) {
@@ -203,6 +203,7 @@ class ChatRepositoryTest : ChatFixtures() {
             )
 
             assertThat(result).isEqualTo(some(Declination.withReason("chat update error")))
+            assertThat(messages()).hasSize(1)
         }
 
         verify(exactly = 0) {
@@ -247,6 +248,7 @@ class ChatRepositoryTest : ChatFixtures() {
             )
 
             assertThat(result).isEqualTo(some(Declination.withReason("msg add error")))
+            assertThat(messages()).hasSize(1)
         }
 
         verify(exactly = 0) {
@@ -323,6 +325,8 @@ class ChatRepositoryTest : ChatFixtures() {
             )
 
             assertThat(option).isEqualTo(some(Declination.withReason("Invalid id")))
+            assertThat(messages().first().text).isEqualTo(fixtureMessage)
+            assertThat(messages().first().updatedAt).isNull()
         }
 
         verify(exactly = 0) {
