@@ -17,22 +17,47 @@ import org.junit.jupiter.api.Test
 class ChatRepositoryTest : ChatFixtures() {
 
     @Test
-    internal fun `should not create a chat - message id generation issue`() {
+    internal fun `should not create a chat - chat id generation issue`() {
         fixtureClock()
-        every { messageRepository.generateId() } returns left(Declination.withReason("id error"))
+        every { chatRepository.generateId() } returns left(Declination.withReason("chat id error"))
 
         val chat = Chat.new(
             clock,
             eventPublisher,
             chatRepository,
             messageRepository,
-            fixtureChatId,
             Private,
             fixtureInquirerId,
             fixtureMessage,
         )
 
-        assertThat(chat.left).isEqualTo(Declination.withReason("id error"))
+        assertThat(chat.left).isEqualTo(Declination.withReason("chat id error"))
+
+        verify(exactly = 0) {
+            messageRepository.generateId()
+            chatRepository.create(any())
+            messageRepository.add(any())
+            eventPublisher.publish(any())
+        }
+    }
+
+    @Test
+    internal fun `should not create a chat - message id generation issue`() {
+        fixtureClock()
+        every { chatRepository.generateId() } returns right(fixtureChatId)
+        every { messageRepository.generateId() } returns left(Declination.withReason("msg id error"))
+
+        val chat = Chat.new(
+            clock,
+            eventPublisher,
+            chatRepository,
+            messageRepository,
+            Private,
+            fixtureInquirerId,
+            fixtureMessage,
+        )
+
+        assertThat(chat.left).isEqualTo(Declination.withReason("msg id error"))
 
         verify(exactly = 0) {
             chatRepository.create(any())
@@ -44,6 +69,7 @@ class ChatRepositoryTest : ChatFixtures() {
     @Test
     internal fun `should not create a chat - chat repo error`() {
         fixtureClock()
+        every { chatRepository.generateId() } returns right(fixtureChatId)
         every { messageRepository.generateId() } returns right(fixtureMessageId1)
         every { chatRepository.create(any()) } returns some(Declination.withReason("chat create error"))
 
@@ -52,7 +78,6 @@ class ChatRepositoryTest : ChatFixtures() {
             eventPublisher,
             chatRepository,
             messageRepository,
-            fixtureChatId,
             Private,
             fixtureInquirerId,
             fixtureMessage,
@@ -69,6 +94,7 @@ class ChatRepositoryTest : ChatFixtures() {
     @Test
     internal fun `should not create a chat - message repo error`() {
         fixtureClock()
+        every { chatRepository.generateId() } returns right(fixtureChatId)
         every { messageRepository.generateId() } returns right(fixtureMessageId1)
         every { chatRepository.create(any()) } returns none()
         every { messageRepository.add(any()) } returns some(Declination.withReason("message add error"))
@@ -78,7 +104,6 @@ class ChatRepositoryTest : ChatFixtures() {
             eventPublisher,
             chatRepository,
             messageRepository,
-            fixtureChatId,
             Private,
             fixtureInquirerId,
             fixtureMessage,
@@ -94,6 +119,7 @@ class ChatRepositoryTest : ChatFixtures() {
     @Test
     internal fun `should create a chat`() {
         fixtureClock()
+        every { chatRepository.generateId() } returns right(fixtureChatId)
         every { messageRepository.generateId() } returns right(fixtureMessageId1)
         every { chatRepository.create(any()) } returns none()
         every { messageRepository.add(any()) } returns none()
@@ -104,7 +130,6 @@ class ChatRepositoryTest : ChatFixtures() {
             eventPublisher,
             chatRepository,
             messageRepository,
-            fixtureChatId,
             Private,
             fixtureInquirerId,
             fixtureMessage,
@@ -129,6 +154,7 @@ class ChatRepositoryTest : ChatFixtures() {
     @Test
     internal fun `should not add a new message - msg id generation error`() {
         fixtureClockAndThen(30)
+        every { chatRepository.generateId() } returns right(fixtureChatId)
         every { messageRepository.generateId() } returnsMany listOf(
             right(fixtureMessageId1),
             left(Declination.withReason("msg id error"))
@@ -141,7 +167,6 @@ class ChatRepositoryTest : ChatFixtures() {
             eventPublisher,
             chatRepository,
             messageRepository,
-            fixtureChatId,
             Private,
             fixtureInquirerId,
             fixtureMessage,
@@ -164,6 +189,7 @@ class ChatRepositoryTest : ChatFixtures() {
     @Test
     internal fun `should not add a new message - chat update error`() {
         fixtureClockAndThen(30)
+        every { chatRepository.generateId() } returns right(fixtureChatId)
         every { messageRepository.generateId() } returnsMany listOf(
             right(fixtureMessageId1),
             right(fixtureMessageId2),
@@ -177,7 +203,6 @@ class ChatRepositoryTest : ChatFixtures() {
             eventPublisher,
             chatRepository,
             messageRepository,
-            fixtureChatId,
             Private,
             fixtureInquirerId,
             fixtureMessage,
@@ -199,6 +224,7 @@ class ChatRepositoryTest : ChatFixtures() {
     @Test
     internal fun `should not add a new message - msg add error`() {
         fixtureClockAndThen(30)
+        every { chatRepository.generateId() } returns right(fixtureChatId)
         every { messageRepository.generateId() } returnsMany listOf(
             right(fixtureMessageId1),
             right(fixtureMessageId2),
@@ -218,7 +244,6 @@ class ChatRepositoryTest : ChatFixtures() {
             eventPublisher,
             chatRepository,
             messageRepository,
-            fixtureChatId,
             Private,
             fixtureInquirerId,
             fixtureMessage,

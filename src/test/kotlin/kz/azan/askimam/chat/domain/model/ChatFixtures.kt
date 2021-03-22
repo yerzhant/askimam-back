@@ -46,6 +46,7 @@ open class ChatFixtures {
 
         every { eventPublisher.publish(ChatCreated(subject, firstMessage)) } returns Unit
         every { eventPublisher.publish(MessageAdded(subject, newMessage)) } returns Unit
+        every { chatRepository.generateId() } returns right(fixtureChatId)
         every { chatRepository.create(any()) } returns none()
         every { chatRepository.update(any()) } returns none()
         every { messageRepository.add(fixtureSavedMessage()) } returns none()
@@ -59,7 +60,6 @@ open class ChatFixtures {
             eventPublisher,
             chatRepository,
             messageRepository,
-            fixtureChatId,
             type,
             fixtureInquirerId,
             subject,

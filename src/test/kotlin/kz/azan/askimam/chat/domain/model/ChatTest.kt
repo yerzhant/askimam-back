@@ -45,6 +45,7 @@ internal class ChatTest : ChatFixtures() {
         }
 
         verifySequence {
+            chatRepository.generateId()
             messageRepository.generateId()
             chatRepository.create(chat)
             messageRepository.add(fixtureSavedMessage())
@@ -56,16 +57,16 @@ internal class ChatTest : ChatFixtures() {
     internal fun `should create a chat without a subject`() {
         fixtureClock()
         every { eventPublisher.publish(ChatCreated(null, fixtureMessage)) } returns Unit
+        every { chatRepository.generateId() } returns right(fixtureChatId)
         every { chatRepository.create(any()) } returns none()
-        every { messageRepository.add(any()) } returns none()
         every { messageRepository.generateId() } returns right(fixtureMessageId1)
+        every { messageRepository.add(any()) } returns none()
 
         Chat.new(
             clock,
             eventPublisher,
             chatRepository,
             messageRepository,
-            fixtureChatId,
             Private,
             fixtureInquirerId,
             fixtureMessage,
@@ -92,6 +93,7 @@ internal class ChatTest : ChatFixtures() {
         }
 
         verifySequence {
+            chatRepository.generateId()
             chatRepository.create(chat)
             chatRepository.update(chat)
         }
@@ -111,6 +113,7 @@ internal class ChatTest : ChatFixtures() {
         }
 
         verifySequence {
+            chatRepository.generateId()
             chatRepository.create(chat)
             chatRepository.update(chat)
         }
@@ -136,6 +139,7 @@ internal class ChatTest : ChatFixtures() {
         }
 
         verifySequence {
+            chatRepository.generateId()
             messageRepository.generateId()
             chatRepository.create(chat)
             messageRepository.add(fixtureSavedMessage())

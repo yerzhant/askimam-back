@@ -177,12 +177,11 @@ class Chat private constructor(
             eventPublisher: EventPublisher,
             chatRepository: ChatRepository,
             messageRepository: MessageRepository,
-            id: Id,
             type: Type,
             askedBy: User.Id,
             subject: Subject,
             messageText: NonBlankString,
-        ): Either<Declination, Chat> {
+        ): Either<Declination, Chat> = chatRepository.generateId().flatMap { id ->
             val now = ZonedDateTime.now(clock)
             val chat = Chat(
                 clock,
@@ -197,7 +196,7 @@ class Chat private constructor(
                 subject
             )
 
-            return chat.init(messageText).fold(
+            chat.init(messageText).fold(
                 { right(chat) },
                 { left(it) }
             )
@@ -208,11 +207,10 @@ class Chat private constructor(
             eventPublisher: EventPublisher,
             chatRepository: ChatRepository,
             messageRepository: MessageRepository,
-            id: Id,
             type: Type,
             askedBy: User.Id,
             messageText: NonBlankString,
-        ): Either<Declination, Chat> {
+        ): Either<Declination, Chat> = chatRepository.generateId().flatMap { id ->
             val now = ZonedDateTime.now(clock)
             val chat = Chat(
                 clock,
@@ -226,7 +224,7 @@ class Chat private constructor(
                 now
             )
 
-            return chat.init(messageText).fold(
+            chat.init(messageText).fold(
                 { right(chat) },
                 { left(it) }
             )
