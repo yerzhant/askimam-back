@@ -10,7 +10,6 @@ import kz.azan.askimam.chat.domain.event.MessageAdded
 import kz.azan.askimam.chat.domain.event.MessageDeleted
 import kz.azan.askimam.chat.domain.event.MessageUpdated
 import kz.azan.askimam.chat.domain.model.Chat.Type.Private
-import kz.azan.askimam.chat.domain.policy.AddMessagePolicy
 import kz.azan.askimam.chat.domain.policy.DeleteMessagePolicy.Companion.forInquirer
 import kz.azan.askimam.chat.domain.policy.UpdateMessagePolicy
 import kz.azan.askimam.common.domain.Declination
@@ -151,11 +150,7 @@ class ChatRepositoryTest : ChatFixtures() {
         ).get()
 
         chat.run {
-            val result = addTextMessage(
-                AddMessagePolicy.forInquirer,
-                fixtureNewMessage,
-                fixtureInquirer
-            )
+            val result = addTextMessage(fixtureNewMessage, fixtureInquirer)
 
             assertThat(result).isEqualTo(some(Declination.withReason("msg id error")))
             assertThat(messages()).hasSize(1)
@@ -191,11 +186,7 @@ class ChatRepositoryTest : ChatFixtures() {
         ).get()
 
         chat.run {
-            val result = addTextMessage(
-                AddMessagePolicy.forInquirer,
-                fixtureNewMessage,
-                fixtureInquirer
-            )
+            val result = addTextMessage(fixtureNewMessage, fixtureInquirer)
 
             assertThat(result).isEqualTo(some(Declination.withReason("chat update error")))
             assertThat(messages()).hasSize(1)
@@ -236,11 +227,7 @@ class ChatRepositoryTest : ChatFixtures() {
         ).get()
 
         chat.run {
-            val result = addTextMessage(
-                AddMessagePolicy.forInquirer,
-                fixtureNewMessage,
-                fixtureInquirer
-            )
+            val result = addTextMessage(fixtureNewMessage, fixtureInquirer)
 
             assertThat(result).isEqualTo(some(Declination.withReason("msg add error")))
             assertThat(messages()).hasSize(1)

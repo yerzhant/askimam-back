@@ -5,7 +5,6 @@ import io.mockk.verify
 import io.vavr.kotlin.none
 import kz.azan.askimam.chat.domain.event.MessageDeleted
 import kz.azan.askimam.chat.domain.event.MessageUpdated
-import kz.azan.askimam.chat.domain.policy.AddMessagePolicy
 import kz.azan.askimam.chat.domain.policy.DeleteMessagePolicy
 import kz.azan.askimam.chat.domain.policy.UpdateMessagePolicy
 import kz.azan.askimam.common.type.NotBlankString
@@ -45,7 +44,7 @@ class ChatPolicyTest : ChatFixtures() {
         val chat = fixtureChat(fixtureNewReply)
 
         chat.run {
-            addTextMessage(AddMessagePolicy.forImam, fixtureNewReply, fixtureImam)
+            addTextMessage(fixtureNewReply, fixtureImam)
             assertThat(viewedByInquirer(fixtureAnotherInquirer).isDefined).isTrue
             assertThat(isViewedByInquirer()).isFalse
         }
@@ -56,11 +55,7 @@ class ChatPolicyTest : ChatFixtures() {
         fixtureClockAndThen(30)
 
         fixtureChat().run {
-            val option = addTextMessage(
-                AddMessagePolicy.forInquirer,
-                fixtureNewMessage,
-                User(User.Id(10), User.Type.Inquirer),
-            )
+            val option = addTextMessage(fixtureNewMessage, User(User.Id(10), User.Type.Inquirer))
 
             assertThat(option.isDefined).isTrue
         }
@@ -71,7 +66,7 @@ class ChatPolicyTest : ChatFixtures() {
         val audio = NotBlankString.of("Аудио")
         fixtureClock()
         fixtureChat(audio).run {
-            val option = addAudioMessage(AddMessagePolicy.forImam, fixtureAudio, fixtureInquirer)
+            val option = addAudioMessage(fixtureAudio, fixtureInquirer)
 
             assertThat(option.isDefined).isTrue
         }

@@ -100,26 +100,24 @@ class Chat private constructor(
         }
 
     fun addTextMessage(
-        policy: AddMessagePolicy,
         text: NotBlankString,
         author: User
     ): Option<Declination> = messageRepository.generateId().fold(
         { some(it) },
         {
             val message = MessageEntity.newText(clock, it, author.id, text)
-            addMessage(message, policy, author)
+            addMessage(message, AddMessagePolicy.getFor(author), author)
         }
     )
 
     fun addAudioMessage(
-        policy: AddMessagePolicy,
         audio: NotBlankString,
         imam: User
     ): Option<Declination> = messageRepository.generateId().fold(
         { some(it) },
         {
             val message = MessageEntity.newAudio(clock, it, imam.id, audio)
-            addMessage(message, policy, imam)
+            addMessage(message, AddMessagePolicy.forImam, imam)
         }
     )
 

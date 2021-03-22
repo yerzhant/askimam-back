@@ -58,7 +58,7 @@ internal class GetChatPolicyTest : ChatFixtures() {
         every { messageRepository.add(fixtureSavedMessage(fixtureMessageId2)) } returns none()
 
         with(fixtureChat(fixtureNewReply)) {
-            addTextMessage(AddMessagePolicy.forImam, fixtureNewReply, fixtureImam)
+            addTextMessage(fixtureNewReply, fixtureImam)
             assertThat(forInquirer.isAllowed(this, fixtureAnotherInquirer).isRight).isTrue
         }
     }

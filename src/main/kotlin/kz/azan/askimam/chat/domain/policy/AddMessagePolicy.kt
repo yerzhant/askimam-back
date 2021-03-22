@@ -7,11 +7,17 @@ import kz.azan.askimam.chat.domain.model.Chat
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.user.domain.model.User
 import kz.azan.askimam.user.domain.model.User.Type.Imam
+import kz.azan.askimam.user.domain.model.User.Type.Inquirer
 
 fun interface AddMessagePolicy {
     fun isAllowed(chat: Chat, user: User): Option<Declination>
 
     companion object {
+        fun getFor(user: User) = when (user.type) {
+            Imam -> forImam
+            Inquirer -> forInquirer
+        }
+
         val forImam = AddMessagePolicy { _, user ->
             if (user.type == Imam) {
                 none()

@@ -13,7 +13,6 @@ import kz.azan.askimam.chat.domain.model.Chat.Type.Private
 import kz.azan.askimam.chat.domain.model.Chat.Type.Public
 import kz.azan.askimam.chat.domain.model.Message.Type.Audio
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
-import kz.azan.askimam.chat.domain.policy.AddMessagePolicy
 import kz.azan.askimam.chat.domain.policy.DeleteMessagePolicy
 import kz.azan.askimam.chat.domain.policy.UpdateMessagePolicy
 import kz.azan.askimam.common.type.NotBlankString
@@ -126,11 +125,7 @@ internal class ChatTest : ChatFixtures() {
         val chat = fixtureChat()
 
         chat.run {
-            val result = addTextMessage(
-                AddMessagePolicy.forInquirer,
-                fixtureNewMessage,
-                fixtureInquirer
-            )
+            val result = addTextMessage(fixtureNewMessage, fixtureInquirer)
 
             assertThat(result.isEmpty).isTrue
             assertThat(updatedAt()).isEqualTo(timeAfter(30))
@@ -180,11 +175,7 @@ internal class ChatTest : ChatFixtures() {
 
         chat.run {
             viewedByImam(fixtureImam)
-            val result = addTextMessage(
-                AddMessagePolicy.forInquirer,
-                fixtureNewMessage,
-                fixtureInquirer
-            )
+            val result = addTextMessage(fixtureNewMessage, fixtureInquirer)
 
             assertThat(result.isEmpty).isTrue
             assertThat(isViewedByImam()).isFalse
@@ -197,7 +188,7 @@ internal class ChatTest : ChatFixtures() {
         every { messageRepository.add(fixtureSavedMessage(fixtureMessageId2)) } returns none()
 
         fixtureChat(fixtureNewReply).run {
-            val option = addTextMessage(AddMessagePolicy.forImam, fixtureNewReply, fixtureImam)
+            val option = addTextMessage(fixtureNewReply, fixtureImam)
 
             assertThat(option.isEmpty).isTrue
             assertThat(isVisibleToPublic()).isTrue
@@ -218,7 +209,7 @@ internal class ChatTest : ChatFixtures() {
         every { messageRepository.add(fixtureSavedMessage(fixtureMessageId2)) } returns none()
 
         fixtureChat(fixtureNewReply, Private).run {
-            val option = addTextMessage(AddMessagePolicy.forImam, fixtureNewReply, fixtureImam)
+            val option = addTextMessage(fixtureNewReply, fixtureImam)
 
             assertThat(option.isEmpty).isTrue
             assertThat(isVisibleToPublic()).isFalse
@@ -232,7 +223,7 @@ internal class ChatTest : ChatFixtures() {
         val chat = fixtureChat(fixtureNewReply)
 
         chat.run {
-            addTextMessage(AddMessagePolicy.forImam, fixtureNewReply, fixtureImam)
+            addTextMessage(fixtureNewReply, fixtureImam)
             assertThat(isViewedByInquirer()).isFalse
             assertThat(viewedByInquirer(fixtureInquirer).isEmpty).isTrue
             assertThat(isViewedByInquirer()).isTrue
@@ -250,7 +241,7 @@ internal class ChatTest : ChatFixtures() {
         every { messageRepository.add(fixtureSavedAudioMessage()) } returns none()
 
         fixtureChat(audio).run {
-            val option = addAudioMessage(AddMessagePolicy.forImam, fixtureAudio, fixtureImam)
+            val option = addAudioMessage(fixtureAudio, fixtureImam)
 
             assertThat(option.isEmpty).isTrue
             assertThat(messages().last().type).isEqualTo(Audio)
@@ -362,7 +353,7 @@ internal class ChatTest : ChatFixtures() {
         } returns Unit
 
         with(fixtureChat(fixtureNewReply)) {
-            addTextMessage(AddMessagePolicy.forImam, fixtureNewReply, fixtureImam)
+            addTextMessage(fixtureNewReply, fixtureImam)
             val option = updateTextMessage(
                 fixtureMessageId2,
                 fixtureImam,
