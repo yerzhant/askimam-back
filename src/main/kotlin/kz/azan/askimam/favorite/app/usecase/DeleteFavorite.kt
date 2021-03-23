@@ -15,10 +15,7 @@ class DeleteFavorite(
     operator fun invoke(chatId: Chat.Id): Option<Declination> {
         val currentUser = getCurrentUser()
 
-        return favoriteRepository.findByUserIdAndChatId(
-            currentUser.id,
-            chatId,
-        ).fold(
+        return favoriteRepository.findByUserIdAndChatId(currentUser.id, chatId).fold(
             { some(it) },
             {
                 DeleteFavoritePolicy.forAll.isAllowed(it, currentUser).orElse {
