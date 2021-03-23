@@ -1,6 +1,7 @@
 package kz.azan.askimam.favorite.infra
 
 import kz.azan.askimam.chat.domain.model.Chat
+import kz.azan.askimam.common.infra.DataJdbcIT
 import kz.azan.askimam.favorite.FavoriteFixtures
 import kz.azan.askimam.favorite.domain.model.Favorite
 import kz.azan.askimam.user.domain.model.User
@@ -8,17 +9,12 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.data.TemporalUnitWithinOffset
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.data.relational.core.conversion.DbActionExecutionException
-import org.springframework.test.context.TestConstructor
 import org.springframework.test.context.jdbc.Sql
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
-@DataJdbcTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
+@DataJdbcIT
 @Sql("/scripts/users.sql", "/scripts/chat.sql", "/scripts/favorites.sql")
 class FavoriteJdbcRepositoryIT(
     private val dao: FavoriteDao,
