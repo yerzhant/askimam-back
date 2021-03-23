@@ -157,7 +157,7 @@ open class ChatFixtures {
     val fixtureNewReply = NonBlankString.of("A new reply")
 
     val fixtureAudio = NonBlankString.of("audio.mp3")
-    private val fixtureAudioText = NonBlankString.of("Аудио")
+    val fixtureAudioText = NonBlankString.of("Аудио")
 
     val fixtureNow: LocalDateTime = LocalDateTime.now(fixedClock)
 

@@ -8,9 +8,14 @@ import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.common.type.NonBlankString
 
 class AddAudioMessage(private val chatRepository: ChatRepository) {
-    operator fun invoke(id: Chat.Id, text: NonBlankString): Option<Declination> =
+
+    operator fun invoke(id: Chat.Id, audio: NonBlankString): Option<Declination> =
         chatRepository.findById(id).fold(
             { some(it) },
-            { it.addAudioMessage(text) }
+            {
+                it.addAudioMessage(audio).orElse {
+                    chatRepository.update(it)
+                }
+            }
         )
 }
