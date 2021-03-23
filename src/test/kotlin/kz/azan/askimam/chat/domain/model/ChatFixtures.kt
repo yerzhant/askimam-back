@@ -2,8 +2,6 @@ package kz.azan.askimam.chat.domain.model
 
 import io.mockk.every
 import io.mockk.mockk
-import io.vavr.kotlin.none
-import io.vavr.kotlin.right
 import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.event.MessageAdded
 import kz.azan.askimam.chat.domain.model.Chat.Type.Public
@@ -20,7 +18,6 @@ open class ChatFixtures {
     val eventPublisher = mockk<EventPublisher>()
     val getCurrentUser = mockk<GetCurrentUser>()
     val chatRepository = mockk<ChatRepository>()
-    val messageRepository = mockk<MessageRepository>()
 
     private val fixedClock: Clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
     val clock = mockk<Clock>()
@@ -46,29 +43,18 @@ open class ChatFixtures {
 
         every { eventPublisher.publish(ChatCreated(subject, firstMessage)) } returns Unit
         every { eventPublisher.publish(MessageAdded(subject, newMessage)) } returns Unit
-        every { chatRepository.generateId() } returns right(fixtureChatId)
-        every { chatRepository.create(any()) } returns none()
-        every { chatRepository.update(any()) } returns none()
-        every { messageRepository.add(fixtureSavedMessage()) } returns none()
-        every { messageRepository.generateId() } returnsMany listOf(
-            right(fixtureMessageId1),
-            right(fixtureMessageId2),
-        )
 
         return Chat.newWithSubject(
             clock,
             eventPublisher,
             getCurrentUser,
-            chatRepository,
-            messageRepository,
             type,
             subject,
             firstMessage,
-        ).get()
+        )
     }
 
     fun fixtureSavedChat(type: Chat.Type = Public): Chat {
-        fixtureClock()
         val subject = fixtureSubject
         val now = LocalDateTime.now(clock)
 
@@ -76,8 +62,6 @@ open class ChatFixtures {
             clock,
             eventPublisher,
             getCurrentUser,
-            chatRepository,
-            messageRepository,
             fixtureChatId,
             type,
             fixtureInquirerId,
@@ -94,11 +78,31 @@ open class ChatFixtures {
                     null,
                     now,
                     null
-                )
+                ),
+                Message.restore(
+                    clock,
+                    fixtureMessageId2,
+                    Text,
+                    fixtureImamId,
+                    fixtureMessage,
+                    null,
+                    now,
+                    null
+                ),
+                Message.restore(
+                    clock,
+                    fixtureMessageId3,
+                    Audio,
+                    fixtureImamId,
+                    fixtureAudioText,
+                    fixtureAudio,
+                    now,
+                    null
+                ),
             ),
             isVisibleToPublic = type == Public,
             isViewedByImam = true,
-            isViewedByInquirer = false,
+            isViewedByInquirer = true,
         )
     }
 
@@ -125,7 +129,7 @@ open class ChatFixtures {
         fixtureMessageId2,
         Audio,
         fixtureImamId,
-        NonBlankString.of("Аудио"),
+        fixtureAudioText,
         fixtureAudio,
         timeAfter(0),
         null,
@@ -146,12 +150,14 @@ open class ChatFixtures {
 
     val fixtureMessageId1 = Message.Id(1)
     val fixtureMessageId2 = Message.Id(2)
+    val fixtureMessageId3 = Message.Id(3)
 
     val fixtureMessage = NonBlankString.of("A message")
     val fixtureNewMessage = NonBlankString.of("A new message")
     val fixtureNewReply = NonBlankString.of("A new reply")
 
     val fixtureAudio = NonBlankString.of("audio.mp3")
+    private val fixtureAudioText = NonBlankString.of("Аудио")
 
     val fixtureNow: LocalDateTime = LocalDateTime.now(fixedClock)
 
