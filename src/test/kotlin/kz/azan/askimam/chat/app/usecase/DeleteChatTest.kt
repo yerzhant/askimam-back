@@ -5,6 +5,8 @@ import io.mockk.verify
 import io.vavr.kotlin.left
 import io.vavr.kotlin.none
 import io.vavr.kotlin.right
+import io.vavr.kotlin.some
+import kz.azan.askimam.chat.domain.model.Chat
 import kz.azan.askimam.chat.domain.model.ChatFixtures
 import kz.azan.askimam.common.domain.Declination
 import org.assertj.core.api.Assertions
@@ -14,10 +16,7 @@ internal class DeleteChatTest : ChatFixtures() {
 
     @Test
     internal fun `should delete a chat by an author`() {
-        val chat = fixtureSavedChat()
-        every { getCurrentUser() } returns fixtureInquirer
-        every { chatRepository.findById(fixtureChatId) } returns right(chat)
-        every { chatRepository.delete(chat) } returns none()
+        val chat = fixtures()
 
         Assertions.assertThat(DeleteChat(getCurrentUser, chatRepository)(fixtureChatId).isEmpty).isTrue
 
@@ -27,11 +26,17 @@ internal class DeleteChatTest : ChatFixtures() {
     }
 
     @Test
+    internal fun `should not delete a chat by an author - delete error`() {
+        val chat = fixtures()
+        every { chatRepository.delete(chat) } returns some(Declination.withReason("error"))
+
+        Assertions.assertThat(DeleteChat(getCurrentUser, chatRepository)(fixtureChatId).isDefined).isTrue
+    }
+
+    @Test
     internal fun `should delete a chat by an imam`() {
-        val chat = fixtureSavedChat()
+        val chat = fixtures()
         every { getCurrentUser() } returns fixtureImam
-        every { chatRepository.findById(fixtureChatId) } returns right(chat)
-        every { chatRepository.delete(chat) } returns none()
 
         Assertions.assertThat(DeleteChat(getCurrentUser, chatRepository)(fixtureChatId).isEmpty).isTrue
 
@@ -42,6 +47,7 @@ internal class DeleteChatTest : ChatFixtures() {
 
     @Test
     internal fun `should not delete someone else's chat`() {
+        fixtureClock()
         val chat = fixtureSavedChat()
         every { getCurrentUser() } returns fixtureAnotherInquirer
         every { chatRepository.findById(fixtureChatId) } returns right(chat)
@@ -63,5 +69,14 @@ internal class DeleteChatTest : ChatFixtures() {
         verify(exactly = 0) {
             chatRepository.delete(any())
         }
+    }
+
+    private fun fixtures(): Chat {
+        fixtureClock()
+        val chat = fixtureSavedChat()
+        every { getCurrentUser() } returns fixtureInquirer
+        every { chatRepository.findById(fixtureChatId) } returns right(chat)
+        every { chatRepository.delete(chat) } returns none()
+        return chat
     }
 }
