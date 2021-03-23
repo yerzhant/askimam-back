@@ -10,5 +10,4 @@ interface ChatRepository {
     fun create(chat: Chat): Option<Declination>
     fun delete(chat: Chat): Option<Declination>
     fun update(chat: Chat): Option<Declination>
-    fun generateId(): Either<Declination, Id>
 }
