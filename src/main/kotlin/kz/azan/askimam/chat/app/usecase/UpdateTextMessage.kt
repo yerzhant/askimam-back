@@ -9,9 +9,10 @@ import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.common.type.NonBlankString
 
 class UpdateTextMessage(private val chatRepository: ChatRepository) {
+
     operator fun invoke(chatId: Chat.Id, id: Message.Id, text: NonBlankString): Option<Declination> =
         chatRepository.findById(chatId).fold(
             { some(it) },
-            { it.updateTextMessage(id, text) }
+            { it.updateTextMessage(id, text).orElse { chatRepository.update(it) } }
         )
 }

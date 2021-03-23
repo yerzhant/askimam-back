@@ -1,9 +1,13 @@
 package kz.azan.askimam.chat.app.usecase
 
 import io.mockk.every
+import io.mockk.verify
+import io.vavr.kotlin.left
 import io.vavr.kotlin.none
 import io.vavr.kotlin.right
+import io.vavr.kotlin.some
 import kz.azan.askimam.chat.domain.model.ChatFixtures
+import kz.azan.askimam.common.domain.Declination
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
@@ -21,10 +25,43 @@ internal class UpdateTextMessageTest : ChatFixtures() {
                 fixtureNewMessage
             ).isEmpty
         ).isTrue
+
+        verify { chatRepository.update(any()) }
     }
 
     @Test
-    internal fun `should not add a text message`() {
+    internal fun `should not update a text message - id not found`() {
+        every { getCurrentUser() } returns fixtureInquirer
+        every { chatRepository.findById(any()) } returns left(Declination.withReason("x"))
+
+        assertThat(
+            UpdateTextMessage(chatRepository)(
+                fixtureChatId,
+                fixtureMessageId1,
+                fixtureNewMessage
+            ).isDefined
+        ).isTrue
+    }
+
+    @Test
+    internal fun `should not update a text message - update error`() {
+        fixtures()
+        every { getCurrentUser() } returns fixtureInquirer
+        every { chatRepository.update(any()) } returns some(Declination.withReason("x"))
+
+        assertThat(
+            UpdateTextMessage(chatRepository)(
+                fixtureChatId,
+                fixtureMessageId1,
+                fixtureNewMessage
+            ).isDefined
+        ).isTrue
+
+        verify { chatRepository.update(any()) }
+    }
+
+    @Test
+    internal fun `should not update a text message by an imam`() {
         every { getCurrentUser() } returns fixtureImam
         fixtures()
 
@@ -38,8 +75,9 @@ internal class UpdateTextMessageTest : ChatFixtures() {
     }
 
     private fun fixtures() {
+        fixtureClock()
         every { chatRepository.findById(any()) } returns right(fixtureSavedChat())
-        every { messageRepository.update(any()) } returns none()
+        every { chatRepository.update(any()) } returns none()
         every { eventPublisher.publish(any()) } returns Unit
     }
 }
