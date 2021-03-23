@@ -4,7 +4,7 @@ import kz.azan.askimam.common.arch.PackagePrivate
 import kz.azan.askimam.common.type.NonBlankString
 import kz.azan.askimam.user.domain.model.User
 import java.time.Clock
-import java.time.ZonedDateTime
+import java.time.LocalDateTime
 
 class Message private constructor(
     private val clock: Clock,
@@ -17,8 +17,8 @@ class Message private constructor(
 
     val audio: NonBlankString? = null,
 
-    val createdAt: ZonedDateTime = ZonedDateTime.now(clock),
-    private var updatedAt: ZonedDateTime? = null,
+    val createdAt: LocalDateTime = LocalDateTime.now(clock),
+    private var updatedAt: LocalDateTime? = null,
 ) {
     fun updatedAt() = updatedAt
 
@@ -27,7 +27,7 @@ class Message private constructor(
     @PackagePrivate
     fun updateText(text: NonBlankString) {
         this.text = text
-        updatedAt = ZonedDateTime.now(clock)
+        updatedAt = LocalDateTime.now(clock)
     }
 
     companion object {
@@ -55,8 +55,8 @@ class Message private constructor(
             authorId: User.Id,
             text: NonBlankString,
             audio: NonBlankString?,
-            createdAt: ZonedDateTime,
-            updatedAt: ZonedDateTime?,
+            createdAt: LocalDateTime,
+            updatedAt: LocalDateTime?,
         ) =
             Message(
                 clock,

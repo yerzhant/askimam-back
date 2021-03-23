@@ -16,7 +16,7 @@ import kz.azan.askimam.chat.domain.model.Message.Type.Text
 import kz.azan.askimam.common.type.NonBlankString
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import java.time.ZonedDateTime
+import java.time.LocalDateTime
 
 internal class ChatTest : ChatFixtures() {
 
@@ -423,7 +423,7 @@ internal class ChatTest : ChatFixtures() {
     @Test
     internal fun `should restore a saved chat`() {
         fixtureClock()
-        val now = ZonedDateTime.now(clock)
+        val now = LocalDateTime.now(clock)
         val messages =
             listOf(
                 Message.restore(

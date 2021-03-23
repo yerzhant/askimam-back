@@ -70,7 +70,7 @@ open class ChatFixtures {
     fun fixtureSavedChat(type: Chat.Type = Public): Chat {
         fixtureClock()
         val subject = fixtureSubject
-        val now = ZonedDateTime.now(clock)
+        val now = LocalDateTime.now(clock)
 
         return Chat.restore(
             clock,
@@ -106,8 +106,8 @@ open class ChatFixtures {
         id: Message.Id = fixtureMessageId1,
         text: NonBlankString = fixtureMessage,
         userId: User.Id = fixtureInquirerId,
-        createdAt: ZonedDateTime = timeAfter(0),
-        updatedAt: ZonedDateTime? = null,
+        createdAt: LocalDateTime = timeAfter(0),
+        updatedAt: LocalDateTime? = null,
     ) =
         Message.restore(
             clock,
@@ -153,7 +153,7 @@ open class ChatFixtures {
 
     val fixtureAudio = NonBlankString.of("audio.mp3")
 
-    val fixtureNow: ZonedDateTime = ZonedDateTime.now(fixedClock)
+    val fixtureNow: LocalDateTime = LocalDateTime.now(fixedClock)
 
-    fun timeAfter(minutes: Long): ZonedDateTime = fixtureNow.plusMinutes(minutes)
+    fun timeAfter(minutes: Long): LocalDateTime = fixtureNow.plusMinutes(minutes)
 }

@@ -3,13 +3,15 @@ package kz.azan.askimam.favorite.infra
 import kz.azan.askimam.chat.domain.model.Chat
 import kz.azan.askimam.favorite.domain.model.Favorite
 import kz.azan.askimam.user.domain.model.User
-import java.time.ZonedDateTime
+import org.springframework.data.relational.core.mapping.Table
+import java.time.LocalDateTime
 
+@Table("FAVORITE")
 data class FavoriteRow(
     val id: Long?,
     val userId: Long,
     val chatId: Long,
-    val addedAt: ZonedDateTime,
+    val addedAt: LocalDateTime,
 ) {
     companion object {
         fun from(favorite: Favorite) = FavoriteRow(

@@ -22,7 +22,7 @@ import kz.azan.askimam.user.domain.model.User
 import kz.azan.askimam.user.domain.model.User.Type.Imam
 import kz.azan.askimam.user.domain.model.User.Type.Inquirer
 import java.time.Clock
-import java.time.ZonedDateTime
+import java.time.LocalDateTime
 
 class Chat private constructor(
     private val clock: Clock,
@@ -35,8 +35,8 @@ class Chat private constructor(
     val type: Type,
     val askedBy: User.Id,
 
-    private val createdAt: ZonedDateTime,
-    private var updatedAt: ZonedDateTime,
+    private val createdAt: LocalDateTime,
+    private var updatedAt: LocalDateTime,
 
     private var subject: Subject? = null,
 
@@ -113,7 +113,7 @@ class Chat private constructor(
         user: User
     ): Option<Declination> =
         policy.isAllowed(this, user).orElse {
-            updatedAt = ZonedDateTime.now(clock)
+            updatedAt = LocalDateTime.now(clock)
 
             when (user.type) {
                 Inquirer -> isViewedByImam = false
@@ -169,7 +169,7 @@ class Chat private constructor(
             subject: Subject,
             messageText: NonBlankString,
         ): Either<Declination, Chat> = chatRepository.generateId().flatMap { id ->
-            val now = ZonedDateTime.now(clock)
+            val now = LocalDateTime.now(clock)
             val chat = Chat(
                 clock,
                 eventPublisher,
@@ -199,7 +199,7 @@ class Chat private constructor(
             type: Type,
             messageText: NonBlankString,
         ): Either<Declination, Chat> = chatRepository.generateId().flatMap { id ->
-            val now = ZonedDateTime.now(clock)
+            val now = LocalDateTime.now(clock)
             val chat = Chat(
                 clock,
                 eventPublisher,
@@ -228,8 +228,8 @@ class Chat private constructor(
             id: Id,
             type: Type,
             askedBy: User.Id,
-            createdAt: ZonedDateTime,
-            updatedAt: ZonedDateTime,
+            createdAt: LocalDateTime,
+            updatedAt: LocalDateTime,
             subject: Subject?,
             messages: List<Message>,
             isVisibleToPublic: Boolean,

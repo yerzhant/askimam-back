@@ -2,13 +2,13 @@ package kz.azan.askimam.favorite.domain.model
 
 import kz.azan.askimam.chat.domain.model.Chat
 import kz.azan.askimam.user.domain.model.User
-import java.time.ZonedDateTime
+import java.time.LocalDateTime
 
 data class Favorite(
     val id: Id?, // The mapper does not support a composite key
     val userId: User.Id,
     val chatId: Chat.Id,
-    val addedAt: ZonedDateTime,
+    val addedAt: LocalDateTime,
 ) {
 
     data class Id(val value: Long)
