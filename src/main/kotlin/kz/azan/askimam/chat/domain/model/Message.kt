@@ -1,5 +1,6 @@
 package kz.azan.askimam.chat.domain.model
 
+import kz.azan.askimam.common.arch.PackagePrivate
 import kz.azan.askimam.common.type.NonBlankString
 import kz.azan.askimam.user.domain.model.User
 import java.time.Clock
@@ -23,6 +24,7 @@ class Message private constructor(
 
     fun text() = text
 
+    @PackagePrivate
     fun updateText(text: NonBlankString) {
         this.text = text
         updatedAt = ZonedDateTime.now(clock)

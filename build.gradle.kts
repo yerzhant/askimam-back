@@ -45,6 +45,7 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:mysql")
     testImplementation("com.ninja-squad:springmockk:3.0.1")
+    testImplementation("com.tngtech.archunit:archunit-junit5:0.17.0")
     testRuntimeOnly("com.h2database:h2")
 }
 
