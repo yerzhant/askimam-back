@@ -24,7 +24,7 @@ class FavoriteJdbcRepository(private val favoriteDao: FavoriteDao) : FavoriteRep
     override fun findByUserIdAndChatId(userId: User.Id, chatId: Chat.Id): Either<Declination, Favorite> =
         Try { favoriteDao.findByUserIdAndChatId(userId.value, chatId.value) }
             .toEither()
-            .bimap({ getDeclination(it) }, { it })
+            .bimap({ getDeclination(it) }, { it.toDomain() })
 
     override fun add(favorite: Favorite): Option<Declination> =
         Try { favoriteDao.save(FavoriteRow.from(favorite)) }

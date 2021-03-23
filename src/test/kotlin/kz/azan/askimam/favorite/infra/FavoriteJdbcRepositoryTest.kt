@@ -55,7 +55,7 @@ internal class FavoriteJdbcRepositoryTest : FavoriteFixtures() {
     internal fun `should find by a user id and chat id`() {
         every {
             favoriteDao.findByUserIdAndChatId(fixtureInquirerId.value, fixtureChatId.value)
-        } returns fixtureFavorite
+        } returns fixtureFavoriteRow
 
         assertThat(FavoriteJdbcRepository(favoriteDao).findByUserIdAndChatId(fixtureInquirerId, fixtureChatId).get())
             .isEqualTo(fixtureFavorite)
