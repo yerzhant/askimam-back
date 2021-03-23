@@ -3,11 +3,13 @@ package kz.azan.askimam.favorite.infra
 import kz.azan.askimam.chat.domain.model.Chat
 import kz.azan.askimam.favorite.domain.model.Favorite
 import kz.azan.askimam.user.domain.model.User
+import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
 
 @Table("FAVORITE")
 data class FavoriteRow(
+    @Id
     val id: Long?,
     val userId: Long,
     val chatId: Long,
