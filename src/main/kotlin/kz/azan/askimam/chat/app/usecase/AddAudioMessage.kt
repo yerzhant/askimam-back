@@ -12,10 +12,6 @@ class AddAudioMessage(private val chatRepository: ChatRepository) {
     operator fun invoke(id: Chat.Id, audio: NonBlankString): Option<Declination> =
         chatRepository.findById(id).fold(
             { some(it) },
-            {
-                it.addAudioMessage(audio).orElse {
-                    chatRepository.update(it)
-                }
-            }
+            { it.addAudioMessage(audio).orElse { chatRepository.update(it) } }
         )
 }

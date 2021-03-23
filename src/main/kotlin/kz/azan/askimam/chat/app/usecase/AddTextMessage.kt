@@ -12,10 +12,6 @@ class AddTextMessage(private val chatRepository: ChatRepository) {
     operator fun invoke(id: Chat.Id, text: NonBlankString): Option<Declination> =
         chatRepository.findById(id).fold(
             { some(it) },
-            {
-                it.addTextMessage(text).orElse {
-                    chatRepository.update(it)
-                }
-            }
+            { it.addTextMessage(text).orElse { chatRepository.update(it) } }
         )
 }
