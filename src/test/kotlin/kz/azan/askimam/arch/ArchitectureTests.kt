@@ -23,8 +23,18 @@ class ArchitectureTests {
 
     private val domain = "Domain"
     private val application = "Application"
+    private val infra = "Infra"
 //    private val web = "Web"
-//    private val infra = "Infra"
+
+    @ArchTest
+    val layerRule = Architectures.layeredArchitecture()
+        .layer(domain).definedBy("..domain..")
+        .layer(application).definedBy("..app..")
+        .layer(infra).definedBy("..infra..")
+        .whereLayer(infra).mayNotBeAccessedByAnyLayer()
+//        .layer(web).definedBy("..web..")
+//        .whereLayer(application).mayOnlyBeAccessedByLayers(web)
+//        .whereLayer(web).mayNotBeAccessedByAnyLayer()
 
     private val areAnnotatedByAPackagePrivate =
         object : DescribedPredicate<JavaMethod>("are annotated as a package private") {
@@ -47,14 +57,4 @@ class ArchitectureTests {
     @ArchTest
     val `entity package private members should not be accessed from outside of their packages` =
         methods().that(areAnnotatedByAPackagePrivate).should(notBeCalledFromExternalPackages)
-
-    @ArchTest
-    val layerRule = Architectures.layeredArchitecture()
-        .layer(domain).definedBy("..domain..")
-        .layer(application).definedBy("..app..")
-//        .layer(web).definedBy("..web..")
-//        .layer(infra).definedBy("..infra..")
-//        .whereLayer(application).mayOnlyBeAccessedByLayers(web)
-//        .whereLayer(web).mayNotBeAccessedByAnyLayer()
-//        .whereLayer(infra).mayNotBeAccessedByAnyLayer()
 }
