@@ -62,6 +62,8 @@ class Chat private constructor(
 
     fun createdAt() = createdAt
     fun updatedAt() = updatedAt
+    fun subject() = subject
+    fun messages() = messages.toList()
 
     fun isVisibleToPublic() = isVisibleToPublic && type == Public
     fun isViewedByImam() = isViewedByImam
@@ -78,10 +80,6 @@ class Chat private constructor(
             isViewedByInquirer = true
             chatRepository.update(this)
         }
-
-    fun subject() = subject
-
-    fun messages() = messages.toList()
 
     fun updateSubject(newSubject: Subject): Option<Declination> {
         val user = getCurrentUser()
