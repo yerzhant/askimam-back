@@ -1,9 +1,6 @@
 package kz.azan.askimam.chat.domain.model
 
-import io.vavr.control.Either
 import io.vavr.control.Option
-import io.vavr.kotlin.left
-import io.vavr.kotlin.right
 import io.vavr.kotlin.some
 import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.event.MessageAdded
@@ -28,10 +25,8 @@ class Chat private constructor(
     private val clock: Clock,
     private val eventPublisher: EventPublisher,
     private val getCurrentUser: GetCurrentUser,
-    private val chatRepository: ChatRepository,
-    private val messageRepository: MessageRepository,
 
-    val id: Id,
+    val id: Id?,
     val type: Type,
     val askedBy: User.Id,
 
@@ -46,19 +41,11 @@ class Chat private constructor(
     private var isViewedByImam: Boolean = false,
     private var isViewedByInquirer: Boolean = true,
 ) {
-    private fun init(messageText: NonBlankString) = messageRepository.generateId().fold(
-        { some(it) },
-        {
-            chatRepository.create(this).orElse {
-                val message = Message.newText(clock, it, askedBy, messageText)
-
-                messageRepository.add(message).onEmpty {
-                    messages.add(message)
-                    eventPublisher.publish(ChatCreated(subject, messageText))
-                }
-            }
-        }
-    )
+    private fun init(messageText: NonBlankString) {
+        val message = Message.newText(clock, askedBy, messageText)
+        messages.add(message)
+        eventPublisher.publish(ChatCreated(subject, messageText))
+    }
 
     fun updatedAt() = updatedAt
     fun subject() = subject
@@ -69,90 +56,74 @@ class Chat private constructor(
     fun isViewedByInquirer() = isViewedByInquirer
 
     fun viewedByImam(): Option<Declination> =
-        UpdateChatPolicy.forImam.isAllowed(this, getCurrentUser()).orElse {
+        UpdateChatPolicy.forImam.isAllowed(this, getCurrentUser()).onEmpty {
             isViewedByImam = true
-            chatRepository.update(this)
         }
 
     fun viewedByInquirer(): Option<Declination> =
-        UpdateChatPolicy.forInquirer.isAllowed(this, getCurrentUser()).orElse {
+        UpdateChatPolicy.forInquirer.isAllowed(this, getCurrentUser()).onEmpty {
             isViewedByInquirer = true
-            chatRepository.update(this)
         }
 
     fun updateSubject(newSubject: Subject): Option<Declination> {
         val user = getCurrentUser()
-        return UpdateChatPolicy.getFor(user).isAllowed(this, user).orElse {
+        return UpdateChatPolicy.getFor(user).isAllowed(this, user).onEmpty {
             subject = newSubject
-            chatRepository.update(this)
         }
     }
 
-    fun addTextMessage(text: NonBlankString): Option<Declination> = messageRepository.generateId().fold(
-        { some(it) },
-        {
-            val author = getCurrentUser()
-            val message = Message.newText(clock, it, author.id, text)
-            addMessage(message, AddMessagePolicy.getFor(author), author)
-        }
-    )
+    fun addTextMessage(text: NonBlankString): Option<Declination> {
+        val author = getCurrentUser()
+        val message = Message.newText(clock, author.id, text)
+        return addMessage(message, AddMessagePolicy.getFor(author), author)
+    }
 
-    fun addAudioMessage(audio: NonBlankString): Option<Declination> = messageRepository.generateId().fold(
-        { some(it) },
-        {
-            val imam = getCurrentUser()
-            val message = Message.newAudio(clock, it, imam.id, audio)
-            addMessage(message, AddMessagePolicy.forImam, imam)
-        }
-    )
+    fun addAudioMessage(audio: NonBlankString): Option<Declination> {
+        val imam = getCurrentUser()
+        val message = Message.newAudio(clock, imam.id, audio)
+        return addMessage(message, AddMessagePolicy.forImam, imam)
+    }
 
     private fun addMessage(
         message: Message,
         policy: AddMessagePolicy,
         user: User
-    ): Option<Declination> =
-        policy.isAllowed(this, user).orElse {
-            updatedAt = LocalDateTime.now(clock)
+    ): Option<Declination> = policy.isAllowed(this, user).onEmpty {
 
-            when (user.type) {
-                Inquirer -> isViewedByImam = false
-                Imam -> {
-                    if (type == Public) isVisibleToPublic = true
-                    isViewedByInquirer = false
-                }
-            }
+        updatedAt = LocalDateTime.now(clock)
 
-            chatRepository.update(this).orElse {
-                messageRepository.add(message).onEmpty {
-                    messages.add(message)
-                    eventPublisher.publish(MessageAdded(subject, message.text()))
-                }
+        when (user.type) {
+            Inquirer -> isViewedByImam = false
+            Imam -> {
+                if (type == Public) isVisibleToPublic = true
+                isViewedByInquirer = false
             }
         }
 
-    fun deleteMessage(id: Message.Id): Option<Declination> {
-        val messageEntity = messages.find { it.id == id } ?: return some(Declination.withReason("Invalid id"))
+        messages.add(message)
+        eventPublisher.publish(MessageAdded(subject, message.text()))
+    }
 
-        return messageEntity.run {
+    fun deleteMessage(id: Message.Id): Option<Declination> {
+        val message = messages.find { it.id == id } ?: return some(Declination.withReason("Invalid id"))
+
+        return message.run {
             val user = getCurrentUser()
-            DeleteMessagePolicy.forThe(user).isAllowed(authorId, user).orElse {
-                messageRepository.delete(this).onEmpty {
-                    messages.remove(this)
-                    eventPublisher.publish(MessageDeleted(id))
-                }
+
+            DeleteMessagePolicy.forThe(user).isAllowed(authorId, user).onEmpty {
+                messages.remove(this)
+                eventPublisher.publish(MessageDeleted(id))
             }
         }
     }
 
     fun updateTextMessage(id: Message.Id, text: NonBlankString): Option<Declination> {
-        val messageEntity = messages.find { it.id == id } ?: return some(Declination.withReason("Invalid id"))
+        val message = messages.find { it.id == id } ?: return some(Declination.withReason("Invalid id"))
 
-        return messageEntity.run {
-            UpdateMessagePolicy.forAll.isAllowed(authorId, getCurrentUser(), type).orElse {
+        return message.run {
+            UpdateMessagePolicy.forAll.isAllowed(authorId, getCurrentUser(), type).onEmpty {
                 updateText(text)
-                messageRepository.update(this).onEmpty {
-                    eventPublisher.publish(MessageUpdated(id, text, this.updatedAt()!!))
-                }
+                eventPublisher.publish(MessageUpdated(id, text, this.updatedAt()!!))
             }
         }
     }
@@ -162,68 +133,48 @@ class Chat private constructor(
             clock: Clock,
             eventPublisher: EventPublisher,
             getCurrentUser: GetCurrentUser,
-            chatRepository: ChatRepository,
-            messageRepository: MessageRepository,
             type: Type,
             subject: Subject,
             messageText: NonBlankString,
-        ): Either<Declination, Chat> = chatRepository.generateId().flatMap { id ->
+        ): Chat {
             val now = LocalDateTime.now(clock)
-            val chat = Chat(
+            return Chat(
                 clock,
                 eventPublisher,
                 getCurrentUser,
-                chatRepository,
-                messageRepository,
-                id,
+                null,
                 type,
                 getCurrentUser().id,
                 now,
                 now,
                 subject
-            )
-
-            chat.init(messageText).fold(
-                { right(chat) },
-                { left(it) }
-            )
+            ).apply { init(messageText) }
         }
 
         fun new(
             clock: Clock,
             eventPublisher: EventPublisher,
             getCurrentUser: GetCurrentUser,
-            chatRepository: ChatRepository,
-            messageRepository: MessageRepository,
             type: Type,
             messageText: NonBlankString,
-        ): Either<Declination, Chat> = chatRepository.generateId().flatMap { id ->
+        ): Chat {
             val now = LocalDateTime.now(clock)
-            val chat = Chat(
+            return Chat(
                 clock,
                 eventPublisher,
                 getCurrentUser,
-                chatRepository,
-                messageRepository,
-                id,
+                null,
                 type,
                 getCurrentUser().id,
                 now,
                 now
-            )
-
-            chat.init(messageText).fold(
-                { right(chat) },
-                { left(it) }
-            )
+            ).apply { init(messageText) }
         }
 
         fun restore(
             clock: Clock,
             eventPublisher: EventPublisher,
             getCurrentUser: GetCurrentUser,
-            chatRepository: ChatRepository,
-            messageRepository: MessageRepository,
             id: Id,
             type: Type,
             askedBy: User.Id,
@@ -238,8 +189,6 @@ class Chat private constructor(
             clock,
             eventPublisher,
             getCurrentUser,
-            chatRepository,
-            messageRepository,
             id,
             type,
             askedBy,

@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 class Message private constructor(
     private val clock: Clock,
 
-    val id: Id,
+    val id: Id?,
     val type: Type,
     val authorId: User.Id,
 
@@ -33,19 +33,17 @@ class Message private constructor(
     companion object {
         fun newText(
             clock: Clock,
-            id: Id,
             authorId: User.Id,
             text: NonBlankString,
-        ) = Message(clock, id, Type.Text, authorId, text)
+        ) = Message(clock, null, Type.Text, authorId, text)
 
         fun newAudio(
             clock: Clock,
-            id: Id,
             authorId: User.Id,
             audio: NonBlankString,
         ): Message {
             val text = NonBlankString.of("Аудио")
-            return Message(clock, id, Type.Audio, authorId, text, audio)
+            return Message(clock, null, Type.Audio, authorId, text, audio)
         }
 
         fun restore(
@@ -82,7 +80,11 @@ class Message private constructor(
     }
 
     override fun hashCode(): Int {
-        return id.hashCode()
+        return id?.hashCode() ?: 0
+    }
+
+    override fun toString(): String {
+        return "Message(id=$id, type=$type, authorId=$authorId, text=$text, audio=$audio, createdAt=$createdAt, updatedAt=$updatedAt)"
     }
 
     data class Id(val value: Long)
