@@ -8,9 +8,14 @@ import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.common.type.NonBlankString
 
 class AddTextMessage(private val chatRepository: ChatRepository) {
+
     operator fun invoke(id: Chat.Id, text: NonBlankString): Option<Declination> =
         chatRepository.findById(id).fold(
             { some(it) },
-            { it.addTextMessage(text) }
+            {
+                it.addTextMessage(text).orElse {
+                    chatRepository.update(it)
+                }
+            }
         )
 }
