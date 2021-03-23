@@ -1,6 +1,7 @@
 package kz.azan.askimam.chat.app.usecase
 
 import io.mockk.every
+import io.mockk.verify
 import io.vavr.kotlin.left
 import io.vavr.kotlin.none
 import io.vavr.kotlin.right
@@ -15,23 +16,35 @@ internal class SetViewedByTest : ChatFixtures() {
     @Test
     internal fun `should set viewed by an inquirer`() {
         every { getCurrentUser() } returns fixtureInquirer
-        every { chatRepository.findById(any()) } returns right(fixtureSavedChat())
-        every { chatRepository.update(any()) } returns none()
+        fixtures()
 
         assertThat(SetViewedBy(getCurrentUser, chatRepository)(fixtureChatId).isEmpty).isTrue
+
+        verify { chatRepository.update(any()) }
+    }
+
+    @Test
+    internal fun `should not set viewed by an inquirer - update error`() {
+        every { getCurrentUser() } returns fixtureInquirer
+        fixtures()
+        every { chatRepository.update(any()) } returns some(Declination.withReason("x"))
+
+        assertThat(SetViewedBy(getCurrentUser, chatRepository)(fixtureChatId).isDefined).isTrue
     }
 
     @Test
     internal fun `should set viewed by an imam`() {
         every { getCurrentUser() } returns fixtureImam
-        every { chatRepository.findById(any()) } returns right(fixtureSavedChat())
-        every { chatRepository.update(any()) } returns none()
+        fixtures()
 
         assertThat(SetViewedBy(getCurrentUser, chatRepository)(fixtureChatId).isEmpty).isTrue
+
+        verify { chatRepository.update(any()) }
     }
 
     @Test
     internal fun `should not set viewed by an inquirer - the chat is not yours`() {
+        fixtureClock()
         every { getCurrentUser() } returns fixtureAnotherInquirer
         every { chatRepository.findById(any()) } returns right(fixtureSavedChat())
 
@@ -46,5 +59,11 @@ internal class SetViewedByTest : ChatFixtures() {
         assertThat(
             SetViewedBy(getCurrentUser, chatRepository)(fixtureChatId)
         ).isEqualTo(some(Declination.withReason("id not found")))
+    }
+
+    private fun fixtures() {
+        fixtureClock()
+        every { chatRepository.findById(any()) } returns right(fixtureSavedChat())
+        every { chatRepository.update(any()) } returns none()
     }
 }
