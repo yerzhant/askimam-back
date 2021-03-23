@@ -49,10 +49,10 @@ internal class DeleteFavoriteTest : FavoriteFixtures() {
     }
 
     @Test
-    internal fun `should not delete a favorite (mistake in infra)`() {
+    internal fun `should not delete a favorite (mistake in infra - policy in action)`() {
         every { getCurrentUser() } returns fixtureInquirer
         every { favoriteRepository.findByUserIdAndChatId(fixtureInquirerId, fixtureChatId) } returns right(
-            fixtureFavorite.copy(fixtureAnotherInquirer.id)
+            fixtureFavorite.copy(userId = fixtureAnotherInquirer.id)
         )
 
         assertThat(DeleteFavorite(getCurrentUser, favoriteRepository)(fixtureChatId).isDefined).isTrue

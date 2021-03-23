@@ -16,8 +16,8 @@ internal class GetMyFavoritesTest : FavoriteFixtures() {
         every { getCurrentUser() } returns fixtureInquirer
         every { favoriteRepository.findByUserId(fixtureInquirerId) } returns right(
             listOf(
-                Favorite(fixtureInquirerId, fixtureChatId, timeAfter(0)),
-                Favorite(fixtureInquirerId, fixtureChatId, timeAfter(10)),
+                fixtureFavorite,
+                fixtureFavorite.copy(Favorite.Id(10)),
             )
         )
 
@@ -29,7 +29,7 @@ internal class GetMyFavoritesTest : FavoriteFixtures() {
         every { getCurrentUser() } returns fixtureInquirer
         every { favoriteRepository.findByUserId(fixtureInquirerId) } returns left(Declination.withReason("boom!"))
 
-        assertThat(GetMyFavorites(getCurrentUser, favoriteRepository)())
-            .isEqualTo(left<Declination, List<Favorite>>(Declination.withReason("boom!")))
+        assertThat(GetMyFavorites(getCurrentUser, favoriteRepository)().left)
+            .isEqualTo(Declination.withReason("boom!"))
     }
 }

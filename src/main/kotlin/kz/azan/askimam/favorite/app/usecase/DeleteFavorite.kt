@@ -2,8 +2,8 @@ package kz.azan.askimam.favorite.app.usecase
 
 import io.vavr.control.Option
 import io.vavr.kotlin.some
-import kz.azan.askimam.chat.domain.service.GetCurrentUser
 import kz.azan.askimam.chat.domain.model.Chat
+import kz.azan.askimam.chat.domain.service.GetCurrentUser
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.favorite.domain.model.FavoriteRepository
 import kz.azan.askimam.favorite.domain.policy.DeleteFavoritePolicy
