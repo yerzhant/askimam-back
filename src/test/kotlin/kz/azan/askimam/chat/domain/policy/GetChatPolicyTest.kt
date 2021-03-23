@@ -1,7 +1,6 @@
 package kz.azan.askimam.chat.domain.policy
 
 import io.mockk.every
-import io.vavr.kotlin.none
 import kz.azan.askimam.chat.domain.model.Chat.Type.Private
 import kz.azan.askimam.chat.domain.model.ChatFixtures
 import kz.azan.askimam.chat.domain.policy.GetChatPolicy.Companion.forImam
@@ -71,7 +70,6 @@ internal class GetChatPolicyTest : ChatFixtures() {
             fixtureInquirer,
             fixtureImam
         )
-        every { messageRepository.add(fixtureSavedMessage(fixtureMessageId2)) } returns none()
 
         with(fixtureChat(fixtureNewReply)) {
             addTextMessage(fixtureNewReply)
