@@ -1,4 +1,4 @@
-package kz.azan.askimam
+package kz.azan.askimam.arch
 
 import com.tngtech.archunit.base.DescribedPredicate
 import com.tngtech.archunit.core.domain.JavaMethod
@@ -11,6 +11,7 @@ import com.tngtech.archunit.lang.ConditionEvents
 import com.tngtech.archunit.lang.SimpleConditionEvent
 import com.tngtech.archunit.lang.syntax.ArchRuleDefinition.methods
 import com.tngtech.archunit.library.Architectures
+import kz.azan.askimam.AskimamApplication
 import kz.azan.askimam.common.arch.PackagePrivate
 
 @Suppress("PropertyName", "HasPlatformType")
