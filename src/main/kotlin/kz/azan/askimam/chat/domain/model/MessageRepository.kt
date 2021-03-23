@@ -4,6 +4,7 @@ import io.vavr.control.Either
 import io.vavr.control.Option
 import kz.azan.askimam.common.domain.Declination
 
+// This is a workaround of Spring Data JDBC's full recreation of non root entities
 interface MessageRepository {
     fun add(message: Message): Option<Declination>
     fun delete(message: Message): Option<Declination>
