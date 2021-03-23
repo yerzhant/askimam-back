@@ -8,8 +8,9 @@ import kz.azan.askimam.chat.domain.model.Subject
 import kz.azan.askimam.common.domain.Declination
 
 class UpdateChatSubject(private val chatRepository: ChatRepository) {
+
     operator fun invoke(id: Chat.Id, subject: Subject): Option<Declination> = chatRepository.findById(id).fold(
         { some(it) },
-        { it.updateSubject(subject) }
+        { it.updateSubject(subject).orElse { chatRepository.update(it) } }
     )
 }
