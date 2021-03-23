@@ -35,7 +35,7 @@ class Chat private constructor(
     val type: Type,
     val askedBy: User.Id,
 
-    private val createdAt: LocalDateTime,
+    val createdAt: LocalDateTime,
     private var updatedAt: LocalDateTime,
 
     private var subject: Subject? = null,
@@ -60,7 +60,6 @@ class Chat private constructor(
         }
     )
 
-    fun createdAt() = createdAt
     fun updatedAt() = updatedAt
     fun subject() = subject
     fun messages() = messages.toList()

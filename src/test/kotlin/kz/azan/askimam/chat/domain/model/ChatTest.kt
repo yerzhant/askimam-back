@@ -30,7 +30,7 @@ internal class ChatTest : ChatFixtures() {
         val chat = fixtureChat()
         with(chat) {
             assertThat(type).isEqualTo(Public)
-            assertThat(createdAt()).isEqualTo(fixtureNow)
+            assertThat(createdAt).isEqualTo(fixtureNow)
             assertThat(updatedAt()).isEqualTo(fixtureNow)
             assertThat(isVisibleToPublic()).isFalse
             assertThat(isViewedByImam()).isFalse
@@ -459,7 +459,7 @@ internal class ChatTest : ChatFixtures() {
         ) {
             assertThat(type).isEqualTo(Public)
             assertThat(askedBy).isEqualTo(fixtureInquirerId)
-            assertThat(createdAt()).isEqualTo(now)
+            assertThat(createdAt).isEqualTo(now)
             assertThat(updatedAt()).isEqualTo(now.plusMinutes(10))
             assertThat(subject()).isEqualTo(fixtureSubject)
             assertThat(isVisibleToPublic()).isTrue
