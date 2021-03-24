@@ -138,6 +138,8 @@ class Chat private constructor(
     }
 
     fun deleteMessage(id: Message.Id): Option<Declination> {
+        if (messages.size == 1) return some(Declination.withReason("Deletion of a last message is disallowed"))
+
         val message = messages.find { it.id == id } ?: return some(Declination.withReason("Invalid id"))
 
         return message.run {

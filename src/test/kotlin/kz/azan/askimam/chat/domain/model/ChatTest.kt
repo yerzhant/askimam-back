@@ -317,6 +317,19 @@ internal class ChatTest : ChatFixtures() {
     }
 
     @Test
+    internal fun `should not delete last message`() {
+        fixtureClock()
+        every { getCurrentUser() } returns fixtureImam
+        every { eventPublisher.publish(any()) } returns Unit
+
+        with(fixtureSavedChat()) {
+            assertThat(deleteMessage(fixtureMessageId1).isEmpty).isTrue
+            assertThat(deleteMessage(fixtureMessageId3).isEmpty).isTrue
+            assertThat(deleteMessage(fixtureMessageId2).isDefined).isTrue
+        }
+    }
+
+    @Test
     internal fun `should delete a message by an imam`() {
         fixtureClock()
         every { getCurrentUser() } returns fixtureImam
