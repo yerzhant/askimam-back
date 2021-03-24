@@ -49,6 +49,8 @@ open class ChatFixtures {
             subject = subject,
             messageText = firstMessage,
 
+            inquirerFcmToken = fixtureInquirerFcmToken,
+
             clock = clock,
             eventPublisher = eventPublisher,
             getCurrentUser = getCurrentUser,
@@ -66,6 +68,9 @@ open class ChatFixtures {
 
             askedBy = fixtureInquirerId,
             answeredBy = fixtureImamId,
+
+            inquirerFcmToken = fixtureInquirerFcmToken,
+            imamFcmToken = fixtureImamFcmToken,
 
             createdAt = now,
             updatedAt = now,
@@ -150,9 +155,11 @@ open class ChatFixtures {
 
     val fixtureImam = User(User.Id(1), User.Type.Imam, NonBlankString.of("Imam"))
     val fixtureImamId = fixtureImam.id
+    val fixtureImamFcmToken = FcmToken(NonBlankString.of("123"))
 
     val fixtureInquirer = User(User.Id(2), User.Type.Inquirer, NonBlankString.of("Inquirer"))
     val fixtureInquirerId = fixtureInquirer.id
+    val fixtureInquirerFcmToken = FcmToken(NonBlankString.of("456"))
 
     val fixtureAnotherInquirer = User(User.Id(20), User.Type.Inquirer, NonBlankString.of("Some guy"))
     val fixtureAnotherImam = User(User.Id(30), User.Type.Imam, NonBlankString.of("Some imam"))

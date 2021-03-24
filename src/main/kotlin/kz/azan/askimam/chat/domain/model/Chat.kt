@@ -19,16 +19,15 @@ import java.time.Clock
 import java.time.LocalDateTime
 
 class Chat private constructor(
-    private val clock: Clock,
-    private val eventPublisher: EventPublisher,
-    private val getCurrentUser: GetCurrentUser,
-
     val id: Id? = null,
     val type: Type,
     private var subject: Subject? = null,
 
     val askedBy: User.Id,
     private var answeredBy: User.Id? = null,
+
+    private var inquirerFcmToken: FcmToken,
+    private var imamFcmToken: FcmToken? = null,
 
     val createdAt: LocalDateTime,
     private var updatedAt: LocalDateTime,
@@ -38,6 +37,10 @@ class Chat private constructor(
     private var isViewedByInquirer: Boolean = true,
 
     private val messages: MutableList<Message> = mutableListOf(),
+
+    private val clock: Clock,
+    private val eventPublisher: EventPublisher,
+    private val getCurrentUser: GetCurrentUser,
 ) {
     private fun init(messageText: NonBlankString) {
         val message = Message.newText(clock, askedBy, messageText)
@@ -47,7 +50,12 @@ class Chat private constructor(
 
     fun subject() = subject
     fun updatedAt() = updatedAt
+
     fun answeredBy() = answeredBy
+
+    fun inquirerFcmToken() = inquirerFcmToken
+    fun imamFcmToken() = imamFcmToken
+
     fun messages() = messages.toList()
 
     fun isVisibleToPublic() = isVisibleToPublic && type == Public
@@ -71,32 +79,37 @@ class Chat private constructor(
         }
     }
 
-    fun addTextMessage(text: NonBlankString): Option<Declination> {
+    fun addTextMessage(text: NonBlankString, fcmToken: FcmToken): Option<Declination> {
         val author = getCurrentUser()
         val message = Message.newText(clock, author.id, text)
-        return addMessage(message, AddMessagePolicy.getFor(author), author)
+        return addMessage(message, AddMessagePolicy.getFor(author), author, fcmToken)
     }
 
-    fun addAudioMessage(audio: NonBlankString): Option<Declination> {
+    fun addAudioMessage(audio: NonBlankString, fcmToken: FcmToken): Option<Declination> {
         val imam = getCurrentUser()
         val message = Message.newAudio(clock, imam.id, audio)
-        return addMessage(message, AddMessagePolicy.forImam, imam)
+        return addMessage(message, AddMessagePolicy.forImam, imam, fcmToken)
     }
 
     private fun addMessage(
         message: Message,
         policy: AddMessagePolicy,
-        user: User
+        user: User,
+        fcmToken: FcmToken,
     ): Option<Declination> = policy.isAllowed(this, user).onEmpty {
 
         updatedAt = LocalDateTime.now(clock)
 
         when (user.type) {
-            Inquirer -> isViewedByImam = false
+            Inquirer -> {
+                isViewedByImam = false
+                inquirerFcmToken = fcmToken
+            }
             Imam -> {
                 if (type == Public) isVisibleToPublic = true
                 isViewedByInquirer = false
                 answeredBy = user.id
+                imamFcmToken = fcmToken
             }
         }
 
@@ -104,11 +117,19 @@ class Chat private constructor(
         eventPublisher.publish(MessageAdded(subject, message.text()))
     }
 
-    fun updateTextMessage(id: Message.Id, text: NonBlankString): Option<Declination> {
+    fun updateTextMessage(id: Message.Id, text: NonBlankString, fcmToken: FcmToken): Option<Declination> {
+
         val message = messages.find { it.id == id } ?: return some(Declination.withReason("Invalid id"))
 
         return message.run {
-            UpdateMessagePolicy.forAll.isAllowed(authorId, getCurrentUser(), type).onEmpty {
+            val currentUser = getCurrentUser()
+
+            UpdateMessagePolicy.forAll.isAllowed(authorId, currentUser, type).onEmpty {
+                when (currentUser.type) {
+                    Imam -> imamFcmToken = fcmToken
+                    Inquirer -> inquirerFcmToken = fcmToken
+                }
+
                 updateText(text)
                 eventPublisher.publish(MessageUpdated(id, text, this.updatedAt()!!))
             }
@@ -131,22 +152,28 @@ class Chat private constructor(
     fun returnToUnansweredList(): Option<Declination> =
         ReturnChatToUnansweredListPolicy.forAll.isAllowed(getCurrentUser()).onEmpty {
             answeredBy = null
+            imamFcmToken = null
         }
 
     companion object {
         fun newWithSubject(
-            clock: Clock,
-            eventPublisher: EventPublisher,
-            getCurrentUser: GetCurrentUser,
             type: Type,
             subject: Subject,
             messageText: NonBlankString,
+
+            inquirerFcmToken: FcmToken,
+
+            clock: Clock,
+            eventPublisher: EventPublisher,
+            getCurrentUser: GetCurrentUser,
         ): Chat {
             val now = LocalDateTime.now(clock)
             return Chat(
                 type = type,
                 subject = subject,
                 askedBy = getCurrentUser().id,
+
+                inquirerFcmToken = inquirerFcmToken,
 
                 createdAt = now,
                 updatedAt = now,
@@ -158,16 +185,21 @@ class Chat private constructor(
         }
 
         fun new(
+            type: Type,
+            messageText: NonBlankString,
+
+            inquirerFcmToken: FcmToken,
+
             clock: Clock,
             eventPublisher: EventPublisher,
             getCurrentUser: GetCurrentUser,
-            type: Type,
-            messageText: NonBlankString,
         ): Chat {
             val now = LocalDateTime.now(clock)
             return Chat(
                 type = type,
                 askedBy = getCurrentUser().id,
+
+                inquirerFcmToken = inquirerFcmToken,
 
                 createdAt = now,
                 updatedAt = now,
@@ -179,20 +211,28 @@ class Chat private constructor(
         }
 
         fun restore(
-            clock: Clock,
-            eventPublisher: EventPublisher,
-            getCurrentUser: GetCurrentUser,
             id: Id,
             type: Type,
+            subject: Subject?,
+
             askedBy: User.Id,
+            answeredBy: User.Id?,
+
+            inquirerFcmToken: FcmToken,
+            imamFcmToken: FcmToken?,
+
             createdAt: LocalDateTime,
             updatedAt: LocalDateTime,
-            subject: Subject?,
-            messages: List<Message>,
+
             isVisibleToPublic: Boolean,
             isViewedByImam: Boolean,
             isViewedByInquirer: Boolean,
-            answeredBy: User.Id?,
+
+            messages: List<Message>,
+
+            clock: Clock,
+            eventPublisher: EventPublisher,
+            getCurrentUser: GetCurrentUser,
         ) = Chat(
             id = id,
             type = type,
@@ -200,6 +240,9 @@ class Chat private constructor(
 
             askedBy = askedBy,
             answeredBy = answeredBy,
+
+            inquirerFcmToken = inquirerFcmToken,
+            imamFcmToken = imamFcmToken,
 
             createdAt = createdAt,
             updatedAt = updatedAt,

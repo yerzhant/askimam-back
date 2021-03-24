@@ -26,19 +26,27 @@ internal class ChatTest : ChatFixtures() {
         val chat = fixtureChat()
         with(chat) {
             assertThat(type).isEqualTo(Public)
+            assertThat(subject()).isEqualTo(fixtureSubject)
+
             assertThat(createdAt).isEqualTo(fixtureNow)
             assertThat(updatedAt()).isEqualTo(fixtureNow)
+
             assertThat(isVisibleToPublic()).isFalse
             assertThat(isViewedByImam()).isFalse
             assertThat(isViewedByInquirer()).isTrue
+
             assertThat(askedBy).isEqualTo(fixtureInquirerId)
             assertThat(answeredBy()).isNull()
-            assertThat(subject()).isEqualTo(fixtureSubject)
+
+            assertThat(inquirerFcmToken()).isEqualTo(fixtureInquirerFcmToken)
+            assertThat(imamFcmToken()).isNull()
 
             assertThat(messages().size).isEqualTo(1)
+
             assertThat(messages().first().type).isEqualTo(Text)
             assertThat(messages().first().authorId).isEqualTo(fixtureInquirerId)
             assertThat(messages().first().text()).isEqualTo(fixtureMessage)
+
             assertThat(messages().first().createdAt).isEqualTo(fixtureNow)
             assertThat(messages().first().updatedAt()).isNull()
 
@@ -56,11 +64,13 @@ internal class ChatTest : ChatFixtures() {
         every { eventPublisher.publish(ChatCreated(null, fixtureMessage)) } returns Unit
 
         Chat.new(
-            clock,
-            eventPublisher,
-            getCurrentUser,
-            Private,
-            fixtureMessage,
+            type = Private,
+            messageText = fixtureMessage,
+            inquirerFcmToken = fixtureInquirerFcmToken,
+
+            clock = clock,
+            eventPublisher = eventPublisher,
+            getCurrentUser = getCurrentUser,
         ).run {
             assertThat(subject()).isNull()
         }
@@ -108,7 +118,7 @@ internal class ChatTest : ChatFixtures() {
         val chat = fixtureChat()
 
         chat.run {
-            val result = addTextMessage(fixtureNewMessage)
+            val result = addTextMessage(fixtureNewMessage, fixtureInquirerFcmToken)
 
             assertThat(result.isEmpty).isTrue
             assertThat(updatedAt()).isEqualTo(timeAfter(30))
@@ -123,6 +133,20 @@ internal class ChatTest : ChatFixtures() {
         verifySequence {
             eventPublisher.publish(ChatCreated(fixtureSubject, fixtureMessage))
             eventPublisher.publish(MessageAdded(fixtureSubject, fixtureNewMessage))
+        }
+    }
+
+    @Test
+    internal fun `should replace an inquirer's fcm token on adding a new message from another device`() {
+        fixtureClockAndThen(30)
+        every { getCurrentUser() } returns fixtureInquirer
+        val chat = fixtureChat()
+
+        chat.run {
+            val result = addTextMessage(fixtureNewMessage, FcmToken.from("555"))
+
+            assertThat(result.isEmpty).isTrue
+            assertThat(inquirerFcmToken()).isEqualTo(FcmToken.from("555"))
         }
     }
 
@@ -154,7 +178,7 @@ internal class ChatTest : ChatFixtures() {
 
         chat.run {
             viewedByImam()
-            val result = addTextMessage(fixtureNewMessage)
+            val result = addTextMessage(fixtureNewMessage, fixtureInquirerFcmToken)
 
             assertThat(result.isEmpty).isTrue
             assertThat(isViewedByImam()).isFalse
@@ -170,12 +194,13 @@ internal class ChatTest : ChatFixtures() {
         )
 
         fixtureChat(fixtureNewReply).run {
-            val option = addTextMessage(fixtureNewReply)
+            val option = addTextMessage(fixtureNewReply, fixtureImamFcmToken)
 
             assertThat(option.isEmpty).isTrue
             assertThat(isVisibleToPublic()).isTrue
             assertThat(isViewedByInquirer()).isFalse
             assertThat(answeredBy()).isEqualTo(fixtureImamId)
+            assertThat(imamFcmToken()).isEqualTo(fixtureImamFcmToken)
             assertThat(updatedAt()).isEqualTo(timeAfter(31))
 
             assertThat(messages().size).isEqualTo(2)
@@ -187,6 +212,21 @@ internal class ChatTest : ChatFixtures() {
     }
 
     @Test
+    internal fun `should replace an fcm token when adding a new reply by another imam`() {
+        fixtureClockAndThen(31)
+        every { getCurrentUser() } returnsMany listOf(
+            fixtureInquirer,
+            fixtureAnotherImam
+        )
+
+        fixtureChat(fixtureNewReply).run {
+            addTextMessage(fixtureNewReply, FcmToken.from("777"))
+
+            assertThat(imamFcmToken()).isEqualTo(FcmToken.from("777"))
+        }
+    }
+
+    @Test
     internal fun `should return a chat by an imam to not answered`() {
         fixtureClock()
         every { getCurrentUser() } returns fixtureImam
@@ -194,17 +234,7 @@ internal class ChatTest : ChatFixtures() {
         with(fixtureSavedChat()) {
             assertThat(returnToUnansweredList().isEmpty).isTrue
             assertThat(answeredBy()).isNull()
-        }
-    }
-
-    @Test
-    internal fun `should not return a chat by a not imam to not answered`() {
-        fixtureClock()
-        every { getCurrentUser() } returns fixtureInquirer
-
-        with(fixtureSavedChat()) {
-            assertThat(returnToUnansweredList().isDefined).isTrue
-            assertThat(answeredBy()).isNotNull
+            assertThat(imamFcmToken()).isNull()
         }
     }
 
@@ -217,7 +247,7 @@ internal class ChatTest : ChatFixtures() {
         )
 
         fixtureChat(fixtureNewReply, Private).run {
-            val option = addTextMessage(fixtureNewReply)
+            val option = addTextMessage(fixtureNewReply, fixtureImamFcmToken)
 
             assertThat(option.isEmpty).isTrue
             assertThat(isVisibleToPublic()).isFalse
@@ -235,9 +265,11 @@ internal class ChatTest : ChatFixtures() {
         val chat = fixtureChat(fixtureNewReply)
 
         chat.run {
-            addTextMessage(fixtureNewReply)
+            addTextMessage(fixtureNewReply, fixtureImamFcmToken)
             assertThat(isViewedByInquirer()).isFalse
+
             assertThat(viewedByInquirer().isEmpty).isTrue
+
             assertThat(isViewedByInquirer()).isTrue
         }
     }
@@ -252,9 +284,11 @@ internal class ChatTest : ChatFixtures() {
         )
 
         fixtureChat(audio).run {
-            val option = addAudioMessage(fixtureAudio)
+            val option = addAudioMessage(fixtureAudio, fixtureImamFcmToken)
 
             assertThat(option.isEmpty).isTrue
+            assertThat(imamFcmToken()).isEqualTo(fixtureImamFcmToken)
+
             assertThat(messages().last().type).isEqualTo(Audio)
             assertThat(messages().last().text()).isEqualTo(audio)
             assertThat(messages().last().audio).isEqualTo(fixtureAudio)
@@ -316,9 +350,10 @@ internal class ChatTest : ChatFixtures() {
         } returns Unit
 
         with(fixtureSavedChat()) {
-            val option = updateTextMessage(fixtureMessageId1, fixtureNewMessage)
+            val option = updateTextMessage(fixtureMessageId1, fixtureNewMessage, FcmToken.from("444"))
 
             assertThat(option.isEmpty).isTrue
+            assertThat(inquirerFcmToken()).isEqualTo(FcmToken.from("444"))
             assertThat(messages().first().text()).isEqualTo(fixtureNewMessage)
             assertThat(messages().first().updatedAt()).isEqualTo(timeAfter(10))
         }
@@ -343,9 +378,10 @@ internal class ChatTest : ChatFixtures() {
         } returns Unit
 
         with(fixtureSavedChat()) {
-            val option = updateTextMessage(fixtureMessageId2, NonBlankString.of("Update"))
+            val option = updateTextMessage(fixtureMessageId2, NonBlankString.of("Update"), FcmToken.from("111"))
 
             assertThat(option.isEmpty).isTrue
+            assertThat(imamFcmToken()).isEqualTo(FcmToken.from("111"))
             assertThat(messages()[1].text()).isEqualTo(NonBlankString.of("Update"))
             assertThat(messages()[1].updatedAt()).isEqualTo(timeAfter(11))
         }
@@ -385,12 +421,15 @@ internal class ChatTest : ChatFixtures() {
                 askedBy = fixtureInquirerId,
                 answeredBy = null,
 
+                inquirerFcmToken = fixtureInquirerFcmToken,
+                imamFcmToken = null,
+
                 createdAt = now,
                 updatedAt = now.plusMinutes(10),
 
-                isVisibleToPublic = true,
+                isVisibleToPublic = false,
                 isViewedByImam = true,
-                isViewedByInquirer = false,
+                isViewedByInquirer = true,
 
                 messages = messages,
 
@@ -405,9 +444,9 @@ internal class ChatTest : ChatFixtures() {
             assertThat(createdAt).isEqualTo(now)
             assertThat(updatedAt()).isEqualTo(now.plusMinutes(10))
             assertThat(subject()).isEqualTo(fixtureSubject)
-            assertThat(isVisibleToPublic()).isTrue
+            assertThat(isVisibleToPublic()).isFalse
             assertThat(isViewedByImam()).isTrue
-            assertThat(isViewedByInquirer()).isFalse
+            assertThat(isViewedByInquirer()).isTrue
             assertThat(messages()).hasSize(1)
             assertThat(messages()).isEqualTo(messages)
         }
