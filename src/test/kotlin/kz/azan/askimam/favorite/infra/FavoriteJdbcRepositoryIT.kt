@@ -15,7 +15,7 @@ import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
 @DataJdbcIT
-@Sql("/scripts/users.sql", "/scripts/chat.sql", "/scripts/favorites.sql")
+@Sql("/scripts/users.sql", "/scripts/chats.sql", "/scripts/favorites.sql")
 class FavoriteJdbcRepositoryIT(
     private val dao: FavoriteDao,
 ) : FavoriteFixtures() {

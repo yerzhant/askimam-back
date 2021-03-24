@@ -3,15 +3,19 @@ package kz.azan.askimam.chat.infra
 import kz.azan.askimam.chat.domain.model.Message
 import kz.azan.askimam.common.type.NonBlankString
 import kz.azan.askimam.user.domain.model.User
+import org.springframework.data.relational.core.mapping.Table
 import java.time.Clock
 import java.time.LocalDateTime
 
+@Table("MESSAGES")
 data class MessageRow(
     val id: Long?,
     val type: Message.Type,
     val authorId: Long,
+
     val text: String,
     val audio: String?,
+
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime?,
 ) {

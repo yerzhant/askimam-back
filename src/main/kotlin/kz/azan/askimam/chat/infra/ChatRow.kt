@@ -6,10 +6,15 @@ import kz.azan.askimam.chat.domain.model.Subject
 import kz.azan.askimam.chat.domain.service.GetCurrentUser
 import kz.azan.askimam.common.domain.EventPublisher
 import kz.azan.askimam.user.domain.model.User
+import org.springframework.data.annotation.Id
+import org.springframework.data.relational.core.mapping.MappedCollection
+import org.springframework.data.relational.core.mapping.Table
 import java.time.Clock
 import java.time.LocalDateTime
 
+@Table("CHATS")
 data class ChatRow(
+    @Id
     val id: Long?,
     val type: Chat.Type,
     val subject: String?,
@@ -27,6 +32,7 @@ data class ChatRow(
     val isViewedByImam: Boolean,
     val isViewedByInquirer: Boolean,
 
+    @MappedCollection(idColumn = "CHAT_ID")
     val messages: Set<MessageRow>,
 ) {
     companion object {
@@ -70,7 +76,7 @@ data class ChatRow(
         isViewedByImam = isViewedByImam,
         isViewedByInquirer = isViewedByInquirer,
 
-        messages = messages.map { it.toDomain(clock) },
+        messages = messages.map { it.toDomain(clock) }.sortedBy { it.createdAt },
 
         clock = clock,
         eventPublisher = eventPublisher,

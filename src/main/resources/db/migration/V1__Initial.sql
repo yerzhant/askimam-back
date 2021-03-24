@@ -1,13 +1,35 @@
 create table if not exists users(id int);
 
-create table chat(
-    id          bigint          not null primary key auto_increment
+create table chats(
+    id                      bigint          not null primary key auto_increment,
+    asked_by                bigint          not null references users(id),
+    answered_by             bigint                   references users(id),
+    type                    varchar(100)    not null,
+    is_visible_to_public    bit             not null,
+    updated_at              datetime        not null,
+    inquirer_fcm_token      varchar(255)    not null,
+    is_viewed_by_imam       bit             not null,
+    is_viewed_by_inquirer   bit             not null,
+    created_at              datetime        not null,
+    imam_fcm_token          varchar(255),
+    subject                 varchar(255)
 );
 
-create table favorite(
+create table messages(
+    id                      bigint          not null primary key auto_increment,
+    chat_id                 bigint          not null references chats(id),
+    author_id               bigint          not null references users(id),
+    created_at              datetime        not null,
+    type                    varchar(100)    not null,
+    text                    text            not null,
+    audio                   varchar(1024),
+    updated_at              datetime
+);
+
+create table favorites(
     id          bigint          not null primary key auto_increment,
     user_id     bigint          not null references users(id),
-    chat_id     bigint          not null references chat(id),
+    chat_id     bigint          not null references chats(id) on delete cascade,
     added_at    datetime        not null,
     unique index(user_id, chat_id)
 );

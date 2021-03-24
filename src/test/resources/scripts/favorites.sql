@@ -1,1 +1,1 @@
-insert into favorite values (1, 2, 1, now());
+insert into favorites values (1, 2, 1, now());
