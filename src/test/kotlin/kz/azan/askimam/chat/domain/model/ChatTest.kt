@@ -23,8 +23,7 @@ internal class ChatTest : ChatFixtures() {
         fixtureClock()
         every { getCurrentUser() } returns fixtureInquirer
 
-        val chat = fixtureChat()
-        with(chat) {
+        with(fixtureChat()) {
             assertThat(type).isEqualTo(Public)
             assertThat(subject()).isEqualTo(fixtureSubject)
 
@@ -49,7 +48,6 @@ internal class ChatTest : ChatFixtures() {
 
             assertThat(messages().first().createdAt).isEqualTo(fixtureNow)
             assertThat(messages().first().updatedAt()).isNull()
-
         }
 
         verifySequence {

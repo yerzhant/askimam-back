@@ -9,5 +9,11 @@ data class Declination(val reason: NonBlankString) {
                 if (reason.isNullOrEmpty()) "Unknown" else reason
             )
         )
+
+        fun from(throwable: Throwable) = Declination(
+            NonBlankString.of(
+                if (throwable.message.isNullOrEmpty()) "Unknown" else throwable.message!!
+            )
+        )
     }
 }

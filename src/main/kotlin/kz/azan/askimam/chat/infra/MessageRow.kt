@@ -17,24 +17,29 @@ data class MessageRow(
 ) {
     companion object {
         fun from(message: Message) = MessageRow(
-            message.id?.value,
-            message.type,
-            message.authorId.value,
-            message.text().value,
-            message.audio?.value,
-            message.createdAt,
-            message.updatedAt(),
+            id = message.id?.value,
+            type = message.type,
+            authorId = message.authorId.value,
+
+            text = message.text().value,
+            audio = message.audio?.value,
+
+            createdAt = message.createdAt,
+            updatedAt = message.updatedAt(),
         )
     }
 
     fun toDomain(clock: Clock) = Message.restore(
-        clock,
-        Message.Id(id!!),
-        type,
-        User.Id(authorId),
-        NonBlankString.of(text),
-        audio?.run { NonBlankString.of(audio) },
-        createdAt,
-        updatedAt,
+        id = Message.Id(id!!),
+        type = type,
+        authorId = User.Id(authorId),
+
+        text = NonBlankString.of(text),
+        audio = audio?.run { NonBlankString.of(audio) },
+
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+
+        clock = clock,
     )
 }
