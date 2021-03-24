@@ -32,39 +32,64 @@ class Message private constructor(
 
     companion object {
         fun newText(
-            clock: Clock,
             authorId: User.Id,
             text: NonBlankString,
-        ) = Message(clock, null, Type.Text, authorId, text)
+
+            clock: Clock,
+        ) = Message(
+            id = null,
+            type = Type.Text,
+            authorId = authorId,
+
+            text = text,
+
+            clock = clock,
+        )
 
         fun newAudio(
-            clock: Clock,
             authorId: User.Id,
             audio: NonBlankString,
+
+            clock: Clock,
         ): Message {
             val text = NonBlankString.of("Аудио")
-            return Message(clock, null, Type.Audio, authorId, text, audio)
+            return Message(
+                id = null,
+                type = Type.Audio,
+                authorId = authorId,
+
+                text = text,
+                audio = audio,
+
+                clock = clock,
+            )
         }
 
         fun restore(
-            clock: Clock,
             id: Id,
             type: Type,
             authorId: User.Id,
+
             text: NonBlankString,
             audio: NonBlankString?,
+
             createdAt: LocalDateTime,
             updatedAt: LocalDateTime?,
+
+            clock: Clock,
         ) =
             Message(
-                clock,
-                id,
-                type,
-                authorId,
-                text,
-                audio,
-                createdAt,
-                updatedAt
+                id = id,
+                type = type,
+                authorId = authorId,
+
+                text = text,
+                audio = audio,
+
+                createdAt = createdAt,
+                updatedAt = updatedAt,
+
+                clock = clock,
             )
     }
 

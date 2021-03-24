@@ -43,13 +43,17 @@ class Chat private constructor(
     private val getCurrentUser: GetCurrentUser,
 ) {
     private fun init(messageText: NonBlankString) {
-        val message = Message.newText(clock, askedBy, messageText)
+        val message = Message.newText(
+            authorId = askedBy,
+            text = messageText,
+            clock = clock,
+        )
         messages.add(message)
         eventPublisher.publish(ChatCreated(subject, messageText))
     }
 
     fun subject() = subject
-    fun subjectText() = subject ?: messages.first().text()
+    fun subjectText() = subject ?: Subject(messages.first().text())
     fun updatedAt() = updatedAt
 
     fun answeredBy() = answeredBy
@@ -82,13 +86,21 @@ class Chat private constructor(
 
     fun addTextMessage(text: NonBlankString, fcmToken: FcmToken): Option<Declination> {
         val author = getCurrentUser()
-        val message = Message.newText(clock, author.id, text)
+        val message = Message.newText(
+            authorId = author.id,
+            text = text,
+            clock = clock,
+        )
         return addMessage(message, AddMessagePolicy.getFor(author), author, fcmToken)
     }
 
     fun addAudioMessage(audio: NonBlankString, fcmToken: FcmToken): Option<Declination> {
         val imam = getCurrentUser()
-        val message = Message.newAudio(clock, imam.id, audio)
+        val message = Message.newAudio(
+            authorId = imam.id,
+            audio = audio,
+            clock = clock,
+        )
         return addMessage(message, AddMessagePolicy.forImam, imam, fcmToken)
     }
 
