@@ -40,5 +40,5 @@ class FavoriteJdbcRepository(private val favoriteDao: FavoriteDao) : FavoriteRep
                 { none() }
             )
 
-    private fun getDeclination(t: Throwable) = Declination.withReason(t.message)
+    private fun getDeclination(throwable: Throwable) = Declination.from(throwable)
 }
