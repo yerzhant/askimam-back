@@ -19,7 +19,7 @@ internal class CreateChatTest : ChatFixtures() {
 
         assertThat(
             CreateChat(clock, eventPublisher, getCurrentUser, chatRepository)
-                (Public, fixtureMessage).isEmpty
+                (Public, fixtureMessage, fixtureInquirerFcmToken).isEmpty
         ).isTrue
 
         verifySequence {
@@ -35,7 +35,7 @@ internal class CreateChatTest : ChatFixtures() {
 
         assertThat(
             CreateChat(clock, eventPublisher, getCurrentUser, chatRepository)
-                (Public, fixtureMessage).isDefined
+                (Public, fixtureMessage, fixtureInquirerFcmToken).isDefined
         ).isTrue
     }
 
@@ -45,7 +45,7 @@ internal class CreateChatTest : ChatFixtures() {
 
         assertThat(
             CreateChat(clock, eventPublisher, getCurrentUser, chatRepository)
-                .withSubject(Public, fixtureSubject, fixtureMessage).isEmpty
+                .withSubject(Public, fixtureSubject, fixtureMessage, fixtureInquirerFcmToken).isEmpty
         ).isTrue
 
         verifySequence {
