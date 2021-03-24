@@ -50,7 +50,7 @@ class ChatPolicyTest : ChatFixtures() {
         val chat = fixtureChat(fixtureNewReply)
 
         chat.run {
-            addTextMessage(fixtureNewReply)
+            addTextMessage(fixtureNewReply, fixtureInquirerFcmToken)
             assertThat(viewedByInquirer().isDefined).isTrue
             assertThat(isViewedByInquirer()).isFalse
         }
@@ -65,7 +65,7 @@ class ChatPolicyTest : ChatFixtures() {
         )
 
         fixtureChat().run {
-            val option = addTextMessage(fixtureNewMessage)
+            val option = addTextMessage(fixtureNewMessage, fixtureInquirerFcmToken)
 
             assertThat(option.isDefined).isTrue
         }
@@ -78,7 +78,7 @@ class ChatPolicyTest : ChatFixtures() {
         every { getCurrentUser() } returns fixtureInquirer
 
         fixtureChat(audio).run {
-            val option = addAudioMessage(fixtureAudio)
+            val option = addAudioMessage(fixtureAudio, fixtureImamFcmToken)
 
             assertThat(option.isDefined).isTrue
         }
@@ -107,7 +107,7 @@ class ChatPolicyTest : ChatFixtures() {
         every { getCurrentUser() } returns fixtureAnotherInquirer
 
         with(fixtureSavedChat()) {
-            val option = updateTextMessage(fixtureMessageId1, fixtureNewMessage)
+            val option = updateTextMessage(fixtureMessageId1, fixtureNewMessage, fixtureInquirerFcmToken)
 
             assertThat(option.isDefined).isTrue
             assertThat(messages().first().text()).isEqualTo(fixtureMessage)
@@ -125,10 +125,22 @@ class ChatPolicyTest : ChatFixtures() {
         every { getCurrentUser() } returns fixtureImam
 
         with(fixtureSavedChat()) {
-            val option = updateTextMessage(fixtureMessageId3, fixtureNewReply)
+            val option = updateTextMessage(fixtureMessageId3, fixtureNewReply, fixtureImamFcmToken)
 
             assertThat(option).isEqualTo(some(Declination.withReason("An audio message may not be edited")))
             assertThat(messages().first().updatedAt()).isNull()
+        }
+    }
+
+    @Test
+    internal fun `should not return a chat by a not imam to not answered`() {
+        fixtureClock()
+        every { getCurrentUser() } returns fixtureInquirer
+
+        with(fixtureSavedChat()) {
+            assertThat(returnToUnansweredList().isDefined).isTrue
+            assertThat(answeredBy()).isNotNull
+            assertThat(imamFcmToken()).isNotNull
         }
     }
 }
