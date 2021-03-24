@@ -20,7 +20,7 @@ internal class UpdateChatSubjectTest : ChatFixtures() {
         every { chatRepository.findById(any()) } returns right(fixtureSavedChat())
         every { chatRepository.update(any()) } returns none()
 
-        assertThat(UpdateChatSubject(chatRepository)(fixtureChatId, fixtureSubject).isEmpty).isTrue
+        assertThat(UpdateChatSubject(chatRepository)(fixtureChatId1, fixtureSubject).isEmpty).isTrue
 
         verify { chatRepository.update(any()) }
     }
@@ -31,7 +31,7 @@ internal class UpdateChatSubjectTest : ChatFixtures() {
         every { chatRepository.findById(any()) } returns left(Declination.withReason("id not found"))
 
         assertThat(
-            UpdateChatSubject(chatRepository)(fixtureChatId, fixtureSubject)
+            UpdateChatSubject(chatRepository)(fixtureChatId1, fixtureSubject)
         ).isEqualTo(some(Declination.withReason("id not found")))
     }
 
@@ -43,7 +43,7 @@ internal class UpdateChatSubjectTest : ChatFixtures() {
         every { chatRepository.update(any()) } returns some(Declination.withReason("x"))
 
         assertThat(
-            UpdateChatSubject(chatRepository)(fixtureChatId, fixtureSubject)
+            UpdateChatSubject(chatRepository)(fixtureChatId1, fixtureSubject)
         ).isEqualTo(some(Declination.withReason("x")))
     }
 }

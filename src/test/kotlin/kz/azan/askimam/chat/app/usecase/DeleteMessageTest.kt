@@ -18,7 +18,7 @@ internal class DeleteMessageTest : ChatFixtures() {
         every { getCurrentUser() } returns fixtureInquirer
         fixtures()
 
-        assertThat(DeleteMessage(chatRepository)(fixtureChatId, fixtureMessageId1).isEmpty).isTrue
+        assertThat(DeleteMessage(chatRepository)(fixtureChatId1, fixtureMessageId1).isEmpty).isTrue
 
         verify {
             chatRepository.findById(any())
@@ -30,7 +30,7 @@ internal class DeleteMessageTest : ChatFixtures() {
     internal fun `should not delete a message - chat not found`() {
         every { chatRepository.findById(any()) } returns left(Declination.withReason("x"))
 
-        assertThat(DeleteMessage(chatRepository)(fixtureChatId, fixtureMessageId1).isDefined).isTrue
+        assertThat(DeleteMessage(chatRepository)(fixtureChatId1, fixtureMessageId1).isDefined).isTrue
     }
 
     @Test
@@ -39,7 +39,7 @@ internal class DeleteMessageTest : ChatFixtures() {
         every { getCurrentUser() } returns fixtureInquirer
         every { chatRepository.update(any()) } returns some(Declination.withReason("x"))
 
-        assertThat(DeleteMessage(chatRepository)(fixtureChatId, fixtureMessageId1).isDefined).isTrue
+        assertThat(DeleteMessage(chatRepository)(fixtureChatId1, fixtureMessageId1).isDefined).isTrue
     }
 
     @Test
@@ -47,7 +47,7 @@ internal class DeleteMessageTest : ChatFixtures() {
         every { getCurrentUser() } returns fixtureImam
         fixtures()
 
-        assertThat(DeleteMessage(chatRepository)(fixtureChatId, fixtureMessageId1).isEmpty).isTrue
+        assertThat(DeleteMessage(chatRepository)(fixtureChatId1, fixtureMessageId1).isEmpty).isTrue
     }
 
     @Test
@@ -55,7 +55,7 @@ internal class DeleteMessageTest : ChatFixtures() {
         every { getCurrentUser() } returns fixtureAnotherInquirer
         fixtures()
 
-        assertThat(DeleteMessage(chatRepository)(fixtureChatId, fixtureMessageId1).isDefined).isTrue
+        assertThat(DeleteMessage(chatRepository)(fixtureChatId1, fixtureMessageId1).isDefined).isTrue
     }
 
     private fun fixtures() {

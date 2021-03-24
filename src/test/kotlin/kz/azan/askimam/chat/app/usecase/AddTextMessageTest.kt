@@ -21,7 +21,7 @@ internal class AddTextMessageTest : ChatFixtures() {
 
         assertThat(
             AddTextMessage(chatRepository)(
-                fixtureChatId,
+                fixtureChatId1,
                 fixtureNewMessage,
                 fixtureInquirerFcmToken
             ).isEmpty
@@ -41,7 +41,7 @@ internal class AddTextMessageTest : ChatFixtures() {
 
         assertThat(
             AddTextMessage(chatRepository)(
-                fixtureChatId,
+                fixtureChatId1,
                 fixtureNewMessage,
                 fixtureInquirerFcmToken
             ).isDefined
@@ -56,7 +56,7 @@ internal class AddTextMessageTest : ChatFixtures() {
 
         assertThat(
             AddTextMessage(chatRepository)(
-                fixtureChatId,
+                fixtureChatId1,
                 fixtureNewMessage,
                 fixtureInquirerFcmToken
             ).isDefined
@@ -70,7 +70,7 @@ internal class AddTextMessageTest : ChatFixtures() {
 
         assertThat(
             AddTextMessage(chatRepository)(
-                fixtureChatId,
+                fixtureChatId1,
                 fixtureNewMessage,
                 fixtureInquirerFcmToken
             ).isEmpty
@@ -84,7 +84,7 @@ internal class AddTextMessageTest : ChatFixtures() {
 
         assertThat(
             AddTextMessage(chatRepository)(
-                fixtureChatId,
+                fixtureChatId1,
                 fixtureNewMessage,
                 fixtureInquirerFcmToken
             ).isDefined
@@ -99,7 +99,7 @@ internal class AddTextMessageTest : ChatFixtures() {
 
         assertThat(
             AddTextMessage(chatRepository)(
-                fixtureChatId,
+                fixtureChatId1,
                 fixtureNewMessage,
                 fixtureInquirerFcmToken
             ).isDefined

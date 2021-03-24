@@ -18,7 +18,7 @@ internal class SetViewedByTest : ChatFixtures() {
         every { getCurrentUser() } returns fixtureInquirer
         fixtures()
 
-        assertThat(SetViewedBy(getCurrentUser, chatRepository)(fixtureChatId).isEmpty).isTrue
+        assertThat(SetViewedBy(getCurrentUser, chatRepository)(fixtureChatId1).isEmpty).isTrue
 
         verify { chatRepository.update(any()) }
     }
@@ -29,7 +29,7 @@ internal class SetViewedByTest : ChatFixtures() {
         fixtures()
         every { chatRepository.update(any()) } returns some(Declination.withReason("x"))
 
-        assertThat(SetViewedBy(getCurrentUser, chatRepository)(fixtureChatId).isDefined).isTrue
+        assertThat(SetViewedBy(getCurrentUser, chatRepository)(fixtureChatId1).isDefined).isTrue
     }
 
     @Test
@@ -37,7 +37,7 @@ internal class SetViewedByTest : ChatFixtures() {
         every { getCurrentUser() } returns fixtureImam
         fixtures()
 
-        assertThat(SetViewedBy(getCurrentUser, chatRepository)(fixtureChatId).isEmpty).isTrue
+        assertThat(SetViewedBy(getCurrentUser, chatRepository)(fixtureChatId1).isEmpty).isTrue
 
         verify { chatRepository.update(any()) }
     }
@@ -48,7 +48,7 @@ internal class SetViewedByTest : ChatFixtures() {
         every { getCurrentUser() } returns fixtureAnotherInquirer
         every { chatRepository.findById(any()) } returns right(fixtureSavedChat())
 
-        assertThat(SetViewedBy(getCurrentUser, chatRepository)(fixtureChatId).isDefined).isTrue
+        assertThat(SetViewedBy(getCurrentUser, chatRepository)(fixtureChatId1).isDefined).isTrue
     }
 
     @Test
@@ -57,7 +57,7 @@ internal class SetViewedByTest : ChatFixtures() {
         every { chatRepository.findById(any()) } returns left(Declination.withReason("id not found"))
 
         assertThat(
-            SetViewedBy(getCurrentUser, chatRepository)(fixtureChatId)
+            SetViewedBy(getCurrentUser, chatRepository)(fixtureChatId1)
         ).isEqualTo(some(Declination.withReason("id not found")))
     }
 

@@ -17,7 +17,7 @@ internal class GetChatTest : ChatFixtures() {
         val chat = fixtures()
         every { getCurrentUser() } returns fixtureInquirer
 
-        assertThat(GetChat(getCurrentUser, chatRepository)(fixtureChatId).get()).isEqualTo(chat)
+        assertThat(GetChat(getCurrentUser, chatRepository)(fixtureChatId1).get()).isEqualTo(chat)
     }
 
     @Test
@@ -25,16 +25,16 @@ internal class GetChatTest : ChatFixtures() {
         val chat = fixtures()
         every { getCurrentUser() } returns fixtureImam
 
-        assertThat(GetChat(getCurrentUser, chatRepository)(fixtureChatId).get()).isEqualTo(chat)
+        assertThat(GetChat(getCurrentUser, chatRepository)(fixtureChatId1).get()).isEqualTo(chat)
     }
 
     @Test
     internal fun `chat is not found`() {
         val declination = Declination.withReason("Chat is not found")
         every { getCurrentUser() } returns fixtureImam
-        every { chatRepository.findById(fixtureChatId) } returns left(declination)
+        every { chatRepository.findById(fixtureChatId1) } returns left(declination)
 
-        assertThat(GetChat(getCurrentUser, chatRepository)(fixtureChatId).left).isEqualTo(declination)
+        assertThat(GetChat(getCurrentUser, chatRepository)(fixtureChatId1).left).isEqualTo(declination)
     }
 
     @Test
@@ -42,7 +42,7 @@ internal class GetChatTest : ChatFixtures() {
         val chat = fixtures()
         every { getCurrentUser() } returns fixtureAnotherInquirer
 
-        assertThat(GetChat(getCurrentUser, chatRepository)(fixtureChatId).get()).isEqualTo(chat)
+        assertThat(GetChat(getCurrentUser, chatRepository)(fixtureChatId1).get()).isEqualTo(chat)
     }
 
     @Test
@@ -51,15 +51,15 @@ internal class GetChatTest : ChatFixtures() {
         val chat = fixtureSavedChat(Private)
         val declination = Declination.withReason("The operation is not permitted")
         every { getCurrentUser() } returns fixtureAnotherInquirer
-        every { chatRepository.findById(fixtureChatId) } returns right(chat)
+        every { chatRepository.findById(fixtureChatId1) } returns right(chat)
 
-        assertThat(GetChat(getCurrentUser, chatRepository)(fixtureChatId).left).isEqualTo(declination)
+        assertThat(GetChat(getCurrentUser, chatRepository)(fixtureChatId1).left).isEqualTo(declination)
     }
 
     private fun fixtures(): Chat {
         fixtureClock()
         val chat = fixtureSavedChat()
-        every { chatRepository.findById(fixtureChatId) } returns right(chat)
+        every { chatRepository.findById(fixtureChatId1) } returns right(chat)
         return chat
     }
 }
