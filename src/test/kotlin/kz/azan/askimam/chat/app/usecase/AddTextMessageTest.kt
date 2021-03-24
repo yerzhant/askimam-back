@@ -19,7 +19,13 @@ internal class AddTextMessageTest : ChatFixtures() {
         every { getCurrentUser() } returns fixtureInquirer
         fixtures()
 
-        assertThat(AddTextMessage(chatRepository)(fixtureChatId, fixtureNewMessage).isEmpty).isTrue
+        assertThat(
+            AddTextMessage(chatRepository)(
+                fixtureChatId,
+                fixtureNewMessage,
+                fixtureInquirerFcmToken
+            ).isEmpty
+        ).isTrue
 
         verifySequence {
             chatRepository.findById(any())
@@ -33,7 +39,13 @@ internal class AddTextMessageTest : ChatFixtures() {
         every { getCurrentUser() } returns fixtureInquirer
         every { chatRepository.findById(any()) } returns left(Declination.withReason("not found"))
 
-        assertThat(AddTextMessage(chatRepository)(fixtureChatId, fixtureNewMessage).isDefined).isTrue
+        assertThat(
+            AddTextMessage(chatRepository)(
+                fixtureChatId,
+                fixtureNewMessage,
+                fixtureInquirerFcmToken
+            ).isDefined
+        ).isTrue
     }
 
     @Test
@@ -42,7 +54,13 @@ internal class AddTextMessageTest : ChatFixtures() {
         fixtures()
         every { chatRepository.update(any()) } returns some(Declination.withReason("not found"))
 
-        assertThat(AddTextMessage(chatRepository)(fixtureChatId, fixtureNewMessage).isDefined).isTrue
+        assertThat(
+            AddTextMessage(chatRepository)(
+                fixtureChatId,
+                fixtureNewMessage,
+                fixtureInquirerFcmToken
+            ).isDefined
+        ).isTrue
     }
 
     @Test
@@ -50,7 +68,13 @@ internal class AddTextMessageTest : ChatFixtures() {
         every { getCurrentUser() } returns fixtureImam
         fixtures()
 
-        assertThat(AddTextMessage(chatRepository)(fixtureChatId, fixtureNewMessage).isEmpty).isTrue
+        assertThat(
+            AddTextMessage(chatRepository)(
+                fixtureChatId,
+                fixtureNewMessage,
+                fixtureInquirerFcmToken
+            ).isEmpty
+        ).isTrue
     }
 
     @Test
@@ -58,7 +82,13 @@ internal class AddTextMessageTest : ChatFixtures() {
         every { getCurrentUser() } returns fixtureAnotherInquirer
         fixtures()
 
-        assertThat(AddTextMessage(chatRepository)(fixtureChatId, fixtureNewMessage).isDefined).isTrue
+        assertThat(
+            AddTextMessage(chatRepository)(
+                fixtureChatId,
+                fixtureNewMessage,
+                fixtureInquirerFcmToken
+            ).isDefined
+        ).isTrue
     }
 
     @Test
@@ -67,7 +97,13 @@ internal class AddTextMessageTest : ChatFixtures() {
         fixtures()
         every { chatRepository.findById(any()) } returns left(Declination.withReason("not found"))
 
-        assertThat(AddTextMessage(chatRepository)(fixtureChatId, fixtureNewMessage).isDefined).isTrue
+        assertThat(
+            AddTextMessage(chatRepository)(
+                fixtureChatId,
+                fixtureNewMessage,
+                fixtureInquirerFcmToken
+            ).isDefined
+        ).isTrue
     }
 
     private fun fixtures() {
