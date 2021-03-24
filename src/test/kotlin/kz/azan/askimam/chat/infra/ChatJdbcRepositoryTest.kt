@@ -106,6 +106,25 @@ internal class ChatJdbcRepositoryTest : ChatFixtures() {
     }
 
     @Test
+    internal fun `should find unanswered chats`() {
+        fixtureClock()
+        every {
+            dao.findByAnsweredByIsNullOrderByUpdatedAtDesc(any())
+        } returns fixtureSavedTwoChats().map { ChatRow.from(it) }
+
+        assertThat(repository.findUnansweredChats(0, 20).get()).hasSize(2)
+    }
+
+    @Test
+    internal fun `should not find unanswered chats - db error`() {
+        every {
+            dao.findByAnsweredByIsNullOrderByUpdatedAtDesc(any())
+        } throws Exception("x")
+
+        assertThat(repository.findUnansweredChats(0, 20).isLeft).isTrue
+    }
+
+    @Test
     internal fun `should create a chat`() {
         fixtureClock()
         every { getCurrentUser() } returns fixtureInquirer

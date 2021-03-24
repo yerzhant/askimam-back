@@ -130,6 +130,11 @@ internal class ChatJdbcRepositoryTestIT(
     }
 
     @Test
+    internal fun `should find unanswered chats`() {
+        assertThat(repository.findUnansweredChats(0, 20).get()).hasSize(3)
+    }
+
+    @Test
     internal fun `should create a chat`() {
         every { getCurrentUser() } returns fixtureInquirer
         fixtureClock()

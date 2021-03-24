@@ -54,6 +54,14 @@ class ChatJdbcRepository(
                 { it.map { row -> row.toDomain(clock, eventPublisher, getCurrentUser) } }
             )
 
+    override fun findUnansweredChats(offset: Int, pageSize: Int): Either<Declination, List<Chat>> =
+        Try { dao.findByAnsweredByIsNullOrderByUpdatedAtDesc(PageRequest.of(offset, pageSize)) }
+            .toEither()
+            .bimap(
+                { Declination.from(it) },
+                { it.map { row -> row.toDomain(clock, eventPublisher, getCurrentUser) } }
+            )
+
     override fun create(chat: Chat): Option<Declination> =
         Try { dao.save(ChatRow.from(chat)) }.fold(
             { some(Declination.from(it)) },

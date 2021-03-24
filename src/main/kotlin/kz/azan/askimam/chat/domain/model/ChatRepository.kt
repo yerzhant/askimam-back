@@ -9,6 +9,7 @@ interface ChatRepository {
     fun findById(id: Id): Either<Declination, Chat>
     fun findPublicChats(offset: Int, pageSize: Int): Either<Declination, List<Chat>>
     fun findMyChats(offset: Int, pageSize: Int): Either<Declination, List<Chat>>
+    fun findUnansweredChats(offset: Int, pageSize: Int): Either<Declination, List<Chat>>
 
     fun create(chat: Chat): Option<Declination>
     fun delete(chat: Chat): Option<Declination>
