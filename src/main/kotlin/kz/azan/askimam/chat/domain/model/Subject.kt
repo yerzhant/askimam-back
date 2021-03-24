@@ -6,4 +6,6 @@ data class Subject(val value: NonBlankString) {
     companion object {
         fun from(string: String) = Subject(NonBlankString.of(string))
     }
+
+    fun string() = value.value
 }

@@ -49,6 +49,7 @@ class Chat private constructor(
     }
 
     fun subject() = subject
+    fun subjectText() = subject ?: messages.first().text()
     fun updatedAt() = updatedAt
 
     fun answeredBy() = answeredBy
