@@ -57,12 +57,12 @@ open class ChatFixtures {
         )
     }
 
-    fun fixtureSavedChat(type: Chat.Type = Public): Chat {
+    fun fixtureSavedChat(type: Chat.Type = Public, id: Chat.Id = fixtureChatId1): Chat {
         val subject = fixtureSubject
         val now = LocalDateTime.now(clock)
 
         return Chat.restore(
-            id = fixtureChatId1,
+            id = id,
             type = type,
             subject = subject,
 

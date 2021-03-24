@@ -15,12 +15,14 @@ internal class ChatJdbcRepositoryTest : ChatFixtures() {
 
     private val dao = mockk<ChatDao>()
 
+    private val repository = ChatJdbcRepository(dao, clock, eventPublisher, getCurrentUser)
+
     @Test
     internal fun `should find by an id`() {
         fixtureClock()
         every { dao.findById(1) } returns Optional.of(ChatRow.from(fixtureSavedChat()))
 
-        val chat = ChatJdbcRepository(dao, clock, eventPublisher, getCurrentUser).findById(fixtureChatId1).get()
+        val chat = repository.findById(fixtureChatId1).get()
 
         with(chat) {
             assertThat(type).isEqualTo(Public)
@@ -56,7 +58,7 @@ internal class ChatJdbcRepositoryTest : ChatFixtures() {
         fixtureClock()
         every { dao.findById(1) } returns Optional.empty()
 
-        val error = ChatJdbcRepository(dao, clock, eventPublisher, getCurrentUser).findById(fixtureChatId1)
+        val error = repository.findById(fixtureChatId1)
 
         assertThat(error.left).isEqualTo(Declination.withReason("Chat not found"))
     }
@@ -66,9 +68,19 @@ internal class ChatJdbcRepositoryTest : ChatFixtures() {
         fixtureClock()
         every { dao.findById(1) } throws Exception("boom")
 
-        val error = ChatJdbcRepository(dao, clock, eventPublisher, getCurrentUser).findById(fixtureChatId1)
+        val error = repository.findById(fixtureChatId1)
 
         assertThat(error.left).isEqualTo(Declination.withReason("boom"))
+    }
+
+    @Test
+    internal fun `should find public chats`() {
+        fixtureClock()
+        every {
+            dao.findByTypeAndIsVisibleToPublicIsTrue(Public, any())
+        } returns fixtureSavedTwoChats().map { ChatRow.from(it) }
+
+        assertThat(repository.findPublicChats(0, 20).get()).hasSize(2)
     }
 
     @Test
@@ -78,7 +90,7 @@ internal class ChatJdbcRepositoryTest : ChatFixtures() {
         val chatRow = ChatRow.from(fixtureChat())
         every { dao.save(chatRow) } returns chatRow
 
-        assertThat(ChatJdbcRepository(dao, clock, eventPublisher, getCurrentUser).create(fixtureChat()).isEmpty).isTrue
+        assertThat(repository.create(fixtureChat()).isEmpty).isTrue
 
         verify { dao.save(chatRow) }
     }
@@ -91,12 +103,7 @@ internal class ChatJdbcRepositoryTest : ChatFixtures() {
         every { dao.save(chatRow) } throws Exception("ta da")
 
         assertThat(
-            ChatJdbcRepository(
-                dao,
-                clock,
-                eventPublisher,
-                getCurrentUser
-            ).create(fixtureChat()).isDefined
+            repository.create(fixtureChat()).isDefined
         ).isTrue
     }
 
@@ -108,7 +115,7 @@ internal class ChatJdbcRepositoryTest : ChatFixtures() {
         val chatRow = ChatRow.from(chat)
         every { dao.delete(chatRow) } returns Unit
 
-        assertThat(ChatJdbcRepository(dao, clock, eventPublisher, getCurrentUser).delete(chat).isEmpty).isTrue
+        assertThat(repository.delete(chat).isEmpty).isTrue
 
         verify { dao.delete(chatRow) }
     }
@@ -121,7 +128,7 @@ internal class ChatJdbcRepositoryTest : ChatFixtures() {
         val chatRow = ChatRow.from(chat)
         every { dao.delete(chatRow) } throws Exception("x")
 
-        assertThat(ChatJdbcRepository(dao, clock, eventPublisher, getCurrentUser).delete(chat).isDefined).isTrue
+        assertThat(repository.delete(chat).isDefined).isTrue
     }
 
     @Test
@@ -132,7 +139,7 @@ internal class ChatJdbcRepositoryTest : ChatFixtures() {
         val chatRow = ChatRow.from(chat)
         every { dao.save(chatRow) } returns chatRow
 
-        assertThat(ChatJdbcRepository(dao, clock, eventPublisher, getCurrentUser).update(chat).isEmpty).isTrue
+        assertThat(repository.update(chat).isEmpty).isTrue
 
         verify { dao.save(chatRow) }
     }
@@ -145,7 +152,7 @@ internal class ChatJdbcRepositoryTest : ChatFixtures() {
         val chatRow = ChatRow.from(chat)
         every { dao.save(chatRow) } throws Exception()
 
-        assertThat(ChatJdbcRepository(dao, clock, eventPublisher, getCurrentUser).update(chat).get()).isEqualTo(
+        assertThat(repository.update(chat).get()).isEqualTo(
             Declination.withReason("Unknown")
         )
     }

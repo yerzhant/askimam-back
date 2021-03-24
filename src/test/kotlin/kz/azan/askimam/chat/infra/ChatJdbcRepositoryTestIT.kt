@@ -12,6 +12,7 @@ import kz.azan.askimam.common.type.NonBlankString
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.data.TemporalUnitWithinOffset
 import org.junit.jupiter.api.Test
+import org.springframework.data.domain.PageRequest
 import org.springframework.test.context.jdbc.Sql
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
@@ -26,12 +27,14 @@ internal class ChatJdbcRepositoryTestIT(
 
     @Test
     internal fun `should get a chat by an id - dao`() {
-        dao.findById(1).get()
+        dao.findById(100).get()
+        val public = dao.findByTypeAndIsVisibleToPublicIsTrue(Public, PageRequest.of(0, 1))
+        assertThat(public).hasSize(1)
     }
 
     @Test
     internal fun `should find by an id`() {
-        val chat = repository.findById(fixtureChatId1).get()
+        val chat = repository.findById(Chat.Id(100)).get()
 
         with(chat) {
             assertThat(type).isEqualTo(Public)
@@ -97,9 +100,19 @@ internal class ChatJdbcRepositoryTestIT(
 
     @Test
     internal fun `should not find by an id`() {
-        val error = repository.findById(Chat.Id(100))
+        val error = repository.findById(Chat.Id(1000))
 
         assertThat(error.left).isEqualTo(Declination.withReason("Chat not found"))
+    }
+
+    @Test
+    internal fun `should find public chats`() {
+        assertThat(repository.findPublicChats(0, 20).get()).hasSize(2)
+    }
+
+    @Test
+    internal fun `should find public chats - limit`() {
+        assertThat(repository.findPublicChats(0, 1).get()).hasSize(1)
     }
 
     @Test
@@ -110,18 +123,18 @@ internal class ChatJdbcRepositoryTestIT(
         assertThat(repository.create(fixtureChat()).isEmpty).isTrue
 
         val all = dao.findAll()
-        assertThat(all).hasSize(2)
-        assertThat(all.find { it.id!! != 1L }?.messages).hasSize(1)
-        assertThat(all.find { it.id!! != 1L }?.messages?.first()?.id).isGreaterThan(3)
+        assertThat(all).hasSize(5)
+        assertThat(all.find { it.id!! > 400 }?.messages).hasSize(1)
+        assertThat(all.find { it.id!! > 400 }?.messages?.first()?.id).isGreaterThan(3)
     }
 
     @Test
     internal fun `should delete a chat`() {
         fixtureClock()
 
-        assertThat(repository.delete(fixtureSavedChat()).isEmpty).isTrue
+        assertThat(repository.delete(fixtureSavedChat(id = Chat.Id(100))).isEmpty).isTrue
 
-        assertThat(dao.findAll()).hasSize(0)
+        assertThat(dao.findAll()).hasSize(3)
     }
 
     @Test
@@ -129,7 +142,7 @@ internal class ChatJdbcRepositoryTestIT(
         fixtureClock()
         every { getCurrentUser() } returns fixtureInquirer
         every { eventPublisher.publish(any()) } returns Unit
-        val chat = fixtureSavedChat()
+        val chat = fixtureSavedChat(id = Chat.Id(100))
         chat.updateSubject(Subject.from("Hello"))
         chat.updateTextMessage(Message.Id(1), NonBlankString.of("Bye"), fixtureInquirerFcmToken)
 
