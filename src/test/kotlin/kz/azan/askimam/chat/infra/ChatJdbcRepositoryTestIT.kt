@@ -27,14 +27,14 @@ internal class ChatJdbcRepositoryTestIT(
 
     @Test
     internal fun `should get a chat by an id - dao`() {
-        dao.findById(100).get()
+        dao.findById(1).get()
         val public = dao.findByTypeAndIsVisibleToPublicIsTrue(Public, PageRequest.of(0, 1))
         assertThat(public).hasSize(1)
     }
 
     @Test
     internal fun `should find by an id`() {
-        val chat = repository.findById(Chat.Id(100)).get()
+        val chat = repository.findById(Chat.Id(1)).get()
 
         with(chat) {
             assertThat(type).isEqualTo(Public)
@@ -100,7 +100,7 @@ internal class ChatJdbcRepositoryTestIT(
 
     @Test
     internal fun `should not find by an id`() {
-        val error = repository.findById(Chat.Id(1000))
+        val error = repository.findById(Chat.Id(100))
 
         assertThat(error.left).isEqualTo(Declination.withReason("Chat not found"))
     }
@@ -138,15 +138,15 @@ internal class ChatJdbcRepositoryTestIT(
 
         val all = dao.findAll()
         assertThat(all).hasSize(5)
-        assertThat(all.find { it.id!! > 400 }?.messages).hasSize(1)
-        assertThat(all.find { it.id!! > 400 }?.messages?.first()?.id).isGreaterThan(3)
+        assertThat(all.find { it.id!! > 4 }?.messages).hasSize(1)
+        assertThat(all.find { it.id!! > 4 }?.messages?.first()?.id).isGreaterThan(3)
     }
 
     @Test
     internal fun `should delete a chat`() {
         fixtureClock()
 
-        assertThat(repository.delete(fixtureSavedChat(id = Chat.Id(100))).isEmpty).isTrue
+        assertThat(repository.delete(fixtureSavedChat(id = Chat.Id(1))).isEmpty).isTrue
 
         assertThat(dao.findAll()).hasSize(3)
     }
@@ -156,7 +156,7 @@ internal class ChatJdbcRepositoryTestIT(
         fixtureClock()
         every { getCurrentUser() } returns fixtureInquirer
         every { eventPublisher.publish(any()) } returns Unit
-        val chat = fixtureSavedChat(id = Chat.Id(100))
+        val chat = fixtureSavedChat(id = Chat.Id(1))
         chat.updateSubject(Subject.from("Hello"))
         chat.updateTextMessage(Message.Id(1), NonBlankString.of("Bye"), fixtureInquirerFcmToken)
 

@@ -13,7 +13,7 @@ insert into chats(
     imam_fcm_token,
     subject
 ) values(
-    100,
+    1,
     2,
     1,
     'Public',
@@ -38,7 +38,7 @@ insert into messages(
     updated_at
 ) values (
     1,
-    100,
+    1,
     2,
     now(),
     'Text',
@@ -57,7 +57,7 @@ insert into messages(
     updated_at
 ) values (
     2,
-    100,
+    1,
     1,
     now() + 1,
     'Text',
@@ -76,7 +76,7 @@ insert into messages(
     updated_at
 ) values (
     3,
-    100,
+    1,
     1,
     now() + .5,
     'Audio',
@@ -100,7 +100,7 @@ insert into chats(
     imam_fcm_token,
     subject
 ) values(
-    200,
+    2,
     2,
     null,
     'Public',
@@ -125,7 +125,7 @@ insert into messages(
     updated_at
 ) values (
     4,
-    200,
+    2,
     2,
     now(),
     'Text',
@@ -149,7 +149,7 @@ insert into chats(
     imam_fcm_token,
     subject
 ) values(
-    300,
+    3,
     2,
     null,
     'Public',
@@ -174,7 +174,7 @@ insert into messages(
     updated_at
 ) values (
     5,
-    300,
+    3,
     2,
     now(),
     'Text',
@@ -198,7 +198,7 @@ insert into chats(
     imam_fcm_token,
     subject
 ) values(
-    400,
+    4,
     2,
     null,
     'Private',
@@ -223,7 +223,7 @@ insert into messages(
     updated_at
 ) values (
     6,
-    400,
+    4,
     2,
     now(),
     'Text',
