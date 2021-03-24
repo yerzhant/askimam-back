@@ -71,7 +71,7 @@ internal class ChatTest : ChatFixtures() {
             getCurrentUser = getCurrentUser,
         ).run {
             assertThat(subject()).isNull()
-            assertThat(subjectText()).isEqualTo(fixtureMessage)
+            assertThat(subjectText()).isEqualTo(Subject(fixtureMessage))
         }
 
         verify {
