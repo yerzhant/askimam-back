@@ -19,7 +19,7 @@ internal class AddAudioMessageTest : ChatFixtures() {
         every { getCurrentUser() } returns fixtureImam
         fixtures()
 
-        assertThat(AddAudioMessage(chatRepository)(fixtureChatId, fixtureAudio).isEmpty).isTrue
+        assertThat(AddAudioMessage(chatRepository)(fixtureChatId, fixtureAudio, fixtureImamFcmToken).isEmpty).isTrue
 
         verifySequence {
             chatRepository.findById(any())
@@ -33,7 +33,7 @@ internal class AddAudioMessageTest : ChatFixtures() {
         every { getCurrentUser() } returns fixtureImam
         every { chatRepository.findById(any()) } returns left(Declination.withReason("error"))
 
-        assertThat(AddAudioMessage(chatRepository)(fixtureChatId, fixtureAudio).get()).isEqualTo(
+        assertThat(AddAudioMessage(chatRepository)(fixtureChatId, fixtureAudio, fixtureImamFcmToken).get()).isEqualTo(
             Declination.withReason("error")
         )
     }
@@ -44,7 +44,7 @@ internal class AddAudioMessageTest : ChatFixtures() {
         fixtures()
         every { chatRepository.update(any()) } returns some(Declination.withReason("error"))
 
-        assertThat(AddAudioMessage(chatRepository)(fixtureChatId, fixtureAudio).get()).isEqualTo(
+        assertThat(AddAudioMessage(chatRepository)(fixtureChatId, fixtureAudio, fixtureImamFcmToken).get()).isEqualTo(
             Declination.withReason("error")
         )
     }
@@ -54,7 +54,7 @@ internal class AddAudioMessageTest : ChatFixtures() {
         every { getCurrentUser() } returns fixtureInquirer
         fixtures()
 
-        assertThat(AddAudioMessage(chatRepository)(fixtureChatId, fixtureAudio).isDefined).isTrue
+        assertThat(AddAudioMessage(chatRepository)(fixtureChatId, fixtureAudio, fixtureImamFcmToken).isDefined).isTrue
     }
 
     private fun fixtures() {
