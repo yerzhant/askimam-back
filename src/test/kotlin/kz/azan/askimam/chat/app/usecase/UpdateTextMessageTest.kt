@@ -20,7 +20,7 @@ internal class UpdateTextMessageTest : ChatFixtures() {
 
         assertThat(
             UpdateTextMessage(chatRepository)(
-                fixtureChatId,
+                fixtureChatId1,
                 fixtureMessageId1,
                 fixtureNewMessage,
                 fixtureInquirerFcmToken,
@@ -37,7 +37,7 @@ internal class UpdateTextMessageTest : ChatFixtures() {
 
         assertThat(
             UpdateTextMessage(chatRepository)(
-                fixtureChatId,
+                fixtureChatId1,
                 fixtureMessageId1,
                 fixtureNewMessage,
                 fixtureInquirerFcmToken,
@@ -53,7 +53,7 @@ internal class UpdateTextMessageTest : ChatFixtures() {
 
         assertThat(
             UpdateTextMessage(chatRepository)(
-                fixtureChatId,
+                fixtureChatId1,
                 fixtureMessageId1,
                 fixtureNewMessage,
                 fixtureInquirerFcmToken,
@@ -70,7 +70,7 @@ internal class UpdateTextMessageTest : ChatFixtures() {
 
         assertThat(
             UpdateTextMessage(chatRepository)(
-                fixtureChatId,
+                fixtureChatId1,
                 fixtureMessageId1,
                 fixtureNewReply,
                 fixtureImamFcmToken,

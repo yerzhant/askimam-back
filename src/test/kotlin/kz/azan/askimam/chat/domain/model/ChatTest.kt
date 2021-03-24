@@ -426,7 +426,7 @@ internal class ChatTest : ChatFixtures() {
 
         with(
             Chat.restore(
-                id = fixtureChatId,
+                id = fixtureChatId1,
                 type = Public,
                 subject = fixtureSubject,
 

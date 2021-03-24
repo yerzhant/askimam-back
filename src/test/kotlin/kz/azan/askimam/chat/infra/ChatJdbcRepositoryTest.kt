@@ -20,7 +20,7 @@ internal class ChatJdbcRepositoryTest : ChatFixtures() {
         fixtureClock()
         every { dao.findById(1) } returns Optional.of(ChatRow.from(fixtureSavedChat()))
 
-        val chat = ChatJdbcRepository(dao, clock, eventPublisher, getCurrentUser).findById(fixtureChatId).get()
+        val chat = ChatJdbcRepository(dao, clock, eventPublisher, getCurrentUser).findById(fixtureChatId1).get()
 
         with(chat) {
             assertThat(type).isEqualTo(Public)
@@ -56,7 +56,7 @@ internal class ChatJdbcRepositoryTest : ChatFixtures() {
         fixtureClock()
         every { dao.findById(1) } returns Optional.empty()
 
-        val error = ChatJdbcRepository(dao, clock, eventPublisher, getCurrentUser).findById(fixtureChatId)
+        val error = ChatJdbcRepository(dao, clock, eventPublisher, getCurrentUser).findById(fixtureChatId1)
 
         assertThat(error.left).isEqualTo(Declination.withReason("Chat not found"))
     }
@@ -66,7 +66,7 @@ internal class ChatJdbcRepositoryTest : ChatFixtures() {
         fixtureClock()
         every { dao.findById(1) } throws Exception("boom")
 
-        val error = ChatJdbcRepository(dao, clock, eventPublisher, getCurrentUser).findById(fixtureChatId)
+        val error = ChatJdbcRepository(dao, clock, eventPublisher, getCurrentUser).findById(fixtureChatId1)
 
         assertThat(error.left).isEqualTo(Declination.withReason("boom"))
     }

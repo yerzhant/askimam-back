@@ -13,12 +13,12 @@ open class FavoriteFixtures : ChatFixtures() {
     val favoriteDao = mockk<FavoriteDao>()
 
     private val fixtureFavoriteId = Favorite.Id(1)
-    val fixtureFavorite = Favorite(fixtureFavoriteId, fixtureInquirerId, fixtureChatId, timeAfter(0))
+    val fixtureFavorite = Favorite(fixtureFavoriteId, fixtureInquirerId, fixtureChatId1, timeAfter(0))
 
     val fixtureFavoriteRow = FavoriteRow(
         fixtureFavoriteId.value,
         fixtureInquirerId.value,
-        fixtureChatId.value,
+        fixtureChatId1.value,
         timeAfter(0)
     )
 }

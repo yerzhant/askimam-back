@@ -52,7 +52,7 @@ class FavoriteJdbcRepositoryIT(
 
     @Test
     internal fun `should get a favorite`() {
-        val favorite = dao.findByUserIdAndChatId(fixtureFavoriteRow.userId, fixtureChatId.value)
+        val favorite = dao.findByUserIdAndChatId(fixtureFavoriteRow.userId, fixtureChatId1.value)
 
         assertThat(favorite.id).isEqualTo(1)
         assertThat(favorite.userId).isEqualTo(2)
@@ -65,7 +65,7 @@ class FavoriteJdbcRepositoryIT(
 
     @Test
     internal fun `should get a favorite - repo`() {
-        val favorite = repository.findByUserIdAndChatId(fixtureFavorite.userId, fixtureChatId).get()
+        val favorite = repository.findByUserIdAndChatId(fixtureFavorite.userId, fixtureChatId1).get()
 
         assertThat(favorite.id).isEqualTo(Favorite.Id(1))
         assertThat(favorite.userId).isEqualTo(User.Id(2))

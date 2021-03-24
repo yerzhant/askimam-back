@@ -54,20 +54,20 @@ internal class FavoriteJdbcRepositoryTest : FavoriteFixtures() {
     @Test
     internal fun `should find by a user id and chat id`() {
         every {
-            favoriteDao.findByUserIdAndChatId(fixtureInquirerId.value, fixtureChatId.value)
+            favoriteDao.findByUserIdAndChatId(fixtureInquirerId.value, fixtureChatId1.value)
         } returns fixtureFavoriteRow
 
-        assertThat(FavoriteJdbcRepository(favoriteDao).findByUserIdAndChatId(fixtureInquirerId, fixtureChatId).get())
+        assertThat(FavoriteJdbcRepository(favoriteDao).findByUserIdAndChatId(fixtureInquirerId, fixtureChatId1).get())
             .isEqualTo(fixtureFavorite)
     }
 
     @Test
     internal fun `should not find by a user id and chat id`() {
         every {
-            favoriteDao.findByUserIdAndChatId(fixtureInquirerId.value, fixtureChatId.value)
+            favoriteDao.findByUserIdAndChatId(fixtureInquirerId.value, fixtureChatId1.value)
         } throws Exception("boom")
 
-        assertThat(FavoriteJdbcRepository(favoriteDao).findByUserIdAndChatId(fixtureInquirerId, fixtureChatId).left)
+        assertThat(FavoriteJdbcRepository(favoriteDao).findByUserIdAndChatId(fixtureInquirerId, fixtureChatId1).left)
             .isEqualTo(Declination.withReason("boom"))
     }
 

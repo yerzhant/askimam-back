@@ -16,7 +16,7 @@ internal class AddChatToFavoritesTest : FavoriteFixtures() {
         every { getCurrentUser() } returns fixtureInquirer
         every { favoriteRepository.add(fixtureFavorite.copy(null)) } returns none()
 
-        assertThat(AddChatToFavorites(clock, getCurrentUser, favoriteRepository)(fixtureChatId).isEmpty).isTrue
+        assertThat(AddChatToFavorites(clock, getCurrentUser, favoriteRepository)(fixtureChatId1).isEmpty).isTrue
     }
 
     @Test
@@ -25,7 +25,7 @@ internal class AddChatToFavoritesTest : FavoriteFixtures() {
         every { getCurrentUser() } returns fixtureInquirer
         every { favoriteRepository.add(fixtureFavorite.copy(null)) } returns some(Declination.withReason("boom!"))
 
-        assertThat(AddChatToFavorites(clock, getCurrentUser, favoriteRepository)(fixtureChatId)).isEqualTo(
+        assertThat(AddChatToFavorites(clock, getCurrentUser, favoriteRepository)(fixtureChatId1)).isEqualTo(
             some(Declination.withReason("boom!"))
         )
     }

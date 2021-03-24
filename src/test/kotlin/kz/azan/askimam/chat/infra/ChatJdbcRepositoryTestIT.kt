@@ -31,7 +31,7 @@ internal class ChatJdbcRepositoryTestIT(
 
     @Test
     internal fun `should find by an id`() {
-        val chat = repository.findById(fixtureChatId).get()
+        val chat = repository.findById(fixtureChatId1).get()
 
         with(chat) {
             assertThat(type).isEqualTo(Public)
