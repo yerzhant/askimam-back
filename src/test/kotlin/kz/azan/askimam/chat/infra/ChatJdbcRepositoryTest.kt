@@ -84,6 +84,28 @@ internal class ChatJdbcRepositoryTest : ChatFixtures() {
     }
 
     @Test
+    internal fun `should find my chats - inquirer`() {
+        fixtureClock()
+        every { getCurrentUser() } returns fixtureInquirer
+        every {
+            dao.findByAskedByOrderByUpdatedAtDesc(fixtureInquirerId.value, any())
+        } returns fixtureSavedTwoChats().map { ChatRow.from(it) }
+
+        assertThat(repository.findMyChats(0, 20).get()).hasSize(2)
+    }
+
+    @Test
+    internal fun `should find my chats - imam`() {
+        fixtureClock()
+        every { getCurrentUser() } returns fixtureImam
+        every {
+            dao.findByAnsweredByOrderByUpdatedAtDesc(fixtureImamId.value, any())
+        } returns fixtureSavedTwoChats().map { ChatRow.from(it) }
+
+        assertThat(repository.findMyChats(0, 20).get()).hasSize(2)
+    }
+
+    @Test
     internal fun `should create a chat`() {
         fixtureClock()
         every { getCurrentUser() } returns fixtureInquirer

@@ -11,6 +11,8 @@ import kz.azan.askimam.chat.domain.model.ChatRepository
 import kz.azan.askimam.chat.domain.service.GetCurrentUser
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.common.domain.EventPublisher
+import kz.azan.askimam.user.domain.model.User.Type.Imam
+import kz.azan.askimam.user.domain.model.User.Type.Inquirer
 import org.springframework.data.domain.PageRequest
 import java.time.Clock
 
@@ -34,6 +36,19 @@ class ChatJdbcRepository(
     override fun findPublicChats(offset: Int, pageSize: Int): Either<Declination, List<Chat>> =
         Try { dao.findByTypeAndIsVisibleToPublicIsTrue(Public, PageRequest.of(offset, pageSize)) }
             .toEither()
+            .bimap(
+                { Declination.from(it) },
+                { it.map { row -> row.toDomain(clock, eventPublisher, getCurrentUser) } }
+            )
+
+    override fun findMyChats(offset: Int, pageSize: Int): Either<Declination, List<Chat>> =
+        Try {
+            val user = getCurrentUser()
+            when (user.type) {
+                Imam -> dao.findByAnsweredByOrderByUpdatedAtDesc(user.id.value, PageRequest.of(offset, pageSize))
+                Inquirer -> dao.findByAskedByOrderByUpdatedAtDesc(user.id.value, PageRequest.of(offset, pageSize))
+            }
+        }.toEither()
             .bimap(
                 { Declination.from(it) },
                 { it.map { row -> row.toDomain(clock, eventPublisher, getCurrentUser) } }

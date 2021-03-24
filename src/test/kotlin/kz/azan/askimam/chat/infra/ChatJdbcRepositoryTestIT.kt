@@ -116,6 +116,20 @@ internal class ChatJdbcRepositoryTestIT(
     }
 
     @Test
+    internal fun `should find my chats - inquirer`() {
+        every { getCurrentUser() } returns fixtureInquirer
+
+        assertThat(repository.findMyChats(0, 20).get()).hasSize(4)
+    }
+
+    @Test
+    internal fun `should find my chats - imam`() {
+        every { getCurrentUser() } returns fixtureImam
+
+        assertThat(repository.findMyChats(0, 20).get()).hasSize(1)
+    }
+
+    @Test
     internal fun `should create a chat`() {
         every { getCurrentUser() } returns fixtureInquirer
         fixtureClock()
