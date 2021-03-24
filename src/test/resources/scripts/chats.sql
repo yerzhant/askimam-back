@@ -1,3 +1,5 @@
+SET NAMES 'utf8';
+
 -- *************** 1 *****************
 insert into chats(
     id,
@@ -59,11 +61,11 @@ insert into messages(
     2,
     1,
     1,
-    now() + 1,
+    now() + 2,
     'Text',
     'A new reply',
     null,
-    now() + 1
+    now() + 3
 );
 insert into messages(
     id,
@@ -78,9 +80,9 @@ insert into messages(
     3,
     1,
     1,
-    now() + .5,
+    now() + 1,
     'Audio',
-    'Аудио',
+    'Audio',
     'audio.mp3',
     null
 );

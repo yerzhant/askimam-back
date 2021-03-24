@@ -7,7 +7,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
 
-@Table("FAVORITES")
+@Table("favorites")
 data class FavoriteRow(
     @Id
     val id: Long?,

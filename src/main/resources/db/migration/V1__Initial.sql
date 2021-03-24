@@ -1,3 +1,5 @@
+SET NAMES 'utf8';
+
 create table if not exists users(id int);
 
 create table chats(

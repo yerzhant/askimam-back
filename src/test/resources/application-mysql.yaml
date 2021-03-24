@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    url: jdbc:tc:mysql:5.7:///databasename
+#    url: jdbc:tc:mysql:5.7:///database?connectionTimeZone=Asia/Almaty&serverTimezone=UTC
+#    url: jdbc:tc:mariadb:10.1://localhost/databasename
+#    url: jdbc:tc:domain.com/my-image:1.0.0:///testdb

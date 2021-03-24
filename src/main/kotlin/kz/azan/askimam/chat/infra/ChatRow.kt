@@ -12,7 +12,7 @@ import org.springframework.data.relational.core.mapping.Table
 import java.time.Clock
 import java.time.LocalDateTime
 
-@Table("CHATS")
+@Table("chats")
 data class ChatRow(
     @Id
     val id: Long?,

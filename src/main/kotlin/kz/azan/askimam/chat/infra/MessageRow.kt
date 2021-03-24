@@ -7,7 +7,7 @@ import org.springframework.data.relational.core.mapping.Table
 import java.time.Clock
 import java.time.LocalDateTime
 
-@Table("MESSAGES")
+@Table("messages")
 data class MessageRow(
     val id: Long?,
     val type: Message.Type,
