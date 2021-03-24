@@ -61,11 +61,11 @@ insert into messages(
     2,
     1,
     1,
-    now() + 2,
+    timestampadd(day, 2, now()),
     'Text',
     'A new reply',
     null,
-    now() + 3
+    timestampadd(day, 3, now())
 );
 insert into messages(
     id,
@@ -80,7 +80,7 @@ insert into messages(
     3,
     1,
     1,
-    now() + 1,
+    timestampadd(day, 1, now()),
     'Audio',
     'Audio',
     'audio.mp3',

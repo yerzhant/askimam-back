@@ -10,9 +10,12 @@ import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.common.infra.DataJdbcIT
 import kz.azan.askimam.common.type.NonBlankString
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.data.TemporalUnitWithinOffset
 import org.junit.jupiter.api.Test
 import org.springframework.data.domain.PageRequest
 import org.springframework.test.context.jdbc.Sql
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 @DataJdbcIT
 @Sql("/scripts/users.sql", "/scripts/chats.sql")
@@ -30,21 +33,21 @@ internal class ChatJdbcRepositoryTestIT(
     }
 
     @Test
-    internal fun `should find by an id`() {
+    fun `should find by an id`() {
         val chat = repository.findById(Chat.Id(1)).get()
 
         with(chat) {
             assertThat(type).isEqualTo(Public)
             assertThat(subject()).isEqualTo(fixtureSubject)
 
-//            assertThat(createdAt).isCloseTo(
-//                LocalDateTime.now(),
-//                TemporalUnitWithinOffset(1, ChronoUnit.SECONDS)
-//            )
-//            assertThat(updatedAt()).isCloseTo(
-//                LocalDateTime.now(),
-//                TemporalUnitWithinOffset(1, ChronoUnit.SECONDS)
-//            )
+            assertThat(createdAt).isCloseTo(
+                LocalDateTime.now(),
+                TemporalUnitWithinOffset(1, ChronoUnit.SECONDS)
+            )
+            assertThat(updatedAt()).isCloseTo(
+                LocalDateTime.now(),
+                TemporalUnitWithinOffset(1, ChronoUnit.SECONDS)
+            )
 
             assertThat(isVisibleToPublic()).isTrue
             assertThat(isViewedByImam()).isTrue
@@ -64,10 +67,10 @@ internal class ChatJdbcRepositoryTestIT(
             assertThat(messages()[0].authorId).isEqualTo(fixtureInquirerId)
             assertThat(messages()[0].text()).isEqualTo(fixtureMessage)
             assertThat(messages()[0].updatedAt()).isNull()
-//            assertThat(messages()[0].createdAt).isCloseTo(
-//                LocalDateTime.now(),
-//                TemporalUnitWithinOffset(1, ChronoUnit.SECONDS)
-//            )
+            assertThat(messages()[0].createdAt).isCloseTo(
+                LocalDateTime.now(),
+                TemporalUnitWithinOffset(1, ChronoUnit.SECONDS)
+            )
 
             assertThat(messages()[1].id).isEqualTo(Message.Id(3))
             assertThat(messages()[1].type).isEqualTo(Message.Type.Audio)
@@ -75,23 +78,23 @@ internal class ChatJdbcRepositoryTestIT(
             assertThat(messages()[1].text()).isEqualTo(NonBlankString.of("Audio"))
             assertThat(messages()[1].audio).isEqualTo(fixtureAudio)
             assertThat(messages()[1].updatedAt()).isNull()
-//            assertThat(messages()[1].createdAt).isCloseTo(
-//                LocalDateTime.now().plusHours(12),
-//                TemporalUnitWithinOffset(1, ChronoUnit.SECONDS)
-//            )
+            assertThat(messages()[1].createdAt).isCloseTo(
+                LocalDateTime.now().plusDays(1),
+                TemporalUnitWithinOffset(1, ChronoUnit.SECONDS)
+            )
 
             assertThat(messages()[2].id).isEqualTo(Message.Id(2))
             assertThat(messages()[2].type).isEqualTo(Message.Type.Text)
             assertThat(messages()[2].authorId).isEqualTo(fixtureImamId)
             assertThat(messages()[2].text()).isEqualTo(fixtureNewReply)
-//            assertThat(messages()[2].createdAt).isCloseTo(
-//                LocalDateTime.now().plusDays(1),
-//                TemporalUnitWithinOffset(1, ChronoUnit.SECONDS)
-//            )
-//            assertThat(messages()[2].updatedAt()).isCloseTo(
-//                LocalDateTime.now().plusDays(1),
-//                TemporalUnitWithinOffset(1, ChronoUnit.SECONDS)
-//            )
+            assertThat(messages()[2].createdAt).isCloseTo(
+                LocalDateTime.now().plusDays(2),
+                TemporalUnitWithinOffset(1, ChronoUnit.SECONDS)
+            )
+            assertThat(messages()[2].updatedAt()).isCloseTo(
+                LocalDateTime.now().plusDays(3),
+                TemporalUnitWithinOffset(1, ChronoUnit.SECONDS)
+            )
         }
     }
 
