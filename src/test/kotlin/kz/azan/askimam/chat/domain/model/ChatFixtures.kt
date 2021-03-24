@@ -45,12 +45,13 @@ open class ChatFixtures {
         every { eventPublisher.publish(MessageAdded(subject, newMessage)) } returns Unit
 
         return Chat.newWithSubject(
-            clock,
-            eventPublisher,
-            getCurrentUser,
-            type,
-            subject,
-            firstMessage,
+            type = type,
+            subject = subject,
+            messageText = firstMessage,
+
+            clock = clock,
+            eventPublisher = eventPublisher,
+            getCurrentUser = getCurrentUser,
         )
     }
 
@@ -59,16 +60,21 @@ open class ChatFixtures {
         val now = LocalDateTime.now(clock)
 
         return Chat.restore(
-            clock,
-            eventPublisher,
-            getCurrentUser,
-            fixtureChatId,
-            type,
-            fixtureInquirerId,
-            now,
-            now,
-            subject,
-            listOf(
+            id = fixtureChatId,
+            type = type,
+            subject = subject,
+
+            askedBy = fixtureInquirerId,
+            answeredBy = fixtureImamId,
+
+            createdAt = now,
+            updatedAt = now,
+
+            isVisibleToPublic = type == Public,
+            isViewedByImam = true,
+            isViewedByInquirer = true,
+
+            messages = listOf(
                 Message.restore(
                     clock,
                     fixtureMessageId1,
@@ -100,9 +106,10 @@ open class ChatFixtures {
                     null
                 ),
             ),
-            isVisibleToPublic = type == Public,
-            isViewedByImam = true,
-            isViewedByInquirer = true,
+
+            clock = clock,
+            eventPublisher = eventPublisher,
+            getCurrentUser = getCurrentUser,
         )
     }
 
@@ -114,25 +121,31 @@ open class ChatFixtures {
         updatedAt: LocalDateTime? = null,
     ) =
         Message.restore(
-            clock,
-            id,
-            Text,
-            userId,
-            text,
-            null,
-            createdAt,
-            updatedAt,
+            id = id,
+            type = Text,
+            authorId = userId,
+
+            text = text,
+            audio = null,
+
+            createdAt = createdAt,
+            updatedAt = updatedAt,
+
+            clock = clock,
         )
 
     fun fixtureSavedAudioMessage() = Message.restore(
-        clock,
-        fixtureMessageId2,
-        Audio,
-        fixtureImamId,
-        fixtureAudioText,
-        fixtureAudio,
-        timeAfter(0),
-        null,
+        id = fixtureMessageId2,
+        type = Audio,
+        authorId = fixtureImamId,
+
+        text = fixtureAudioText,
+        audio = fixtureAudio,
+
+        createdAt = timeAfter(0),
+        updatedAt = null,
+
+        clock = clock,
     )
 
     val fixtureImam = User(User.Id(1), User.Type.Imam, NonBlankString.of("Imam"))

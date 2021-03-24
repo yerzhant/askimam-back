@@ -32,6 +32,7 @@ internal class ChatTest : ChatFixtures() {
             assertThat(isViewedByImam()).isFalse
             assertThat(isViewedByInquirer()).isTrue
             assertThat(askedBy).isEqualTo(fixtureInquirerId)
+            assertThat(answeredBy()).isNull()
             assertThat(subject()).isEqualTo(fixtureSubject)
 
             assertThat(messages().size).isEqualTo(1)
@@ -174,6 +175,7 @@ internal class ChatTest : ChatFixtures() {
             assertThat(option.isEmpty).isTrue
             assertThat(isVisibleToPublic()).isTrue
             assertThat(isViewedByInquirer()).isFalse
+            assertThat(answeredBy()).isEqualTo(fixtureImamId)
             assertThat(updatedAt()).isEqualTo(timeAfter(31))
 
             assertThat(messages().size).isEqualTo(2)
@@ -181,6 +183,28 @@ internal class ChatTest : ChatFixtures() {
             assertThat(messages().last().type).isEqualTo(Text)
             assertThat(messages().last().text()).isEqualTo(fixtureNewReply)
             assertThat(messages().last().authorId).isEqualTo(fixtureImamId)
+        }
+    }
+
+    @Test
+    internal fun `should return a chat by an imam to not answered`() {
+        fixtureClock()
+        every { getCurrentUser() } returns fixtureImam
+
+        with(fixtureSavedChat()) {
+            assertThat(returnToUnansweredList().isEmpty).isTrue
+            assertThat(answeredBy()).isNull()
+        }
+    }
+
+    @Test
+    internal fun `should not return a chat by a not imam to not answered`() {
+        fixtureClock()
+        every { getCurrentUser() } returns fixtureInquirer
+
+        with(fixtureSavedChat()) {
+            assertThat(returnToUnansweredList().isDefined).isTrue
+            assertThat(answeredBy()).isNotNull
         }
     }
 
@@ -338,36 +362,46 @@ internal class ChatTest : ChatFixtures() {
         val messages =
             listOf(
                 Message.restore(
-                    clock,
-                    fixtureMessageId1,
-                    Text,
-                    fixtureInquirerId,
-                    fixtureMessage,
-                    null,
-                    now,
-                    null,
+                    id = fixtureMessageId1,
+                    type = Text,
+                    authorId = fixtureInquirerId,
+
+                    text = fixtureMessage,
+                    audio = null,
+
+                    createdAt = now,
+                    updatedAt = null,
+
+                    clock = clock,
                 )
             )
 
         with(
             Chat.restore(
-                clock,
-                eventPublisher,
-                getCurrentUser,
-                fixtureChatId,
-                Public,
-                fixtureInquirerId,
-                now,
-                now.plusMinutes(10),
-                fixtureSubject,
-                messages,
+                id = fixtureChatId,
+                type = Public,
+                subject = fixtureSubject,
+
+                askedBy = fixtureInquirerId,
+                answeredBy = null,
+
+                createdAt = now,
+                updatedAt = now.plusMinutes(10),
+
                 isVisibleToPublic = true,
                 isViewedByImam = true,
                 isViewedByInquirer = false,
+
+                messages = messages,
+
+                clock = clock,
+                eventPublisher = eventPublisher,
+                getCurrentUser = getCurrentUser,
             )
         ) {
             assertThat(type).isEqualTo(Public)
             assertThat(askedBy).isEqualTo(fixtureInquirerId)
+            assertThat(answeredBy()).isNull()
             assertThat(createdAt).isEqualTo(now)
             assertThat(updatedAt()).isEqualTo(now.plusMinutes(10))
             assertThat(subject()).isEqualTo(fixtureSubject)

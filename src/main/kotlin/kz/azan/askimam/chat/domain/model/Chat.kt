@@ -7,10 +7,7 @@ import kz.azan.askimam.chat.domain.event.MessageAdded
 import kz.azan.askimam.chat.domain.event.MessageDeleted
 import kz.azan.askimam.chat.domain.event.MessageUpdated
 import kz.azan.askimam.chat.domain.model.Chat.Type.Public
-import kz.azan.askimam.chat.domain.policy.AddMessagePolicy
-import kz.azan.askimam.chat.domain.policy.DeleteMessagePolicy
-import kz.azan.askimam.chat.domain.policy.UpdateChatPolicy
-import kz.azan.askimam.chat.domain.policy.UpdateMessagePolicy
+import kz.azan.askimam.chat.domain.policy.*
 import kz.azan.askimam.chat.domain.service.GetCurrentUser
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.common.domain.EventPublisher
@@ -26,20 +23,21 @@ class Chat private constructor(
     private val eventPublisher: EventPublisher,
     private val getCurrentUser: GetCurrentUser,
 
-    val id: Id?,
+    val id: Id? = null,
     val type: Type,
+    private var subject: Subject? = null,
+
     val askedBy: User.Id,
+    private var answeredBy: User.Id? = null,
 
     val createdAt: LocalDateTime,
     private var updatedAt: LocalDateTime,
 
-    private var subject: Subject? = null,
-
-    private val messages: MutableList<Message> = mutableListOf(),
-
     private var isVisibleToPublic: Boolean = false,
     private var isViewedByImam: Boolean = false,
     private var isViewedByInquirer: Boolean = true,
+
+    private val messages: MutableList<Message> = mutableListOf(),
 ) {
     private fun init(messageText: NonBlankString) {
         val message = Message.newText(clock, askedBy, messageText)
@@ -47,8 +45,9 @@ class Chat private constructor(
         eventPublisher.publish(ChatCreated(subject, messageText))
     }
 
-    fun updatedAt() = updatedAt
     fun subject() = subject
+    fun updatedAt() = updatedAt
+    fun answeredBy() = answeredBy
     fun messages() = messages.toList()
 
     fun isVisibleToPublic() = isVisibleToPublic && type == Public
@@ -97,11 +96,23 @@ class Chat private constructor(
             Imam -> {
                 if (type == Public) isVisibleToPublic = true
                 isViewedByInquirer = false
+                answeredBy = user.id
             }
         }
 
         messages.add(message)
         eventPublisher.publish(MessageAdded(subject, message.text()))
+    }
+
+    fun updateTextMessage(id: Message.Id, text: NonBlankString): Option<Declination> {
+        val message = messages.find { it.id == id } ?: return some(Declination.withReason("Invalid id"))
+
+        return message.run {
+            UpdateMessagePolicy.forAll.isAllowed(authorId, getCurrentUser(), type).onEmpty {
+                updateText(text)
+                eventPublisher.publish(MessageUpdated(id, text, this.updatedAt()!!))
+            }
+        }
     }
 
     fun deleteMessage(id: Message.Id): Option<Declination> {
@@ -117,16 +128,10 @@ class Chat private constructor(
         }
     }
 
-    fun updateTextMessage(id: Message.Id, text: NonBlankString): Option<Declination> {
-        val message = messages.find { it.id == id } ?: return some(Declination.withReason("Invalid id"))
-
-        return message.run {
-            UpdateMessagePolicy.forAll.isAllowed(authorId, getCurrentUser(), type).onEmpty {
-                updateText(text)
-                eventPublisher.publish(MessageUpdated(id, text, this.updatedAt()!!))
-            }
+    fun returnToUnansweredList(): Option<Declination> =
+        ReturnChatToUnansweredListPolicy.forAll.isAllowed(getCurrentUser()).onEmpty {
+            answeredBy = null
         }
-    }
 
     companion object {
         fun newWithSubject(
@@ -139,15 +144,16 @@ class Chat private constructor(
         ): Chat {
             val now = LocalDateTime.now(clock)
             return Chat(
-                clock,
-                eventPublisher,
-                getCurrentUser,
-                null,
-                type,
-                getCurrentUser().id,
-                now,
-                now,
-                subject
+                type = type,
+                subject = subject,
+                askedBy = getCurrentUser().id,
+
+                createdAt = now,
+                updatedAt = now,
+
+                clock = clock,
+                eventPublisher = eventPublisher,
+                getCurrentUser = getCurrentUser,
             ).apply { init(messageText) }
         }
 
@@ -160,14 +166,15 @@ class Chat private constructor(
         ): Chat {
             val now = LocalDateTime.now(clock)
             return Chat(
-                clock,
-                eventPublisher,
-                getCurrentUser,
-                null,
-                type,
-                getCurrentUser().id,
-                now,
-                now
+                type = type,
+                askedBy = getCurrentUser().id,
+
+                createdAt = now,
+                updatedAt = now,
+
+                clock = clock,
+                eventPublisher = eventPublisher,
+                getCurrentUser = getCurrentUser,
             ).apply { init(messageText) }
         }
 
@@ -185,20 +192,27 @@ class Chat private constructor(
             isVisibleToPublic: Boolean,
             isViewedByImam: Boolean,
             isViewedByInquirer: Boolean,
+            answeredBy: User.Id?,
         ) = Chat(
-            clock,
-            eventPublisher,
-            getCurrentUser,
-            id,
-            type,
-            askedBy,
-            createdAt,
-            updatedAt,
-            subject,
-            messages.toMutableList(),
-            isVisibleToPublic,
-            isViewedByImam,
-            isViewedByInquirer,
+            id = id,
+            type = type,
+            subject = subject,
+
+            askedBy = askedBy,
+            answeredBy = answeredBy,
+
+            createdAt = createdAt,
+            updatedAt = updatedAt,
+
+            isVisibleToPublic = isVisibleToPublic,
+            isViewedByImam = isViewedByImam,
+            isViewedByInquirer = isViewedByInquirer,
+
+            messages = messages.toMutableList(),
+
+            clock = clock,
+            eventPublisher = eventPublisher,
+            getCurrentUser = getCurrentUser,
         )
     }
 
