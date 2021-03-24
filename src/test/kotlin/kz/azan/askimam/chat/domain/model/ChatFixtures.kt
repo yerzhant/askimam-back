@@ -62,7 +62,7 @@ open class ChatFixtures {
         val now = LocalDateTime.now(clock)
 
         return Chat.restore(
-            id = fixtureChatId,
+            id = fixtureChatId1,
             type = type,
             subject = subject,
 
@@ -81,40 +81,134 @@ open class ChatFixtures {
 
             messages = listOf(
                 Message.restore(
-                    clock,
-                    fixtureMessageId1,
-                    Text,
-                    fixtureInquirerId,
-                    fixtureMessage,
-                    null,
-                    now,
-                    null
+                    id = fixtureMessageId1,
+                    type = Text,
+                    authorId = fixtureInquirerId,
+
+                    text = fixtureMessage,
+                    audio = null,
+
+                    createdAt = now,
+                    updatedAt = null,
+
+                    clock = clock,
                 ),
                 Message.restore(
-                    clock,
-                    fixtureMessageId2,
-                    Text,
-                    fixtureImamId,
-                    fixtureMessage,
-                    null,
-                    now,
-                    null
+                    id = fixtureMessageId2,
+                    type = Text,
+                    authorId = fixtureImamId,
+
+                    text = fixtureMessage,
+                    audio = null,
+
+                    createdAt = now,
+                    updatedAt = null,
+
+                    clock = clock,
                 ),
                 Message.restore(
-                    clock,
-                    fixtureMessageId3,
-                    Audio,
-                    fixtureImamId,
-                    fixtureAudioText,
-                    fixtureAudio,
-                    now,
-                    null
+                    id = fixtureMessageId3,
+                    type = Audio,
+                    authorId = fixtureImamId,
+
+                    text = fixtureAudioText,
+                    audio = fixtureAudio,
+
+                    createdAt = now,
+                    updatedAt = null,
+
+                    clock = clock,
                 ),
             ),
 
             clock = clock,
             eventPublisher = eventPublisher,
             getCurrentUser = getCurrentUser,
+        )
+    }
+
+    fun fixtureSavedTwoChats(type: Chat.Type = Public): List<Chat> {
+        val subject = fixtureSubject
+        val now = LocalDateTime.now(clock)
+        val later = timeAfter(10)
+
+        return listOf(
+            Chat.restore(
+                id = fixtureChatId1,
+                type = type,
+                subject = subject,
+
+                askedBy = fixtureInquirerId,
+                answeredBy = fixtureImamId,
+
+                inquirerFcmToken = fixtureInquirerFcmToken,
+                imamFcmToken = fixtureImamFcmToken,
+
+                createdAt = now,
+                updatedAt = now,
+
+                isVisibleToPublic = type == Public,
+                isViewedByImam = true,
+                isViewedByInquirer = true,
+
+                messages = listOf(
+                    Message.restore(
+                        id = fixtureMessageId1,
+                        type = Text,
+                        authorId = fixtureInquirerId,
+
+                        text = fixtureMessage,
+                        audio = null,
+
+                        createdAt = now,
+                        updatedAt = null,
+
+                        clock = clock,
+                    ),
+                ),
+
+                clock = clock,
+                eventPublisher = eventPublisher,
+                getCurrentUser = getCurrentUser,
+            ),
+            Chat.restore(
+                id = fixtureChatId2,
+                type = type,
+                subject = null,
+
+                askedBy = fixtureInquirerId,
+                answeredBy = null,
+
+                inquirerFcmToken = fixtureInquirerFcmToken,
+                imamFcmToken = null,
+
+                createdAt = later,
+                updatedAt = later,
+
+                isVisibleToPublic = type == Public,
+                isViewedByImam = false,
+                isViewedByInquirer = true,
+
+                messages = listOf(
+                    Message.restore(
+                        id = fixtureMessageId1,
+                        type = Text,
+                        authorId = fixtureInquirerId,
+
+                        text = fixtureMessage,
+                        audio = null,
+
+                        createdAt = later,
+                        updatedAt = null,
+
+                        clock = clock,
+                    ),
+                ),
+
+                clock = clock,
+                eventPublisher = eventPublisher,
+                getCurrentUser = getCurrentUser,
+            ),
         )
     }
 
@@ -164,7 +258,8 @@ open class ChatFixtures {
     val fixtureAnotherInquirer = User(User.Id(20), User.Type.Inquirer, NonBlankString.of("Some guy"))
     val fixtureAnotherImam = User(User.Id(30), User.Type.Imam, NonBlankString.of("Some imam"))
 
-    val fixtureChatId = Chat.Id(1)
+    val fixtureChatId1 = Chat.Id(1)
+    val fixtureChatId2 = Chat.Id(2)
 
     val fixtureSubject = Subject(NonBlankString.of("Subject"))
 
