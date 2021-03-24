@@ -22,7 +22,8 @@ internal class UpdateTextMessageTest : ChatFixtures() {
             UpdateTextMessage(chatRepository)(
                 fixtureChatId,
                 fixtureMessageId1,
-                fixtureNewMessage
+                fixtureNewMessage,
+                fixtureInquirerFcmToken,
             ).isEmpty
         ).isTrue
 
@@ -38,7 +39,8 @@ internal class UpdateTextMessageTest : ChatFixtures() {
             UpdateTextMessage(chatRepository)(
                 fixtureChatId,
                 fixtureMessageId1,
-                fixtureNewMessage
+                fixtureNewMessage,
+                fixtureInquirerFcmToken,
             ).isDefined
         ).isTrue
     }
@@ -53,7 +55,8 @@ internal class UpdateTextMessageTest : ChatFixtures() {
             UpdateTextMessage(chatRepository)(
                 fixtureChatId,
                 fixtureMessageId1,
-                fixtureNewMessage
+                fixtureNewMessage,
+                fixtureInquirerFcmToken,
             ).isDefined
         ).isTrue
 
@@ -69,7 +72,8 @@ internal class UpdateTextMessageTest : ChatFixtures() {
             UpdateTextMessage(chatRepository)(
                 fixtureChatId,
                 fixtureMessageId1,
-                fixtureNewReply
+                fixtureNewReply,
+                fixtureImamFcmToken,
             ).isDefined
         ).isTrue
     }
