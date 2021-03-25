@@ -7,7 +7,7 @@ import kz.azan.askimam.chat.domain.model.ChatFixtures
 import kz.azan.askimam.chat.domain.model.Message
 import kz.azan.askimam.chat.domain.model.Subject
 import kz.azan.askimam.common.domain.Declination
-import kz.azan.askimam.common.infra.DataJdbcIT
+import kz.azan.askimam.meta.DataJdbcIT
 import kz.azan.askimam.common.type.NonBlankString
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.data.TemporalUnitWithinOffset

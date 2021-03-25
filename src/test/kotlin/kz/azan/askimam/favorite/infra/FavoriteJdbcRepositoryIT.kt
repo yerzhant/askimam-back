@@ -1,7 +1,7 @@
 package kz.azan.askimam.favorite.infra
 
 import kz.azan.askimam.chat.domain.model.Chat
-import kz.azan.askimam.common.infra.DataJdbcIT
+import kz.azan.askimam.meta.DataJdbcIT
 import kz.azan.askimam.favorite.FavoriteFixtures
 import kz.azan.askimam.favorite.domain.model.Favorite
 import kz.azan.askimam.user.domain.model.User
