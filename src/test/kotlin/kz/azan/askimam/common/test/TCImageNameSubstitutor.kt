@@ -6,7 +6,7 @@ import org.testcontainers.utility.ImageNameSubstitutor
 class TCImageNameSubstitutor : ImageNameSubstitutor() {
     override fun apply(original: DockerImageName?): DockerImageName =
         when (original?.unversionedPart) {
-            "mysql" -> DockerImageName.parse("reg.azan.kz/test-mysql:1.0.0")
+            "mysql" -> DockerImageName.parse("test-mysql:1.0.0")
             else -> original!!
         }
 
