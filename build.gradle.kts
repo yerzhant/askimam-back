@@ -37,6 +37,7 @@ dependencies {
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("mysql:mysql-connector-java")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude(module = "junit")
         exclude(module = "mockito-core")
     }
 //    testImplementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner")
