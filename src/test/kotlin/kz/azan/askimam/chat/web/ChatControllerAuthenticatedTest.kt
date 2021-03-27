@@ -26,9 +26,9 @@ internal class ChatControllerAuthenticatedTest : ChatControllerTest() {
     @Test
     internal fun `should be rejected with 401 for non imams`() {
         mvc.get("$url/unanswered/0/20").andExpect { status { isForbidden() } }
+        mvc.patch("$url/1/return-to-unanswered").andExpect { status { isForbidden() } }
 
         // add audio
-        // return to unanswered
     }
 
     @Test
@@ -214,6 +214,29 @@ internal class ChatControllerAuthenticatedTest : ChatControllerTest() {
         every { setViewedBy(fixtureChatId1) } returns some(Declination.withReason("x"))
 
         mvc.patch("$url/1/viewed-by").andExpect {
+            status { isOk() }
+            jsonPath("\$.status") { value("Error") }
+            jsonPath("\$.error") { value("x") }
+        }
+    }
+
+    @Test
+    @WithPrincipal(authority = Imam)
+    internal fun `should return to unanswered list`() {
+        every { returnChatToUnansweredList(fixtureChatId1) } returns none()
+
+        mvc.patch("$url/1/return-to-unanswered").andExpect {
+            status { isOk() }
+            jsonPath("\$.status") { value("Ok") }
+        }
+    }
+
+    @Test
+    @WithPrincipal(authority = Imam)
+    internal fun `should not return to unanswered list`() {
+        every { returnChatToUnansweredList(fixtureChatId1) } returns some(Declination.withReason("x"))
+
+        mvc.patch("$url/1/return-to-unanswered").andExpect {
             status { isOk() }
             jsonPath("\$.status") { value("Error") }
             jsonPath("\$.error") { value("x") }

@@ -33,4 +33,7 @@ internal open class ChatControllerTest : ControllerTest() {
 
     @MockkBean
     protected lateinit var setViewedBy: SetViewedBy
+
+    @MockkBean
+    protected lateinit var returnChatToUnansweredList: ReturnChatToUnansweredList
 }

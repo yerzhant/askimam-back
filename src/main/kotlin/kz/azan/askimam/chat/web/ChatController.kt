@@ -22,6 +22,7 @@ class ChatController(
     private val deleteChat: DeleteChat,
     private val updateChatSubject: UpdateChatSubject,
     private val setViewedBy: SetViewedBy,
+    private val returnChatToUnansweredList: ReturnChatToUnansweredList,
 ) {
 
     @GetMapping("public/{offset}/{pageSize}")
@@ -85,8 +86,15 @@ class ChatController(
         )
 
     @PatchMapping("{id}/viewed-by")
-    fun setViewByFlag(@PathVariable id: Long): ResponseDto =
+    fun setViewedByFlag(@PathVariable id: Long): ResponseDto =
         setViewedBy(Chat.Id(id)).fold(
+            { ResponseDto.ok() },
+            { ResponseDto.error(it) }
+        )
+
+    @PatchMapping("{id}/return-to-unanswered")
+    fun returnToUnansweredList(@PathVariable id: Long): ResponseDto =
+        returnChatToUnansweredList(Chat.Id(id)).fold(
             { ResponseDto.ok() },
             { ResponseDto.error(it) }
         )
