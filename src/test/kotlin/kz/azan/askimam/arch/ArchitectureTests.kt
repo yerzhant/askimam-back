@@ -24,17 +24,17 @@ class ArchitectureTests {
     private val domain = "Domain"
     private val application = "Application"
     private val infra = "Infra"
-//    private val web = "Web"
+    private val web = "Web"
 
     @ArchTest
     val layerRule = Architectures.layeredArchitecture()
         .layer(domain).definedBy("..domain..")
         .layer(application).definedBy("..app..")
         .layer(infra).definedBy("..infra..")
+        .layer(web).definedBy("..web..")
         .whereLayer(infra).mayNotBeAccessedByAnyLayer()
-//        .layer(web).definedBy("..web..")
-//        .whereLayer(application).mayOnlyBeAccessedByLayers(web)
-//        .whereLayer(web).mayNotBeAccessedByAnyLayer()
+        .whereLayer(web).mayNotBeAccessedByAnyLayer()
+        .whereLayer(application).mayOnlyBeAccessedByLayers(web)
 
     private val areAnnotatedByAPackagePrivate =
         object : DescribedPredicate<JavaMethod>("are annotated as a package private") {

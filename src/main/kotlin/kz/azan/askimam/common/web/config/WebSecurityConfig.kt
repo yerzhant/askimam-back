@@ -1,4 +1,4 @@
-package kz.azan.askimam.common.web
+package kz.azan.askimam.common.web.config
 
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
