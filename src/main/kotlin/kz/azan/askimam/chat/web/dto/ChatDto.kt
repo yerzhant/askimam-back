@@ -14,7 +14,7 @@ data class ChatDto(
                 chat.id.value,
                 chat.subject.string(),
                 chat.isFavorite,
-                chat.messages?.map { MessageDto.from(it) },
+                chat.messages?.map { MessageDto.from(it) }?.toJavaList(),
             )
     }
 }

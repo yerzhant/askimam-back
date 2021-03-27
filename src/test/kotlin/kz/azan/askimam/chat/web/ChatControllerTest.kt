@@ -76,8 +76,8 @@ internal class ChatControllerTest : ControllerTest() {
     @Test
     internal fun `should get a chat`() {
         fixtureClock()
-        every { userRepository.findById(fixtureImamId) } returns fixtureImam
-        every { getChatUseCase(fixtureChatId1) } returns right(ChatProjection.from(fixtureSavedChat(), userRepository))
+        every { userRepository.findById(fixtureImamId) } returns right(fixtureImam)
+        every { getChatUseCase(fixtureChatId1) } returns ChatProjection.from(fixtureSavedChat(), userRepository)
 
         mvc.get("$url/messages/1").andExpect {
             status { isOk() }

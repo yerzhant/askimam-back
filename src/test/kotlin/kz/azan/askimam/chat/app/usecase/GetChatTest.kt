@@ -39,6 +39,17 @@ internal class GetChatTest : ChatFixtures() {
     }
 
     @Test
+    internal fun `should not return a chat`() {
+        fixtures()
+        every { getCurrentUser() } returns fixtureInquirer
+        every { userRepository.findById(fixtureImamId) } returns left(Declination.withReason("db err"))
+
+        val result = underTest()
+
+        assertThat(result.left).isEqualTo(Declination.withReason("db err"))
+    }
+
+    @Test
     internal fun `should return a chat to an imam`() {
         val chatProjection = fixtures()
         every { getCurrentUser() } returns fixtureImam
@@ -80,7 +91,7 @@ internal class GetChatTest : ChatFixtures() {
         fixtureClock()
         val chat = fixtureSavedChat()
         every { chatRepository.findById(fixtureChatId1) } returns right(chat)
-        every { userRepository.findById(fixtureImamId) } returns fixtureImam
-        return ChatProjection.from(chat, userRepository)
+        every { userRepository.findById(fixtureImamId) } returns right(fixtureImam)
+        return ChatProjection.from(chat, userRepository).get()
     }
 }

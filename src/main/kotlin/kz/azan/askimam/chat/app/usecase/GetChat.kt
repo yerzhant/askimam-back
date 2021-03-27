@@ -19,7 +19,7 @@ class GetChat(
         val policy = GetChatPolicy.getFor(currentUser)
 
         return chatRepository.findById(id).flatMap {
-            policy.isAllowed(it, currentUser).map { chat -> ChatProjection.from(chat, userRepository) }
+            policy.isAllowed(it, currentUser).flatMap { chat -> ChatProjection.from(chat, userRepository) }
         }
     }
 }
