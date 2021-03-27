@@ -6,9 +6,11 @@ import kz.azan.askimam.chat.domain.model.Chat
 import kz.azan.askimam.chat.domain.model.ChatRepository
 import kz.azan.askimam.chat.domain.policy.GetChatPolicy
 import kz.azan.askimam.chat.domain.service.GetCurrentUser
+import kz.azan.askimam.common.app.meta.UseCase
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.user.domain.model.UserRepository
 
+@UseCase
 class GetChat(
     private val getCurrentUser: GetCurrentUser,
     private val chatRepository: ChatRepository,
