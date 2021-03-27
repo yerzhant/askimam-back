@@ -7,8 +7,10 @@ import io.vavr.kotlin.some
 import kz.azan.askimam.chat.app.usecase.AddAudioMessage
 import kz.azan.askimam.chat.app.usecase.AddTextMessage
 import kz.azan.askimam.chat.app.usecase.DeleteMessage
+import kz.azan.askimam.chat.app.usecase.UpdateTextMessage
 import kz.azan.askimam.chat.web.dto.AddAudioMessageDto
 import kz.azan.askimam.chat.web.dto.AddTextMessageDto
+import kz.azan.askimam.chat.web.dto.UpdateTextMessageDto
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.meta.ControllerTest
 import kz.azan.askimam.meta.WithPrincipal
@@ -36,16 +38,16 @@ internal class MessageControllerTest : ControllerTest() {
     @MockkBean
     private lateinit var deleteMessage: DeleteMessage
 
+    @MockkBean
+    private lateinit var updateTextMessage: UpdateTextMessage
+
     @Test
     @WithAnonymousUser
     internal fun `should be rejected with 401`() {
         mvc.post(url).andExpect { status { isUnauthorized() } }
         mvc.post("$url/audio").andExpect { status { isUnauthorized() } }
         mvc.delete("$url/1/1").andExpect { status { isUnauthorized() } }
-        mvc.patch("$url/1").andExpect { status { isUnauthorized() } }
-
-        // delete message
-        // update text message
+        mvc.patch("$url/1/1").andExpect { status { isUnauthorized() } }
     }
 
     @Test
@@ -128,6 +130,37 @@ internal class MessageControllerTest : ControllerTest() {
         every { deleteMessage(fixtureChatId1, fixtureMessageId1) } returns some(Declination.withReason("x"))
 
         mvc.delete("$url/1/1").andExpect {
+            status { isOk() }
+            jsonPath("\$.status") { value("Error") }
+            jsonPath("\$.error") { value("x") }
+        }
+    }
+
+    @Test
+    internal fun `should update text message`() {
+        every {
+            updateTextMessage(fixtureChatId1, fixtureMessageId1, fixtureNewMessage, fixtureInquirerFcmToken)
+        } returns none()
+
+        mvc.patch("$url/1/1") {
+            contentType = APPLICATION_JSON
+            content = objectMapper.writeValueAsString(UpdateTextMessageDto("A new message", "456"))
+        }.andExpect {
+            status { isOk() }
+            jsonPath("\$.status") { value("Ok") }
+        }
+    }
+
+    @Test
+    internal fun `should not update text message`() {
+        every {
+            updateTextMessage(fixtureChatId1, fixtureMessageId1, fixtureNewMessage, fixtureInquirerFcmToken)
+        } returns some(Declination.withReason("x"))
+
+        mvc.patch("$url/1/1") {
+            contentType = APPLICATION_JSON
+            content = objectMapper.writeValueAsString(UpdateTextMessageDto("A new message", "456"))
+        }.andExpect {
             status { isOk() }
             jsonPath("\$.status") { value("Error") }
             jsonPath("\$.error") { value("x") }
