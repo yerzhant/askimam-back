@@ -2,6 +2,7 @@ package kz.azan.askimam.chat.web
 
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
+import io.mockk.verify
 import io.vavr.kotlin.none
 import io.vavr.kotlin.some
 import kz.azan.askimam.chat.app.usecase.AddAudioMessage
@@ -66,6 +67,8 @@ internal class MessageControllerTest : ControllerTest() {
             status { isOk() }
             jsonPath("\$.status") { value("Ok") }
         }
+
+        verify { addTextMessage(fixtureChatId1, fixtureMessage, fixtureInquirerFcmToken) }
     }
 
     @Test
@@ -82,6 +85,8 @@ internal class MessageControllerTest : ControllerTest() {
             jsonPath("\$.status") { value("Error") }
             jsonPath("\$.error") { value("x") }
         }
+
+        verify { addTextMessage(fixtureChatId1, fixtureMessage, fixtureInquirerFcmToken) }
     }
 
     @Test
@@ -96,6 +101,8 @@ internal class MessageControllerTest : ControllerTest() {
             status { isOk() }
             jsonPath("\$.status") { value("Ok") }
         }
+
+        verify { addAudioMessage(fixtureChatId1, fixtureAudio, fixtureImamFcmToken) }
     }
 
     @Test
@@ -113,6 +120,8 @@ internal class MessageControllerTest : ControllerTest() {
             jsonPath("\$.status") { value("Error") }
             jsonPath("\$.error") { value("x") }
         }
+
+        verify { addAudioMessage(fixtureChatId1, fixtureAudio, fixtureImamFcmToken) }
     }
 
     @Test
@@ -123,6 +132,8 @@ internal class MessageControllerTest : ControllerTest() {
             status { isOk() }
             jsonPath("\$.status") { value("Ok") }
         }
+
+        verify { deleteMessage(fixtureChatId1, fixtureMessageId1) }
     }
 
     @Test
@@ -149,6 +160,8 @@ internal class MessageControllerTest : ControllerTest() {
             status { isOk() }
             jsonPath("\$.status") { value("Ok") }
         }
+
+        verify { updateTextMessage(fixtureChatId1, fixtureMessageId1, fixtureNewMessage, fixtureInquirerFcmToken) }
     }
 
     @Test
