@@ -23,6 +23,7 @@ create table messages(
     author_id               bigint          not null references users(id),
     created_at              datetime        not null,
     type                    varchar(100)    not null,
+    author_type             varchar(100)    not null,
     text                    text            not null,
     audio                   varchar(1024),
     updated_at              datetime

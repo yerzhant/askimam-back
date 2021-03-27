@@ -1,8 +1,11 @@
 package kz.azan.askimam.chat.domain.model
 
+import kz.azan.askimam.chat.domain.model.Message.Type.Audio
+import kz.azan.askimam.chat.domain.model.Message.Type.Text
 import kz.azan.askimam.common.arch.PackagePrivate
 import kz.azan.askimam.common.type.NonBlankString
 import kz.azan.askimam.user.domain.model.User
+import kz.azan.askimam.user.domain.model.User.Type.Imam
 import java.time.Clock
 import java.time.LocalDateTime
 
@@ -11,11 +14,11 @@ class Message private constructor(
 
     val id: Id?,
     val type: Type,
-    val authorId: User.Id,
-
     private var text: NonBlankString,
-
     val audio: NonBlankString? = null,
+
+    val authorId: User.Id,
+    val authorType: User.Type,
 
     val createdAt: LocalDateTime = LocalDateTime.now(clock),
     private var updatedAt: LocalDateTime? = null,
@@ -32,34 +35,37 @@ class Message private constructor(
 
     companion object {
         fun newText(
-            authorId: User.Id,
             text: NonBlankString,
+            authorId: User.Id,
+            authorType: User.Type,
 
             clock: Clock,
         ) = Message(
             id = null,
-            type = Type.Text,
-            authorId = authorId,
-
+            type = Text,
             text = text,
+
+            authorId = authorId,
+            authorType = authorType,
 
             clock = clock,
         )
 
         fun newAudio(
-            authorId: User.Id,
             audio: NonBlankString,
+            authorId: User.Id,
 
             clock: Clock,
         ): Message {
             val text = NonBlankString.of("Аудио")
             return Message(
                 id = null,
-                type = Type.Audio,
-                authorId = authorId,
-
+                type = Audio,
                 text = text,
                 audio = audio,
+
+                authorId = authorId,
+                authorType = Imam,
 
                 clock = clock,
             )
@@ -68,10 +74,11 @@ class Message private constructor(
         fun restore(
             id: Id,
             type: Type,
-            authorId: User.Id,
-
             text: NonBlankString,
             audio: NonBlankString?,
+
+            authorId: User.Id,
+            authorType: User.Type,
 
             createdAt: LocalDateTime,
             updatedAt: LocalDateTime?,
@@ -81,10 +88,11 @@ class Message private constructor(
             Message(
                 id = id,
                 type = type,
-                authorId = authorId,
-
                 text = text,
                 audio = audio,
+
+                authorId = authorId,
+                authorType = authorType,
 
                 createdAt = createdAt,
                 updatedAt = updatedAt,

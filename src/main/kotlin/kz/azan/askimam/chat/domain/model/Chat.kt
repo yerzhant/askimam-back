@@ -44,8 +44,9 @@ class Chat private constructor(
 ) {
     private fun init(messageText: NonBlankString) {
         val message = Message.newText(
-            authorId = askedBy,
             text = messageText,
+            authorId = askedBy,
+            authorType = Inquirer,
             clock = clock,
         )
         messages.add(message)
@@ -87,8 +88,9 @@ class Chat private constructor(
     fun addTextMessage(text: NonBlankString, fcmToken: FcmToken): Option<Declination> {
         val author = getCurrentUser()
         val message = Message.newText(
-            authorId = author.id,
             text = text,
+            authorId = author.id,
+            authorType = author.type,
             clock = clock,
         )
         return addMessage(message, AddMessagePolicy.getFor(author), author, fcmToken)

@@ -86,10 +86,11 @@ open class ChatFixtures {
                 Message.restore(
                     id = fixtureMessageId1,
                     type = Text,
-                    authorId = fixtureInquirerId,
-
                     text = fixtureMessage,
                     audio = null,
+
+                    authorId = fixtureInquirerId,
+                    authorType = fixtureInquirer.type,
 
                     createdAt = now,
                     updatedAt = null,
@@ -99,10 +100,11 @@ open class ChatFixtures {
                 Message.restore(
                     id = fixtureMessageId2,
                     type = Text,
-                    authorId = fixtureImamId,
-
                     text = fixtureMessage,
                     audio = null,
+
+                    authorId = fixtureImamId,
+                    authorType = fixtureImam.type,
 
                     createdAt = now,
                     updatedAt = null,
@@ -112,10 +114,11 @@ open class ChatFixtures {
                 Message.restore(
                     id = fixtureMessageId3,
                     type = Audio,
-                    authorId = fixtureImamId,
-
                     text = fixtureAudioText,
                     audio = fixtureAudio,
+
+                    authorId = fixtureImamId,
+                    authorType = fixtureImam.type,
 
                     createdAt = now,
                     updatedAt = null,
@@ -158,10 +161,11 @@ open class ChatFixtures {
                     Message.restore(
                         id = fixtureMessageId1,
                         type = Text,
-                        authorId = fixtureInquirerId,
-
                         text = fixtureMessage,
                         audio = null,
+
+                        authorId = fixtureInquirerId,
+                        authorType = fixtureInquirer.type,
 
                         createdAt = now,
                         updatedAt = null,
@@ -196,10 +200,11 @@ open class ChatFixtures {
                     Message.restore(
                         id = fixtureMessageId1,
                         type = Text,
-                        authorId = fixtureInquirerId,
-
                         text = fixtureMessage,
                         audio = null,
+
+                        authorId = fixtureInquirerId,
+                        authorType = fixtureInquirer.type,
 
                         createdAt = later,
                         updatedAt = null,
@@ -219,16 +224,18 @@ open class ChatFixtures {
         id: Message.Id = fixtureMessageId1,
         text: NonBlankString = fixtureMessage,
         userId: User.Id = fixtureInquirerId,
+        userType: User.Type = fixtureInquirer.type,
         createdAt: LocalDateTime = timeAfter(0),
         updatedAt: LocalDateTime? = null,
     ) =
         Message.restore(
             id = id,
             type = Text,
-            authorId = userId,
-
             text = text,
             audio = null,
+
+            authorId = userId,
+            authorType = userType,
 
             createdAt = createdAt,
             updatedAt = updatedAt,
@@ -239,10 +246,11 @@ open class ChatFixtures {
     fun fixtureSavedAudioMessage() = Message.restore(
         id = fixtureMessageId2,
         type = Audio,
-        authorId = fixtureImamId,
-
         text = fixtureAudioText,
         audio = fixtureAudio,
+
+        authorId = fixtureImamId,
+        authorType = fixtureImam.type,
 
         createdAt = timeAfter(0),
         updatedAt = null,

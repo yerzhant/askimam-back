@@ -44,6 +44,7 @@ internal class ChatTest : ChatFixtures() {
 
             assertThat(messages().first().type).isEqualTo(Text)
             assertThat(messages().first().authorId).isEqualTo(fixtureInquirerId)
+            assertThat(messages().first().authorType).isEqualTo(fixtureInquirer.type)
             assertThat(messages().first().text()).isEqualTo(fixtureMessage)
 
             assertThat(messages().first().createdAt).isEqualTo(fixtureNow)
@@ -127,6 +128,8 @@ internal class ChatTest : ChatFixtures() {
             assertThat(messages().last().updatedAt()).isNull()
             assertThat(messages().last().type).isEqualTo(Text)
             assertThat(messages().last().text()).isEqualTo(fixtureNewMessage)
+            assertThat(messages().last().authorId).isEqualTo(fixtureInquirer.id)
+            assertThat(messages().last().authorType).isEqualTo(fixtureInquirer.type)
         }
 
         verifySequence {
@@ -207,6 +210,7 @@ internal class ChatTest : ChatFixtures() {
             assertThat(messages().last().type).isEqualTo(Text)
             assertThat(messages().last().text()).isEqualTo(fixtureNewReply)
             assertThat(messages().last().authorId).isEqualTo(fixtureImamId)
+            assertThat(messages().last().authorType).isEqualTo(fixtureImam.type)
         }
     }
 
@@ -291,6 +295,8 @@ internal class ChatTest : ChatFixtures() {
             assertThat(messages().last().type).isEqualTo(Audio)
             assertThat(messages().last().text()).isEqualTo(audio)
             assertThat(messages().last().audio).isEqualTo(fixtureAudio)
+            assertThat(messages().last().authorId).isEqualTo(fixtureImam.id)
+            assertThat(messages().last().authorType).isEqualTo(fixtureImam.type)
         }
 
         verify {
@@ -412,10 +418,11 @@ internal class ChatTest : ChatFixtures() {
                 Message.restore(
                     id = fixtureMessageId1,
                     type = Text,
-                    authorId = fixtureInquirerId,
-
                     text = fixtureMessage,
                     audio = null,
+
+                    authorId = fixtureInquirerId,
+                    authorType = fixtureInquirer.type,
 
                     createdAt = now,
                     updatedAt = null,
