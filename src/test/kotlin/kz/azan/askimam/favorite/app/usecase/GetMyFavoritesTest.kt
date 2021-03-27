@@ -3,6 +3,7 @@ package kz.azan.askimam.favorite.app.usecase
 import io.mockk.every
 import io.vavr.kotlin.left
 import io.vavr.kotlin.right
+import kz.azan.askimam.chat.app.projection.ChatProjection
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.favorite.FavoriteFixtures
 import org.assertj.core.api.Assertions.assertThat
@@ -15,7 +16,7 @@ internal class GetMyFavoritesTest : FavoriteFixtures() {
         fixtureClock()
         every { getCurrentUser() } returns fixtureInquirer
         every { favoriteRepository.findByUserId(fixtureInquirerId) } returns right(listOfFavoritesFixture)
-        every { getChat(any()) } returns right(fixtureSavedChat())
+        every { getChat(any()) } returns right(ChatProjection.from(fixtureSavedChat()))
 
         val list = GetMyFavorites(getCurrentUser, favoriteRepository, getChat)().get()
 
@@ -31,7 +32,7 @@ internal class GetMyFavoritesTest : FavoriteFixtures() {
         every { getCurrentUser() } returns fixtureInquirer
         every { favoriteRepository.findByUserId(fixtureInquirerId) } returns right(listOfFavoritesFixture)
         every { getChat(any()) } returnsMany listOf(
-            right(fixtureSavedChat()),
+            right(ChatProjection.from(fixtureSavedChat())),
             left(Declination.withReason("db error"))
         )
 

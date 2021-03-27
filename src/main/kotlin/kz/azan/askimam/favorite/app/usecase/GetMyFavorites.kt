@@ -18,7 +18,7 @@ class GetMyFavorites(
             Either.sequenceRight(
                 list.map { favorite ->
                     getChat(favorite.chatId).map {
-                        FavoriteProjection(favorite.id!!, it.id!!, it.subjectText())
+                        FavoriteProjection(favorite.id!!, it.id, it.subject)
                     }
                 }
             )
