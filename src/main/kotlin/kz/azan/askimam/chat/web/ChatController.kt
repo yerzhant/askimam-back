@@ -1,22 +1,26 @@
 package kz.azan.askimam.chat.web
 
-import kz.azan.askimam.chat.app.usecase.GetChat
-import kz.azan.askimam.chat.app.usecase.GetMyChats
-import kz.azan.askimam.chat.app.usecase.GetPublicChats
-import kz.azan.askimam.chat.app.usecase.GetUnansweredChats
+import kz.azan.askimam.chat.app.usecase.*
 import kz.azan.askimam.chat.domain.model.Chat
+import kz.azan.askimam.chat.domain.model.FcmToken
+import kz.azan.askimam.chat.domain.model.Subject
 import kz.azan.askimam.chat.web.dto.ChatDto
+import kz.azan.askimam.chat.web.dto.CreateChatDto
+import kz.azan.askimam.common.type.NonBlankString
 import kz.azan.askimam.common.web.dto.ResponseDto
 import kz.azan.askimam.common.web.meta.RestApi
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 
 @RestApi("chats")
 class ChatController(
-    private val getPublicChats: GetPublicChats,
-    private val getMyChats: GetMyChats,
-    private val unansweredChats: GetUnansweredChats,
     private val getChat: GetChat,
+    private val getMyChats: GetMyChats,
+    private val getPublicChats: GetPublicChats,
+    private val unansweredChats: GetUnansweredChats,
+    private val createChat: CreateChat,
 ) {
 
     @GetMapping("public/{offset}/{pageSize}")
@@ -46,4 +50,22 @@ class ChatController(
             { ResponseDto.error(it) },
             { ResponseDto.ok(ChatDto.from(it)) }
         )
+
+    @PostMapping
+    fun create(@RequestBody dto: CreateChatDto): ResponseDto =
+        createChatWithOrWithSubject(dto).fold(
+            { ResponseDto.ok() },
+            { ResponseDto.error(it) }
+        )
+
+    private fun createChatWithOrWithSubject(dto: CreateChatDto) =
+        if (dto.subject == null)
+            createChat(dto.type, NonBlankString.of(dto.text), FcmToken.from(dto.fcmToken))
+        else
+            createChat.withSubject(
+                dto.type,
+                Subject.from(dto.subject),
+                NonBlankString.of(dto.text),
+                FcmToken.from(dto.fcmToken),
+            )
 }
