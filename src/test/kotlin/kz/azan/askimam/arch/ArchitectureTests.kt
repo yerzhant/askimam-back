@@ -10,6 +10,7 @@ import com.tngtech.archunit.lang.ArchCondition
 import com.tngtech.archunit.lang.ConditionEvents
 import com.tngtech.archunit.lang.SimpleConditionEvent
 import com.tngtech.archunit.lang.syntax.ArchRuleDefinition.methods
+import com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses
 import com.tngtech.archunit.library.Architectures
 import kz.azan.askimam.AskimamApplication
 import kz.azan.askimam.common.arch.PackagePrivate
@@ -35,6 +36,11 @@ class ArchitectureTests {
         .whereLayer(infra).mayNotBeAccessedByAnyLayer()
         .whereLayer(web).mayNotBeAccessedByAnyLayer()
         .whereLayer(application).mayOnlyBeAccessedByLayers(web)
+
+    @ArchTest
+    val `domain should not access Spring framework` =
+        noClasses().that().resideInAPackage("..domain..")
+            .should().accessClassesThat().resideInAPackage("org.springframework..")
 
     private val areAnnotatedByAPackagePrivate =
         object : DescribedPredicate<JavaMethod>("are annotated as a package private") {
