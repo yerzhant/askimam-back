@@ -20,8 +20,13 @@ internal class UserJdbcRepositoryTest : ChatFixtures() {
     internal fun `should return an imam user`() {
         every { dao.findById(1) } returns Optional.of(
             UserRow(
-                1, "Jon", "Dow",
-                setOf(AuthAssignmentRow("ask-imam", "1")),
+                id = 1,
+                username = "jon-dow",
+                firstName = "Jon",
+                lastName = "Dow",
+                status = 1,
+                passwordHash = "123",
+                roles = setOf(AuthAssignmentRow("ask-imam", "1")),
             )
         )
 
@@ -37,7 +42,17 @@ internal class UserJdbcRepositoryTest : ChatFixtures() {
 
     @Test
     internal fun `should return an inquirer user`() {
-        every { dao.findById(2) } returns Optional.of(UserRow(1, "Some", "Body", emptySet()))
+        every { dao.findById(2) } returns Optional.of(
+            UserRow(
+                id = 1,
+                username = "some-body",
+                firstName = "Some",
+                lastName = "Body",
+                status = 1,
+                passwordHash = "123",
+                roles = emptySet(),
+            )
+        )
 
         val user = repository.findById(fixtureInquirerId).get()
 
@@ -63,5 +78,29 @@ internal class UserJdbcRepositoryTest : ChatFixtures() {
 
         assertThat(repository.findById(fixtureInquirerId).left)
             .isEqualTo(Declination.withReason("x"))
+    }
+
+    @Test
+    internal fun `should find by username and status`() {
+        every { dao.findByUsernameAndStatus("jon-dow", 1) } returns UserRow(
+            id = 1,
+            username = "jon-dow",
+            firstName = "Jon",
+            lastName = "Dow",
+            status = 1,
+            passwordHash = "123",
+            roles = setOf(AuthAssignmentRow("ask-imam", "1")),
+        )
+
+        assertThat(repository.findByUsernameAndStatus("jon-dow", 1).isRight).isTrue
+
+        verify { dao.findByUsernameAndStatus("jon-dow", 1) }
+    }
+
+    @Test
+    internal fun `should not find by username and status`() {
+        every { dao.findByUsernameAndStatus("jon-dow", 1) } returns null
+
+        assertThat(repository.findByUsernameAndStatus("jon-dow", 1).isLeft).isTrue
     }
 }

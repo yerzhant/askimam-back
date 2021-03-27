@@ -2,8 +2,11 @@ SET NAMES 'utf8';
 
 create table if not exists users(
     id              int,
+    username        varchar(255),
     first_name      varchar(255),
-    last_name       varchar(255)
+    last_name       varchar(255),
+    status          int,
+    password_hash   varchar(255)
 );
 
 create table if not exists auth_assignment(

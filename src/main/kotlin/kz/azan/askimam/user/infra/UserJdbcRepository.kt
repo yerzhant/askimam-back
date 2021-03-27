@@ -10,7 +10,16 @@ class UserJdbcRepository(private val dao: UserDao) : UserRepository {
 
     override fun findById(id: User.Id): Either<Declination, User> =
         Try { dao.findById(id.value.toInt()) }
-            .map { it.orElseThrow { Exception("The user is not found") } }
+            .map { it.orElseThrow { IllegalArgumentException("The user is not found") } }
+            .toEither()
+            .bimap(
+                { Declination.from(it) },
+                { it.toDomain() }
+            )
+
+    override fun findByUsernameAndStatus(username: String?, status: Int): Either<Declination, User> =
+        Try { dao.findByUsernameAndStatus(username, status) }
+            .map { it ?: throw IllegalArgumentException("The user is not found") }
             .toEither()
             .bimap(
                 { Declination.from(it) },

@@ -41,4 +41,14 @@ class UserJdbcRepositoryIT(private val dao: UserDao) : ChatFixtures() {
     internal fun `should not find a user`() {
         assertThat(repository.findById(User.Id(100)).isLeft).isTrue
     }
+
+    @Test
+    internal fun `should find by username and status`() {
+        assertThat(repository.findByUsernameAndStatus("the-imam", 1).isRight).isTrue
+    }
+
+    @Test
+    internal fun `should not find by username and status`() {
+        assertThat(repository.findByUsernameAndStatus("the-imam", 0).isLeft).isTrue
+    }
 }

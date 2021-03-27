@@ -14,9 +14,11 @@ private const val askImam = "ask-imam"
 data class UserRow(
     @Id
     val id: Long,
-
+    val username: String,
     val firstName: String,
     val lastName: String,
+    val status: Int,
+    val passwordHash: String,
 
     @MappedCollection(idColumn = "user_id")
     val roles: Set<AuthAssignmentRow>,
