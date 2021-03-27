@@ -6,6 +6,7 @@ import kz.azan.askimam.chat.domain.model.FcmToken
 import kz.azan.askimam.chat.domain.model.Subject
 import kz.azan.askimam.chat.web.dto.ChatDto
 import kz.azan.askimam.chat.web.dto.CreateChatDto
+import kz.azan.askimam.chat.web.dto.UpdateChatDto
 import kz.azan.askimam.common.type.NonBlankString
 import kz.azan.askimam.common.web.dto.ResponseDto
 import kz.azan.askimam.common.web.meta.RestApi
@@ -19,6 +20,7 @@ class ChatController(
     private val unansweredChats: GetUnansweredChats,
     private val createChat: CreateChat,
     private val deleteChat: DeleteChat,
+    private val updateChatSubject: UpdateChatSubject,
 ) {
 
     @GetMapping("public/{offset}/{pageSize}")
@@ -70,6 +72,13 @@ class ChatController(
     @DeleteMapping("{id}")
     fun delete(@PathVariable id: Long): ResponseDto =
         deleteChat(Chat.Id(id)).fold(
+            { ResponseDto.ok() },
+            { ResponseDto.error(it) }
+        )
+
+    @PatchMapping("{id}")
+    fun update(@PathVariable id: Long, @RequestBody dto: UpdateChatDto): ResponseDto =
+        updateChatSubject(Chat.Id(id), Subject.from(dto.subject)).fold(
             { ResponseDto.ok() },
             { ResponseDto.error(it) }
         )
