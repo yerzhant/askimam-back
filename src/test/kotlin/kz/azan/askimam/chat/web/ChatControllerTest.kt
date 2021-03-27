@@ -30,4 +30,7 @@ internal open class ChatControllerTest : ControllerTest() {
 
     @MockkBean
     protected lateinit var updateChatSubject: UpdateChatSubject
+
+    @MockkBean
+    protected lateinit var setViewedBy: SetViewedBy
 }

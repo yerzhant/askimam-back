@@ -22,10 +22,10 @@ internal class ChatControllerPublicTest : ChatControllerTest() {
         mvc.post(url).andExpect { status { isUnauthorized() } }
         mvc.delete("$url/1").andExpect { status { isUnauthorized() } }
         mvc.patch("$url/1").andExpect { status { isUnauthorized() } }
+        mvc.patch("$url/1/viewed-by").andExpect { status { isUnauthorized() } }
 
         // add text
         // delete message
-        // set view by
         // update text message
     }
 

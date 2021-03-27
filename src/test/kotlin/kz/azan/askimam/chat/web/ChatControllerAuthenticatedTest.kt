@@ -198,4 +198,25 @@ internal class ChatControllerAuthenticatedTest : ChatControllerTest() {
             jsonPath("\$.error") { value("x") }
         }
     }
+
+    @Test
+    internal fun `should set Viewed by flag`() {
+        every { setViewedBy(fixtureChatId1) } returns none()
+
+        mvc.patch("$url/1/viewed-by").andExpect {
+            status { isOk() }
+            jsonPath("\$.status") { value("Ok") }
+        }
+    }
+
+    @Test
+    internal fun `should not set Viewed by flag`() {
+        every { setViewedBy(fixtureChatId1) } returns some(Declination.withReason("x"))
+
+        mvc.patch("$url/1/viewed-by").andExpect {
+            status { isOk() }
+            jsonPath("\$.status") { value("Error") }
+            jsonPath("\$.error") { value("x") }
+        }
+    }
 }

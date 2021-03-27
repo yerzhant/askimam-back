@@ -21,6 +21,7 @@ class ChatController(
     private val createChat: CreateChat,
     private val deleteChat: DeleteChat,
     private val updateChatSubject: UpdateChatSubject,
+    private val setViewedBy: SetViewedBy,
 ) {
 
     @GetMapping("public/{offset}/{pageSize}")
@@ -79,6 +80,13 @@ class ChatController(
     @PatchMapping("{id}")
     fun update(@PathVariable id: Long, @RequestBody dto: UpdateChatDto): ResponseDto =
         updateChatSubject(Chat.Id(id), Subject.from(dto.subject)).fold(
+            { ResponseDto.ok() },
+            { ResponseDto.error(it) }
+        )
+
+    @PatchMapping("{id}/viewed-by")
+    fun setViewByFlag(@PathVariable id: Long): ResponseDto =
+        setViewedBy(Chat.Id(id)).fold(
             { ResponseDto.ok() },
             { ResponseDto.error(it) }
         )
