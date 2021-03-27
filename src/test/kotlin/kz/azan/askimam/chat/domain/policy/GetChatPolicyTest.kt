@@ -23,7 +23,7 @@ internal class GetChatPolicyTest : ChatFixtures() {
     }
 
     @Test
-    internal fun `should allow access to a chat to any imam`() {
+    internal fun `should return a chat to any imam`() {
         fixtureClock()
         every { getCurrentUser() } returns fixtureInquirer
 
@@ -31,7 +31,7 @@ internal class GetChatPolicyTest : ChatFixtures() {
     }
 
     @Test
-    internal fun `should allow access to a private chat to any imam`() {
+    internal fun `should return a private chat to any imam`() {
         fixtureClock()
         every { getCurrentUser() } returns fixtureInquirer
 
@@ -49,7 +49,7 @@ internal class GetChatPolicyTest : ChatFixtures() {
     }
 
     @Test
-    internal fun `should allow access to a chat to an author`() {
+    internal fun `should return a chat to an author`() {
         fixtureClock()
         every { getCurrentUser() } returns fixtureInquirer
 
@@ -57,7 +57,7 @@ internal class GetChatPolicyTest : ChatFixtures() {
     }
 
     @Test
-    internal fun `should allow access to a public chat and that is publicly visible`() {
+    internal fun `should return a public chat which is publicly visible`() {
         fixtureClock()
         every { getCurrentUser() } returnsMany listOf(
             fixtureInquirer,
