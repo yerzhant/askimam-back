@@ -6,6 +6,7 @@ import io.vavr.kotlin.right
 import kz.azan.askimam.chat.app.projection.ChatProjection
 import kz.azan.askimam.chat.domain.model.Chat.Type.Private
 import kz.azan.askimam.chat.domain.model.ChatFixtures
+import kz.azan.askimam.chat.domain.model.Message.Type.Text
 import kz.azan.askimam.common.domain.Declination
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -17,7 +18,18 @@ internal class GetChatTest : ChatFixtures() {
         val chatProjection = fixtures()
         every { getCurrentUser() } returns fixtureInquirer
 
-        assertThat(GetChat(getCurrentUser, chatRepository)(fixtureChatId1).get()).isEqualTo(chatProjection)
+        val result = underTest().get()
+
+        assertThat(result).isEqualTo(chatProjection)
+        assertThat(result.id).isEqualTo(fixtureChatId1)
+        assertThat(result.subject).isEqualTo(fixtureSubject)
+        assertThat(result.messages).hasSize(3)
+        assertThat(result.messages?.first()?.id).isEqualTo(fixtureMessageId1)
+        assertThat(result.messages?.first()?.type).isEqualTo(Text)
+        assertThat(result.messages?.first()?.text).isEqualTo(fixtureMessage)
+        assertThat(result.messages?.first()?.author).isEqualTo(fixtureInquirer)
+        assertThat(result.messages?.first()?.createdAt).isEqualTo(timeAfter(0))
+        assertThat(result.messages?.first()?.updatedAt).isNull()
     }
 
     @Test
@@ -25,7 +37,7 @@ internal class GetChatTest : ChatFixtures() {
         val chatProjection = fixtures()
         every { getCurrentUser() } returns fixtureImam
 
-        assertThat(GetChat(getCurrentUser, chatRepository)(fixtureChatId1).get()).isEqualTo(chatProjection)
+        assertThat(underTest().get()).isEqualTo(chatProjection)
     }
 
     @Test
@@ -34,7 +46,7 @@ internal class GetChatTest : ChatFixtures() {
         every { getCurrentUser() } returns fixtureImam
         every { chatRepository.findById(fixtureChatId1) } returns left(declination)
 
-        assertThat(GetChat(getCurrentUser, chatRepository)(fixtureChatId1).left).isEqualTo(declination)
+        assertThat(underTest().left).isEqualTo(declination)
     }
 
     @Test
@@ -42,7 +54,7 @@ internal class GetChatTest : ChatFixtures() {
         val chatProjection = fixtures()
         every { getCurrentUser() } returns fixtureAnotherInquirer
 
-        assertThat(GetChat(getCurrentUser, chatRepository)(fixtureChatId1).get()).isEqualTo(chatProjection)
+        assertThat(underTest().get()).isEqualTo(chatProjection)
     }
 
     @Test
@@ -53,13 +65,17 @@ internal class GetChatTest : ChatFixtures() {
         every { getCurrentUser() } returns fixtureAnotherInquirer
         every { chatRepository.findById(fixtureChatId1) } returns right(chat)
 
-        assertThat(GetChat(getCurrentUser, chatRepository)(fixtureChatId1).left).isEqualTo(declination)
+        assertThat(underTest().left).isEqualTo(declination)
     }
+
+    private fun underTest() = GetChat(getCurrentUser, chatRepository, userRepository)(fixtureChatId1)
 
     private fun fixtures(): ChatProjection {
         fixtureClock()
         val chat = fixtureSavedChat()
         every { chatRepository.findById(fixtureChatId1) } returns right(chat)
-        return ChatProjection.from(chat)
+        every { userRepository.findById(fixtureInquirerId) } returns fixtureInquirer
+        every { userRepository.findById(fixtureImamId) } returns fixtureImam
+        return ChatProjection.from(chat, userRepository)
     }
 }

@@ -16,7 +16,7 @@ internal class GetMyFavoritesTest : FavoriteFixtures() {
         fixtureClock()
         every { getCurrentUser() } returns fixtureInquirer
         every { favoriteRepository.findByUserId(fixtureInquirerId) } returns right(listOfFavoritesFixture)
-        every { getChat(any()) } returns right(ChatProjection.from(fixtureSavedChat()))
+        every { getChat(any()) } returns right(ChatProjection.from(fixtureSavedChat(), userRepository))
 
         val list = GetMyFavorites(getCurrentUser, favoriteRepository, getChat)().get()
 
@@ -32,7 +32,7 @@ internal class GetMyFavoritesTest : FavoriteFixtures() {
         every { getCurrentUser() } returns fixtureInquirer
         every { favoriteRepository.findByUserId(fixtureInquirerId) } returns right(listOfFavoritesFixture)
         every { getChat(any()) } returnsMany listOf(
-            right(ChatProjection.from(fixtureSavedChat())),
+            right(ChatProjection.from(fixtureSavedChat(), userRepository)),
             left(Declination.withReason("db error"))
         )
 

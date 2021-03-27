@@ -13,14 +13,16 @@ import kz.azan.askimam.chat.domain.service.GetCurrentUser
 import kz.azan.askimam.common.domain.EventPublisher
 import kz.azan.askimam.common.type.NonBlankString
 import kz.azan.askimam.user.domain.model.User
+import kz.azan.askimam.user.domain.model.UserRepository
 import java.time.*
 
 open class ChatFixtures {
 
     val eventPublisher = mockk<EventPublisher>()
     val getCurrentUser = mockk<GetCurrentUser>()
-    val getChat = mockk<GetChat>()
     val chatRepository = mockk<ChatRepository>()
+    val userRepository = mockk<UserRepository>()
+    val getChat = mockk<GetChat>()
 
     private val fixedClock: Clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
     val clock = mockk<Clock>()
