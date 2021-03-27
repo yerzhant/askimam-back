@@ -23,52 +23,45 @@ internal class GetChatPolicyTest : ChatFixtures() {
     }
 
     @Test
-    internal fun `should return a chat to any imam`() {
+    internal fun `should allow access to a chat to any imam`() {
         fixtureClock()
-        every { getCurrentUser() } returnsMany listOf(
-            fixtureInquirer
-        )
+        every { getCurrentUser() } returns fixtureInquirer
+
         assertThat(forImam.isAllowed(fixtureChat(), fixtureImam).isRight).isTrue
     }
 
     @Test
-    internal fun `should return a private chat to any imam`() {
+    internal fun `should allow access to a private chat to any imam`() {
         fixtureClock()
-        every { getCurrentUser() } returnsMany listOf(
-            fixtureInquirer
-        )
+        every { getCurrentUser() } returns fixtureInquirer
+
         assertThat(forImam.isAllowed(fixtureChat(type = Private), fixtureImam).isRight).isTrue
     }
 
     @Test
     internal fun `should be declined for a non imam`() {
         fixtureClock()
-        every { getCurrentUser() } returnsMany listOf(
-            fixtureInquirer
-        )
+        every { getCurrentUser() } returns fixtureInquirer
+
         assertThat(
-            forImam.isAllowed(
-                fixtureChat(),
-                fixtureInquirer
-            ).left
+            forImam.isAllowed(fixtureChat(), fixtureInquirer).left
         ).isEqualTo(Declination.withReason("The operation is not permitted"))
     }
 
     @Test
-    internal fun `should return a chat to an author`() {
+    internal fun `should allow access to a chat to an author`() {
         fixtureClock()
-        every { getCurrentUser() } returnsMany listOf(
-            fixtureInquirer
-        )
+        every { getCurrentUser() } returns fixtureInquirer
+
         assertThat(forInquirer.isAllowed(fixtureChat(type = Private), fixtureInquirer).isRight).isTrue
     }
 
     @Test
-    internal fun `should return a public chat`() {
+    internal fun `should allow access to a public chat and that is publicly visible`() {
         fixtureClock()
         every { getCurrentUser() } returnsMany listOf(
             fixtureInquirer,
-            fixtureImam
+            fixtureImam,
         )
 
         with(fixtureChat(fixtureNewReply)) {
@@ -78,16 +71,26 @@ internal class GetChatPolicyTest : ChatFixtures() {
     }
 
     @Test
-    internal fun `should decline the operation when not an author is trying to get a private chat`() {
+    internal fun `should reject access to a private chat that was already answered`() {
         fixtureClock()
         every { getCurrentUser() } returnsMany listOf(
-            fixtureInquirer
+            fixtureInquirer,
+            fixtureImam,
         )
+
+        with(fixtureChat(fixtureNewReply, Private)) {
+            addTextMessage(fixtureNewReply, fixtureImamFcmToken)
+            assertThat(forInquirer.isAllowed(this, fixtureAnotherInquirer).isLeft).isTrue
+        }
+    }
+
+    @Test
+    internal fun `should decline the operation when not an author is trying to get a private chat`() {
+        fixtureClock()
+        every { getCurrentUser() } returns fixtureInquirer
+
         assertThat(
-            forInquirer.isAllowed(
-                fixtureChat(),
-                fixtureAnotherInquirer
-            ).left
+            forInquirer.isAllowed(fixtureChat(), fixtureAnotherInquirer).left
         ).isEqualTo(Declination.withReason("The operation is not permitted"))
     }
 }
