@@ -11,7 +11,7 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
     override fun configure(http: HttpSecurity?) {
         http {
             authorizeRequests {
-                authorize("/login", permitAll)
+                authorize("/chats/public/**", permitAll)
                 authorize()
             }
             httpBasic { } // TODO: to be replaced by JWT

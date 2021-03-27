@@ -11,6 +11,7 @@ import kz.azan.askimam.meta.WithPrincipal
 import org.hamcrest.Matchers.hasSize
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.security.test.context.support.WithAnonymousUser
 import org.springframework.test.web.servlet.get
 
 @WebMvcTest(ChatController::class)
@@ -22,12 +23,18 @@ internal class ChatControllerTest : ControllerTest() {
     private lateinit var getPublicChats: GetPublicChats
 
     @Test
-    internal fun `should be rejected with 401`() {
-        mvc.get("$url/public").andExpect { status { isUnauthorized() } }
+    internal fun `should be publicly accessible`() {
+        every { getPublicChats(0, 20) } returns right(listOfChatProjectionsFixture())
+
+        mvc.get("$url/public/0/20").andExpect { status { isOk() } }
     }
 
     @Test
-    @WithPrincipal
+    internal fun `should be rejected with 401`() {
+//        mvc.get("$url/public").andExpect { status { isUnauthorized() } }
+    }
+
+    @Test
     internal fun `should get public chats`() {
         every { getPublicChats(0, 20) } returns right(listOfChatProjectionsFixture())
 
@@ -42,7 +49,6 @@ internal class ChatControllerTest : ControllerTest() {
     }
 
     @Test
-    @WithPrincipal
     internal fun `should not get public chats`() {
         every { getPublicChats(0, 20) } returns left(Declination.withReason("x"))
 
