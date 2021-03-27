@@ -8,6 +8,7 @@ import io.vavr.kotlin.right
 import io.vavr.kotlin.some
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.favorite.app.usecase.AddChatToFavorites
+import kz.azan.askimam.favorite.app.usecase.DeleteFavorite
 import kz.azan.askimam.favorite.app.usecase.GetMyFavorites
 import kz.azan.askimam.favorite.web.dto.AddChatToFavoritesDto
 import kz.azan.askimam.meta.ControllerTest
@@ -15,6 +16,7 @@ import kz.azan.askimam.meta.WithPrincipal
 import org.hamcrest.Matchers
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 
@@ -28,10 +30,14 @@ internal class FavoriteControllerTest : ControllerTest() {
     @MockkBean
     private lateinit var addChatToFavorites: AddChatToFavorites
 
+    @MockkBean
+    private lateinit var deleteFavorite: DeleteFavorite
+
     @Test
     internal fun `should reject with 401s`() {
         mvc.get(url).andExpect { status { isUnauthorized() } }
         mvc.post(url).andExpect { status { isUnauthorized() } }
+        mvc.delete("$url/1").andExpect { status { isUnauthorized() } }
     }
 
     @Test
@@ -88,6 +94,29 @@ internal class FavoriteControllerTest : ControllerTest() {
             status { isOk() }
             jsonPath("\$.status") { value("Error") }
             jsonPath("\$.error") { value("nope") }
+        }
+    }
+
+    @Test
+    @WithPrincipal
+    internal fun `should delete a favorite`() {
+        every { deleteFavorite(fixtureChatId1) } returns none()
+
+        mvc.delete("$url/1").andExpect {
+            status { isOk() }
+            jsonPath("\$.status") { value("Ok") }
+        }
+    }
+
+    @Test
+    @WithPrincipal
+    internal fun `should not delete a favorite`() {
+        every { deleteFavorite(fixtureChatId1) } returns some(Declination.withReason("x"))
+
+        mvc.delete("$url/1").andExpect {
+            status { isOk() }
+            jsonPath("\$.status") { value("Error") }
+            jsonPath("\$.error") { value("x") }
         }
     }
 }
