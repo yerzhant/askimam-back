@@ -15,11 +15,13 @@ import kz.azan.askimam.meta.ControllerTest
 import kz.azan.askimam.meta.WithPrincipal
 import org.hamcrest.Matchers
 import org.junit.jupiter.api.Test
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 
+@WebMvcTest(FavoriteController::class)
 internal class FavoriteControllerTest : ControllerTest() {
 
     private val url = "/favorites"
