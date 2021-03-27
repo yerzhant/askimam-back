@@ -3,14 +3,20 @@ package kz.azan.askimam.favorite.web
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.vavr.kotlin.left
+import io.vavr.kotlin.none
 import io.vavr.kotlin.right
+import io.vavr.kotlin.some
 import kz.azan.askimam.common.domain.Declination
+import kz.azan.askimam.favorite.app.usecase.AddChatToFavorites
 import kz.azan.askimam.favorite.app.usecase.GetMyFavorites
+import kz.azan.askimam.favorite.web.dto.AddChatToFavoritesDto
 import kz.azan.askimam.meta.ControllerTest
 import kz.azan.askimam.meta.WithPrincipal
 import org.hamcrest.Matchers
 import org.junit.jupiter.api.Test
+import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.get
+import org.springframework.test.web.servlet.post
 
 internal class FavoriteControllerTest : ControllerTest() {
 
@@ -19,9 +25,13 @@ internal class FavoriteControllerTest : ControllerTest() {
     @MockkBean
     private lateinit var getMyFavorites: GetMyFavorites
 
+    @MockkBean
+    private lateinit var addChatToFavorites: AddChatToFavorites
+
     @Test
-    internal fun `should reject with 401`() {
+    internal fun `should reject with 401s`() {
         mvc.get(url).andExpect { status { isUnauthorized() } }
+        mvc.post(url).andExpect { status { isUnauthorized() } }
     }
 
     @Test
@@ -49,6 +59,35 @@ internal class FavoriteControllerTest : ControllerTest() {
             jsonPath("\$.status") { value("Error") }
             jsonPath("\$.error") { value("oops!") }
             jsonPath("\$.data") { doesNotExist() }
+        }
+    }
+
+    @Test
+    @WithPrincipal
+    internal fun `should add a chat to my favorites`() {
+        every { addChatToFavorites(fixtureChatId1) } returns none()
+
+        mvc.post(url) {
+            contentType = APPLICATION_JSON
+            content = objectMapper.writeValueAsString(AddChatToFavoritesDto(1))
+        }.andExpect {
+            status { isOk() }
+            jsonPath("\$.status") { value("Ok") }
+        }
+    }
+
+    @Test
+    @WithPrincipal
+    internal fun `should not add a chat to my favorites`() {
+        every { addChatToFavorites(fixtureChatId1) } returns some(Declination.withReason("nope"))
+
+        mvc.post(url) {
+            contentType = APPLICATION_JSON
+            content = objectMapper.writeValueAsString(AddChatToFavoritesDto(1))
+        }.andExpect {
+            status { isOk() }
+            jsonPath("\$.status") { value("Error") }
+            jsonPath("\$.error") { value("nope") }
         }
     }
 }
