@@ -19,6 +19,7 @@ import org.hamcrest.Matchers.hasSize
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 
@@ -42,11 +43,15 @@ internal class ChatControllerTest : ControllerTest() {
     @MockkBean
     private lateinit var createChat: CreateChat
 
+    @MockkBean
+    private lateinit var deleteChat: DeleteChat
+
     @Test
     internal fun `should be rejected with 401`() {
         mvc.get("$url/my/0/20").andExpect { status { isUnauthorized() } }
         mvc.get("$url/unanswered/0/20").andExpect { status { isUnauthorized() } }
         mvc.post(url).andExpect { status { isUnauthorized() } }
+        mvc.delete("$url/1").andExpect { status { isUnauthorized() } }
 
         // delete chat
         // add text
@@ -248,6 +253,29 @@ internal class ChatControllerTest : ControllerTest() {
             contentType = APPLICATION_JSON
             content = objectMapper.writeValueAsString(CreateChatDto(Public, "Subject", "A message", "456"))
         }.andExpect {
+            status { isOk() }
+            jsonPath("\$.status") { value("Error") }
+            jsonPath("\$.error") { value("x") }
+        }
+    }
+
+    @Test
+    @WithPrincipal
+    internal fun `should delete a chat`() {
+        every { deleteChat(fixtureChatId1) } returns none()
+
+        mvc.delete("$url/1").andExpect {
+            status { isOk() }
+            jsonPath("\$.status") { value("Ok") }
+        }
+    }
+
+    @Test
+    @WithPrincipal
+    internal fun `should not delete a chat`() {
+        every { deleteChat(fixtureChatId1) } returns some(Declination.withReason("x"))
+
+        mvc.delete("$url/1").andExpect {
             status { isOk() }
             jsonPath("\$.status") { value("Error") }
             jsonPath("\$.error") { value("x") }

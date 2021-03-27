@@ -9,10 +9,7 @@ import kz.azan.askimam.chat.web.dto.CreateChatDto
 import kz.azan.askimam.common.type.NonBlankString
 import kz.azan.askimam.common.web.dto.ResponseDto
 import kz.azan.askimam.common.web.meta.RestApi
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.*
 
 @RestApi("chats")
 class ChatController(
@@ -21,6 +18,7 @@ class ChatController(
     private val getPublicChats: GetPublicChats,
     private val unansweredChats: GetUnansweredChats,
     private val createChat: CreateChat,
+    private val deleteChat: DeleteChat,
 ) {
 
     @GetMapping("public/{offset}/{pageSize}")
@@ -68,4 +66,11 @@ class ChatController(
                 NonBlankString.of(dto.text),
                 FcmToken.from(dto.fcmToken),
             )
+
+    @DeleteMapping("{id}")
+    fun delete(@PathVariable id: Long): ResponseDto =
+        deleteChat(Chat.Id(id)).fold(
+            { ResponseDto.ok() },
+            { ResponseDto.error(it) }
+        )
 }
