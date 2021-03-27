@@ -2,6 +2,7 @@ package kz.azan.askimam.chat.domain.model
 
 import io.mockk.every
 import io.mockk.mockk
+import kz.azan.askimam.chat.app.usecase.GetChat
 import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.event.MessageAdded
 import kz.azan.askimam.chat.domain.model.Chat.Type.Public
@@ -17,6 +18,7 @@ open class ChatFixtures {
 
     val eventPublisher = mockk<EventPublisher>()
     val getCurrentUser = mockk<GetCurrentUser>()
+    val getChat = mockk<GetChat>()
     val chatRepository = mockk<ChatRepository>()
 
     private val fixedClock: Clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())

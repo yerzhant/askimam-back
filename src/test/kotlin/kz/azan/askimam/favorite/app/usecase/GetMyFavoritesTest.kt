@@ -5,7 +5,6 @@ import io.vavr.kotlin.left
 import io.vavr.kotlin.right
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.favorite.FavoriteFixtures
-import kz.azan.askimam.favorite.domain.model.Favorite
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
@@ -13,15 +12,31 @@ internal class GetMyFavoritesTest : FavoriteFixtures() {
 
     @Test
     internal fun `should return favorites`() {
+        fixtureClock()
         every { getCurrentUser() } returns fixtureInquirer
-        every { favoriteRepository.findByUserId(fixtureInquirerId) } returns right(
-            listOf(
-                fixtureFavorite,
-                fixtureFavorite.copy(Favorite.Id(10)),
-            )
+        every { favoriteRepository.findByUserId(fixtureInquirerId) } returns right(listOfFavoritesFixture)
+        every { getChat(any()) } returns right(fixtureSavedChat())
+
+        val list = GetMyFavorites(getCurrentUser, favoriteRepository, getChat)().get()
+
+        assertThat(list).hasSize(2)
+        assertThat(list.first().id).isEqualTo(fixtureFavorite.id)
+        assertThat(list.first().chatId).isEqualTo(fixtureChatId1)
+        assertThat(list.first().subject).isEqualTo(fixtureSubject)
+    }
+
+    @Test
+    internal fun `should fail on a second chat`() {
+        fixtureClock()
+        every { getCurrentUser() } returns fixtureInquirer
+        every { favoriteRepository.findByUserId(fixtureInquirerId) } returns right(listOfFavoritesFixture)
+        every { getChat(any()) } returnsMany listOf(
+            right(fixtureSavedChat()),
+            left(Declination.withReason("db error"))
         )
 
-        assertThat(GetMyFavorites(getCurrentUser, favoriteRepository)().get()).hasSize(2)
+        assertThat(GetMyFavorites(getCurrentUser, favoriteRepository, getChat)().left)
+            .isEqualTo(Declination.withReason("db error"))
     }
 
     @Test
@@ -29,7 +44,7 @@ internal class GetMyFavoritesTest : FavoriteFixtures() {
         every { getCurrentUser() } returns fixtureInquirer
         every { favoriteRepository.findByUserId(fixtureInquirerId) } returns left(Declination.withReason("boom!"))
 
-        assertThat(GetMyFavorites(getCurrentUser, favoriteRepository)().left)
+        assertThat(GetMyFavorites(getCurrentUser, favoriteRepository, getChat)().left)
             .isEqualTo(Declination.withReason("boom!"))
     }
 }

@@ -2,6 +2,8 @@ package kz.azan.askimam.favorite
 
 import io.mockk.mockk
 import kz.azan.askimam.chat.domain.model.ChatFixtures
+import kz.azan.askimam.chat.domain.model.Subject
+import kz.azan.askimam.favorite.app.projection.FavoriteProjection
 import kz.azan.askimam.favorite.domain.model.Favorite
 import kz.azan.askimam.favorite.domain.model.FavoriteRepository
 import kz.azan.askimam.favorite.infra.FavoriteDao
@@ -21,4 +23,13 @@ open class FavoriteFixtures : ChatFixtures() {
         fixtureChatId1.value,
         timeAfter(0)
     )
+
+    val listOfFavoritesFixture = listOf(
+        fixtureFavorite,
+        fixtureFavorite.copy(Favorite.Id(10)),
+    )
+
+    val sequenceOfFavoriteProjectionsFixture = listOfFavoritesFixture.map {
+        FavoriteProjection(it.id!!, it.chatId, Subject.from("Subject ${it.id?.value}"))
+    }
 }
