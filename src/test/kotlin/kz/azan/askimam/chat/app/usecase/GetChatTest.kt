@@ -80,7 +80,6 @@ internal class GetChatTest : ChatFixtures() {
         fixtureClock()
         val chat = fixtureSavedChat()
         every { chatRepository.findById(fixtureChatId1) } returns right(chat)
-        every { userRepository.findById(fixtureInquirerId) } returns fixtureInquirer
         every { userRepository.findById(fixtureImamId) } returns fixtureImam
         return ChatProjection.from(chat, userRepository)
     }
