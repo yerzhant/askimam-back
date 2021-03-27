@@ -12,6 +12,7 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
         http {
             authorizeRequests {
                 authorize("/chats/public/**", permitAll)
+                authorize("/chats/messages/**", permitAll)
                 authorize()
             }
             httpBasic { } // TODO: to be replaced by JWT
