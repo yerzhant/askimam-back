@@ -1,6 +1,7 @@
 package kz.azan.askimam.chat.web
 
 import io.mockk.every
+import io.mockk.verify
 import io.vavr.kotlin.left
 import io.vavr.kotlin.none
 import io.vavr.kotlin.right
@@ -47,6 +48,8 @@ internal class ChatControllerAuthenticatedTest : ChatControllerTest() {
             jsonPath("\$.data[0].messages[0].createdAt") { `is`(timeAfter(0)) }
             jsonPath("\$.data[0].messages[0].updatedAt") { doesNotExist() }
         }
+
+        verify { getMyChats(0, 20) }
     }
 
     @Test
@@ -79,6 +82,8 @@ internal class ChatControllerAuthenticatedTest : ChatControllerTest() {
             jsonPath("\$.data[0].messages[0].createdAt") { `is`(timeAfter(0)) }
             jsonPath("\$.data[0].messages[0].updatedAt") { doesNotExist() }
         }
+
+        verify { getUnansweredChats(0, 20) }
     }
 
     @Test
@@ -104,6 +109,8 @@ internal class ChatControllerAuthenticatedTest : ChatControllerTest() {
             status { isOk() }
             jsonPath("\$.status") { value("Ok") }
         }
+
+        verify { createChat(Public, fixtureMessage, fixtureInquirerFcmToken) }
     }
 
     @Test
@@ -131,6 +138,8 @@ internal class ChatControllerAuthenticatedTest : ChatControllerTest() {
             status { isOk() }
             jsonPath("\$.status") { value("Ok") }
         }
+
+        verify { createChat.withSubject(Public, fixtureSubject, fixtureMessage, fixtureInquirerFcmToken) }
     }
 
     @Test
@@ -157,6 +166,8 @@ internal class ChatControllerAuthenticatedTest : ChatControllerTest() {
             status { isOk() }
             jsonPath("\$.status") { value("Ok") }
         }
+
+        verify { deleteChat(fixtureChatId1) }
     }
 
     @Test
@@ -181,6 +192,8 @@ internal class ChatControllerAuthenticatedTest : ChatControllerTest() {
             status { isOk() }
             jsonPath("\$.status") { value("Ok") }
         }
+
+        verify { updateChatSubject(fixtureChatId1, fixtureSubject) }
     }
 
     @Test
@@ -205,6 +218,8 @@ internal class ChatControllerAuthenticatedTest : ChatControllerTest() {
             status { isOk() }
             jsonPath("\$.status") { value("Ok") }
         }
+
+        verify { setViewedBy(fixtureChatId1) }
     }
 
     @Test
@@ -227,6 +242,8 @@ internal class ChatControllerAuthenticatedTest : ChatControllerTest() {
             status { isOk() }
             jsonPath("\$.status") { value("Ok") }
         }
+
+        verify { returnChatToUnansweredList(fixtureChatId1) }
     }
 
     @Test

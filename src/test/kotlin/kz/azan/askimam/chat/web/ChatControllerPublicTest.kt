@@ -1,6 +1,7 @@
 package kz.azan.askimam.chat.web
 
 import io.mockk.every
+import io.mockk.verify
 import io.vavr.kotlin.left
 import io.vavr.kotlin.right
 import kz.azan.askimam.chat.app.projection.ChatProjection
@@ -38,6 +39,8 @@ internal class ChatControllerPublicTest : ChatControllerTest() {
             jsonPath("\$.data[0].subject") { value("Subject") }
             jsonPath("\$.data[0].isFavorite") { value(false) }
         }
+
+        verify { getPublicChats(0, 20) }
     }
 
     @Test
@@ -76,6 +79,8 @@ internal class ChatControllerPublicTest : ChatControllerTest() {
             jsonPath("\$.data.messages[1].createdAt") { `is`(timeAfter(0)) }
             jsonPath("\$.data.messages[1].updatedAt") { doesNotExist() }
         }
+
+        verify { getChatUseCase(fixtureChatId1) }
     }
 
     @Test
