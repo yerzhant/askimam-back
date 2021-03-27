@@ -27,8 +27,6 @@ internal class ChatControllerAuthenticatedTest : ChatControllerTest() {
     internal fun `should be rejected with 403 for non imams`() {
         mvc.get("$url/unanswered/0/20").andExpect { status { isForbidden() } }
         mvc.patch("$url/1/return-to-unanswered").andExpect { status { isForbidden() } }
-
-        // add audio
     }
 
     @Test

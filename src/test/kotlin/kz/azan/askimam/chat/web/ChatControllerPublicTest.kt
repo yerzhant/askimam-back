@@ -24,10 +24,6 @@ internal class ChatControllerPublicTest : ChatControllerTest() {
         mvc.patch("$url/1").andExpect { status { isUnauthorized() } }
         mvc.patch("$url/1/viewed-by").andExpect { status { isUnauthorized() } }
         mvc.patch("$url/1/return-to-unanswered").andExpect { status { isUnauthorized() } }
-
-        // add text
-        // delete message
-        // update text message
     }
 
     @Test
