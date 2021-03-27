@@ -1,6 +1,7 @@
 package kz.azan.askimam.favorite
 
 import io.mockk.mockk
+import io.vavr.kotlin.toVavrList
 import kz.azan.askimam.chat.domain.model.ChatFixtures
 import kz.azan.askimam.chat.domain.model.Subject
 import kz.azan.askimam.favorite.app.projection.FavoriteProjection
@@ -31,5 +32,5 @@ open class FavoriteFixtures : ChatFixtures() {
 
     val sequenceOfFavoriteProjectionsFixture = listOfFavoritesFixture.map {
         FavoriteProjection(it.id!!, it.chatId, Subject.from("Subject ${it.id?.value}"))
-    }
+    }.toVavrList()
 }
