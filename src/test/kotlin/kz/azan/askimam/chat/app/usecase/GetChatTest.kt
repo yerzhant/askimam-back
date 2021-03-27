@@ -4,7 +4,6 @@ import io.mockk.every
 import io.vavr.kotlin.left
 import io.vavr.kotlin.right
 import kz.azan.askimam.chat.app.projection.ChatProjection
-import kz.azan.askimam.chat.domain.model.Chat
 import kz.azan.askimam.chat.domain.model.Chat.Type.Private
 import kz.azan.askimam.chat.domain.model.ChatFixtures
 import kz.azan.askimam.common.domain.Declination
@@ -15,20 +14,18 @@ internal class GetChatTest : ChatFixtures() {
 
     @Test
     internal fun `should return a chat`() {
-        val chat = fixtures()
+        val chatProjection = fixtures()
         every { getCurrentUser() } returns fixtureInquirer
 
-        assertThat(GetChat(getCurrentUser, chatRepository)(fixtureChatId1).get())
-            .isEqualTo(ChatProjection.from(chat))
+        assertThat(GetChat(getCurrentUser, chatRepository)(fixtureChatId1).get()).isEqualTo(chatProjection)
     }
 
     @Test
     internal fun `should return a chat to an imam`() {
-        val chat = fixtures()
+        val chatProjection = fixtures()
         every { getCurrentUser() } returns fixtureImam
 
-        assertThat(GetChat(getCurrentUser, chatRepository)(fixtureChatId1).get())
-            .isEqualTo(ChatProjection.from(chat))
+        assertThat(GetChat(getCurrentUser, chatRepository)(fixtureChatId1).get()).isEqualTo(chatProjection)
     }
 
     @Test
@@ -42,11 +39,10 @@ internal class GetChatTest : ChatFixtures() {
 
     @Test
     internal fun `should return a publicly visible chat`() {
-        val chat = fixtures()
+        val chatProjection = fixtures()
         every { getCurrentUser() } returns fixtureAnotherInquirer
 
-        assertThat(GetChat(getCurrentUser, chatRepository)(fixtureChatId1).get())
-            .isEqualTo(ChatProjection.from(chat))
+        assertThat(GetChat(getCurrentUser, chatRepository)(fixtureChatId1).get()).isEqualTo(chatProjection)
     }
 
     @Test
@@ -60,10 +56,10 @@ internal class GetChatTest : ChatFixtures() {
         assertThat(GetChat(getCurrentUser, chatRepository)(fixtureChatId1).left).isEqualTo(declination)
     }
 
-    private fun fixtures(): Chat {
+    private fun fixtures(): ChatProjection {
         fixtureClock()
         val chat = fixtureSavedChat()
         every { chatRepository.findById(fixtureChatId1) } returns right(chat)
-        return chat
+        return ChatProjection.from(chat)
     }
 }
