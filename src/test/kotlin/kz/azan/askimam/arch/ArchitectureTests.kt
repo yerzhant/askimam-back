@@ -42,6 +42,11 @@ class ArchitectureTests {
         noClasses().that().resideInAPackage("..domain..")
             .should().accessClassesThat().resideInAPackage("org.springframework..")
 
+    @ArchTest
+    val `application should not access Spring framework` =
+        noClasses().that().resideInAPackage("..app..")
+            .should().accessClassesThat().resideInAPackage("org.springframework..")
+
     private val areAnnotatedByAPackagePrivate =
         object : DescribedPredicate<JavaMethod>("are annotated as a package private") {
             override fun apply(input: JavaMethod?): Boolean {
