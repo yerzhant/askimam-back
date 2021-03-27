@@ -6,6 +6,7 @@ import io.vavr.kotlin.none
 import io.vavr.kotlin.some
 import kz.azan.askimam.chat.app.usecase.AddAudioMessage
 import kz.azan.askimam.chat.app.usecase.AddTextMessage
+import kz.azan.askimam.chat.app.usecase.DeleteMessage
 import kz.azan.askimam.chat.web.dto.AddAudioMessageDto
 import kz.azan.askimam.chat.web.dto.AddTextMessageDto
 import kz.azan.askimam.common.domain.Declination
@@ -32,12 +33,15 @@ internal class MessageControllerTest : ControllerTest() {
     @MockkBean
     private lateinit var addAudioMessage: AddAudioMessage
 
+    @MockkBean
+    private lateinit var deleteMessage: DeleteMessage
+
     @Test
     @WithAnonymousUser
     internal fun `should be rejected with 401`() {
         mvc.post(url).andExpect { status { isUnauthorized() } }
         mvc.post("$url/audio").andExpect { status { isUnauthorized() } }
-        mvc.delete("$url/1").andExpect { status { isUnauthorized() } }
+        mvc.delete("$url/1/1").andExpect { status { isUnauthorized() } }
         mvc.patch("$url/1").andExpect { status { isUnauthorized() } }
 
         // delete message
@@ -103,6 +107,27 @@ internal class MessageControllerTest : ControllerTest() {
             contentType = APPLICATION_JSON
             content = objectMapper.writeValueAsString(AddAudioMessageDto(1, "audio.mp3", "123"))
         }.andExpect {
+            status { isOk() }
+            jsonPath("\$.status") { value("Error") }
+            jsonPath("\$.error") { value("x") }
+        }
+    }
+
+    @Test
+    internal fun `should delete a message`() {
+        every { deleteMessage(fixtureChatId1, fixtureMessageId1) } returns none()
+
+        mvc.delete("$url/1/1").andExpect {
+            status { isOk() }
+            jsonPath("\$.status") { value("Ok") }
+        }
+    }
+
+    @Test
+    internal fun `should not delete a message`() {
+        every { deleteMessage(fixtureChatId1, fixtureMessageId1) } returns some(Declination.withReason("x"))
+
+        mvc.delete("$url/1/1").andExpect {
             status { isOk() }
             jsonPath("\$.status") { value("Error") }
             jsonPath("\$.error") { value("x") }
