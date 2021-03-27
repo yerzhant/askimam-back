@@ -6,9 +6,11 @@ import io.vavr.kotlin.left
 import io.vavr.kotlin.right
 import kz.azan.askimam.chat.app.projection.ChatProjection
 import kz.azan.askimam.chat.app.usecase.GetChat
+import kz.azan.askimam.chat.app.usecase.GetMyChats
 import kz.azan.askimam.chat.app.usecase.GetPublicChats
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.meta.ControllerTest
+import kz.azan.askimam.meta.WithPrincipal
 import org.hamcrest.Matchers.hasSize
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -25,9 +27,12 @@ internal class ChatControllerTest : ControllerTest() {
     @MockkBean
     private lateinit var getChatUseCase: GetChat
 
+    @MockkBean
+    private lateinit var getMyChats: GetMyChats
+
     @Test
     internal fun `should be rejected with 401`() {
-//        mvc.get("$url/public").andExpect { status { isUnauthorized() } }
+        mvc.get("$url/my/0/20").andExpect { status { isUnauthorized() } }
     }
 
     @Test
@@ -87,6 +92,39 @@ internal class ChatControllerTest : ControllerTest() {
         every { getChatUseCase(fixtureChatId1) } returns left(Declination.withReason("x"))
 
         mvc.get("$url/messages/1").andExpect {
+            status { isOk() }
+            jsonPath("\$.status") { value("Error") }
+            jsonPath("\$.error") { value("x") }
+        }
+    }
+
+    @Test
+    @WithPrincipal
+    internal fun `should get my chats`() {
+        every { getMyChats(0, 20) } returns right(listOfChatProjectionsFixture())
+
+        mvc.get("$url/my/0/20").andExpect {
+            status { isOk() }
+            jsonPath("\$.status") { value("Ok") }
+            jsonPath("\$.data", hasSize<Any>(2))
+            jsonPath("\$.data[0].id") { value(1) }
+            jsonPath("\$.data[0].subject") { value("Subject") }
+            jsonPath("\$.data[0].messages", hasSize<Any>(1))
+            jsonPath("\$.data[0].messages[0].id") { value(1) }
+            jsonPath("\$.data[0].messages[0].type") { value("Text") }
+            jsonPath("\$.data[0].messages[0].text") { value("A message") }
+            jsonPath("\$.data[0].messages[0].author") { doesNotExist() }
+            jsonPath("\$.data[0].messages[0].createdAt") { value(timeAfter(0).toString()) }
+            jsonPath("\$.data[0].messages[0].updatedAt") { doesNotExist() }
+        }
+    }
+
+    @Test
+    @WithPrincipal
+    internal fun `should not get my chats`() {
+        every { getMyChats(0, 20) } returns left(Declination.withReason("x"))
+
+        mvc.get("$url/my/0/20").andExpect {
             status { isOk() }
             jsonPath("\$.status") { value("Error") }
             jsonPath("\$.error") { value("x") }

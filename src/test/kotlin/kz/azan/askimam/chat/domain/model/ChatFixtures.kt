@@ -3,6 +3,7 @@ package kz.azan.askimam.chat.domain.model
 import io.mockk.every
 import io.mockk.mockk
 import kz.azan.askimam.chat.app.projection.ChatProjection
+import kz.azan.askimam.chat.app.projection.MessageProjection
 import kz.azan.askimam.chat.app.usecase.GetChat
 import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.event.MessageAdded
@@ -293,6 +294,12 @@ open class ChatFixtures {
 
     fun listOfChatProjectionsFixture(): List<ChatProjection> {
         fixtureClock()
-        return fixtureSavedTwoChats().map { ChatProjection(it.id!!, it.subjectText()) }
+        return fixtureSavedTwoChats().map { chat ->
+            ChatProjection(
+                chat.id!!,
+                chat.subjectText(),
+                messages = chat.messages().map { MessageProjection.from(it, userRepository) }
+            )
+        }
     }
 }
