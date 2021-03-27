@@ -102,7 +102,7 @@ internal class ChatJdbcRepositoryTestIT(
     internal fun `should not find by an id`() {
         val error = repository.findById(Chat.Id(100))
 
-        assertThat(error.left).isEqualTo(Declination.withReason("Chat not found"))
+        assertThat(error.left).isEqualTo(Declination.withReason("The chat is not found"))
     }
 
     @Test
