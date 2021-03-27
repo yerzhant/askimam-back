@@ -8,11 +8,11 @@ import io.vavr.kotlin.some
 import kz.azan.askimam.chat.domain.model.Chat
 import kz.azan.askimam.chat.domain.model.Chat.Type.Public
 import kz.azan.askimam.chat.domain.model.ChatRepository
-import kz.azan.askimam.user.domain.service.GetCurrentUser
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.common.domain.EventPublisher
 import kz.azan.askimam.user.domain.model.User.Type.Imam
 import kz.azan.askimam.user.domain.model.User.Type.Inquirer
+import kz.azan.askimam.user.domain.service.GetCurrentUser
 import org.springframework.data.domain.PageRequest
 import java.time.Clock
 
@@ -26,7 +26,7 @@ class ChatJdbcRepository(
 
     override fun findById(id: Chat.Id): Either<Declination, Chat> =
         Try { dao.findById(id.value) }
-            .map { it.orElseThrow { Exception("Chat not found") } }
+            .map { it.orElseThrow { Exception("The chat is not found") } }
             .toEither()
             .bimap(
                 { Declination.from(it) },

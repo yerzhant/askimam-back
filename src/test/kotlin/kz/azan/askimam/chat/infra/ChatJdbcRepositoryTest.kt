@@ -60,7 +60,7 @@ internal class ChatJdbcRepositoryTest : ChatFixtures() {
 
         val error = repository.findById(fixtureChatId1)
 
-        assertThat(error.left).isEqualTo(Declination.withReason("Chat not found"))
+        assertThat(error.left).isEqualTo(Declination.withReason("The chat is not found"))
     }
 
     @Test

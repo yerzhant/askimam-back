@@ -8,6 +8,8 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.MappedCollection
 import org.springframework.data.relational.core.mapping.Table
 
+private const val askImam = "ask-imam"
+
 @Table("users")
 data class UserRow(
     @Id
@@ -19,7 +21,6 @@ data class UserRow(
     @MappedCollection(idColumn = "user_id")
     val roles: Set<AuthAssignmentRow>,
 ) {
-    private val askImam = "askimam"
 
     fun toDomain() = User(
         User.Id(id),

@@ -10,7 +10,7 @@ class UserJdbcRepository(private val dao: UserDao) : UserRepository {
 
     override fun findById(id: User.Id): Either<Declination, User> =
         Try { dao.findById(id.value.toInt()) }
-            .map { it.orElseThrow { Exception("User is not found") } }
+            .map { it.orElseThrow { Exception("The user is not found") } }
             .toEither()
             .bimap(
                 { Declination.from(it) },

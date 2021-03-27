@@ -21,7 +21,7 @@ internal class UserJdbcRepositoryTest : ChatFixtures() {
         every { dao.findById(1) } returns Optional.of(
             UserRow(
                 1, "Jon", "Dow",
-                setOf(AuthAssignmentRow("askimam", "1")),
+                setOf(AuthAssignmentRow("ask-imam", "1")),
             )
         )
 
@@ -54,7 +54,7 @@ internal class UserJdbcRepositoryTest : ChatFixtures() {
         every { dao.findById(2) } returns Optional.empty()
 
         assertThat(repository.findById(fixtureInquirerId).left)
-            .isEqualTo(Declination.withReason("User is not found"))
+            .isEqualTo(Declination.withReason("The user is not found"))
     }
 
     @Test
