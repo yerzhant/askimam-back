@@ -15,6 +15,7 @@ internal class GetMyFavoritesTest : FavoriteFixtures() {
     internal fun `should return favorites`() {
         fixtureClock()
         every { getCurrentUser() } returns fixtureInquirer
+        every { userRepository.findById(fixtureImamId) } returns fixtureImam
         every { favoriteRepository.findByUserId(fixtureInquirerId) } returns right(listOfFavoritesFixture)
         every { getChat(any()) } returns right(ChatProjection.from(fixtureSavedChat(), userRepository))
 
@@ -30,6 +31,7 @@ internal class GetMyFavoritesTest : FavoriteFixtures() {
     internal fun `should fail on a second chat`() {
         fixtureClock()
         every { getCurrentUser() } returns fixtureInquirer
+        every { userRepository.findById(fixtureImamId) } returns fixtureImam
         every { favoriteRepository.findByUserId(fixtureInquirerId) } returns right(listOfFavoritesFixture)
         every { getChat(any()) } returnsMany listOf(
             right(ChatProjection.from(fixtureSavedChat(), userRepository)),
