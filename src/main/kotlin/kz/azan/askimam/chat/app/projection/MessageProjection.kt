@@ -10,7 +10,7 @@ data class MessageProjection(
     val id: Message.Id,
     val type: Message.Type,
     val text: NonBlankString,
-    val author: User,
+    val author: User?,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime?,
 ) {
@@ -19,7 +19,7 @@ data class MessageProjection(
             message.id!!,
             message.type,
             message.text(),
-            userRepository.findById(message.authorId),
+            if (message.authorType == User.Type.Imam) userRepository.findById(message.authorId) else null,
             message.createdAt,
             message.updatedAt(),
         )

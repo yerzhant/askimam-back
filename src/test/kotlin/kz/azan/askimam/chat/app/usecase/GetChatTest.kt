@@ -27,9 +27,15 @@ internal class GetChatTest : ChatFixtures() {
         assertThat(result.messages?.first()?.id).isEqualTo(fixtureMessageId1)
         assertThat(result.messages?.first()?.type).isEqualTo(Text)
         assertThat(result.messages?.first()?.text).isEqualTo(fixtureMessage)
-        assertThat(result.messages?.first()?.author).isEqualTo(fixtureInquirer)
+        assertThat(result.messages?.first()?.author).isNull()
         assertThat(result.messages?.first()?.createdAt).isEqualTo(timeAfter(0))
         assertThat(result.messages?.first()?.updatedAt).isNull()
+        assertThat(result.messages!![1].id).isEqualTo(fixtureMessageId2)
+        assertThat(result.messages!![1].type).isEqualTo(Text)
+        assertThat(result.messages!![1].text).isEqualTo(fixtureMessage)
+        assertThat(result.messages!![1].author).isEqualTo(fixtureImam)
+        assertThat(result.messages!![1].createdAt).isEqualTo(timeAfter(0))
+        assertThat(result.messages!![1].updatedAt).isNull()
     }
 
     @Test
