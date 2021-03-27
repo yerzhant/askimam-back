@@ -8,7 +8,7 @@ import io.vavr.kotlin.some
 import kz.azan.askimam.chat.domain.model.Chat
 import kz.azan.askimam.chat.domain.model.Chat.Type.Public
 import kz.azan.askimam.chat.domain.model.ChatRepository
-import kz.azan.askimam.chat.domain.service.GetCurrentUser
+import kz.azan.askimam.user.domain.service.GetCurrentUser
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.common.domain.EventPublisher
 import kz.azan.askimam.user.domain.model.User.Type.Imam

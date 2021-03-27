@@ -3,7 +3,7 @@ package kz.azan.askimam.favorite.app.usecase
 import io.vavr.collection.Seq
 import io.vavr.control.Either
 import kz.azan.askimam.chat.app.usecase.GetChat
-import kz.azan.askimam.chat.domain.service.GetCurrentUser
+import kz.azan.askimam.user.domain.service.GetCurrentUser
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.favorite.app.projection.FavoriteProjection
 import kz.azan.askimam.favorite.domain.model.FavoriteRepository

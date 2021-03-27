@@ -10,7 +10,7 @@ import kz.azan.askimam.chat.domain.event.MessageAdded
 import kz.azan.askimam.chat.domain.model.Chat.Type.Public
 import kz.azan.askimam.chat.domain.model.Message.Type.Audio
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
-import kz.azan.askimam.chat.domain.service.GetCurrentUser
+import kz.azan.askimam.user.domain.service.GetCurrentUser
 import kz.azan.askimam.common.domain.EventPublisher
 import kz.azan.askimam.common.type.NonBlankString
 import kz.azan.askimam.user.domain.model.User

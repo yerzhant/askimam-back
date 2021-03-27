@@ -5,7 +5,7 @@ import io.vavr.kotlin.some
 import kz.azan.askimam.chat.domain.model.Chat
 import kz.azan.askimam.chat.domain.model.ChatRepository
 import kz.azan.askimam.chat.domain.policy.DeleteChatPolicy
-import kz.azan.askimam.chat.domain.service.GetCurrentUser
+import kz.azan.askimam.user.domain.service.GetCurrentUser
 import kz.azan.askimam.common.domain.Declination
 
 class DeleteChat(

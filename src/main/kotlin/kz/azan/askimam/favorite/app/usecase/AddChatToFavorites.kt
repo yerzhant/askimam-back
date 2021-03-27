@@ -1,7 +1,7 @@
 package kz.azan.askimam.favorite.app.usecase
 
 import kz.azan.askimam.chat.domain.model.Chat
-import kz.azan.askimam.chat.domain.service.GetCurrentUser
+import kz.azan.askimam.user.domain.service.GetCurrentUser
 import kz.azan.askimam.favorite.domain.model.Favorite
 import kz.azan.askimam.favorite.domain.model.FavoriteRepository
 import java.time.Clock

@@ -3,7 +3,7 @@ package kz.azan.askimam.chat.infra
 import kz.azan.askimam.chat.domain.model.Chat
 import kz.azan.askimam.chat.domain.model.FcmToken
 import kz.azan.askimam.chat.domain.model.Subject
-import kz.azan.askimam.chat.domain.service.GetCurrentUser
+import kz.azan.askimam.user.domain.service.GetCurrentUser
 import kz.azan.askimam.common.domain.EventPublisher
 import kz.azan.askimam.user.domain.model.User
 import org.springframework.data.annotation.Id

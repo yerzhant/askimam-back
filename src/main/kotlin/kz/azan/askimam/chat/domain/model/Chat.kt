@@ -8,7 +8,7 @@ import kz.azan.askimam.chat.domain.event.MessageDeleted
 import kz.azan.askimam.chat.domain.event.MessageUpdated
 import kz.azan.askimam.chat.domain.model.Chat.Type.Public
 import kz.azan.askimam.chat.domain.policy.*
-import kz.azan.askimam.chat.domain.service.GetCurrentUser
+import kz.azan.askimam.user.domain.service.GetCurrentUser
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.common.domain.EventPublisher
 import kz.azan.askimam.common.type.NonBlankString

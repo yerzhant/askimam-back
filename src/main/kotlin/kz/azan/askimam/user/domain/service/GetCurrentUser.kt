@@ -1,4 +1,4 @@
-package kz.azan.askimam.chat.domain.service
+package kz.azan.askimam.user.domain.service
 
 import kz.azan.askimam.user.domain.model.User
 
