@@ -81,4 +81,15 @@ internal class ChatControllerTest : ControllerTest() {
             jsonPath("\$.data.messages[1].updatedAt") { doesNotExist() }
         }
     }
+
+    @Test
+    internal fun `should not get a chat`() {
+        every { getChatUseCase(fixtureChatId1) } returns left(Declination.withReason("x"))
+
+        mvc.get("$url/messages/1").andExpect {
+            status { isOk() }
+            jsonPath("\$.status") { value("Error") }
+            jsonPath("\$.error") { value("x") }
+        }
+    }
 }
