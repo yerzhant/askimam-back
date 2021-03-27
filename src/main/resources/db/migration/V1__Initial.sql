@@ -1,6 +1,15 @@
 SET NAMES 'utf8';
 
-create table if not exists users(id int);
+create table if not exists users(
+    id              int,
+    first_name      varchar(255),
+    last_name       varchar(255)
+);
+
+create table if not exists auth_assignment(
+    item_name       varchar(64),
+    user_id         varchar(64)
+);
 
 create table chats(
     id                      bigint          not null primary key auto_increment,
