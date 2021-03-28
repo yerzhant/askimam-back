@@ -1,9 +1,11 @@
 package kz.azan.askimam.security.web.config
 
+import kz.azan.askimam.security.service.UserService
 import kz.azan.askimam.security.web.filter.JwtFilter
-import kz.azan.askimam.security.service.JwtService
 import kz.azan.askimam.user.domain.model.User.Type.Imam
 import org.springframework.context.annotation.Bean
+import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
@@ -18,7 +20,10 @@ import org.springframework.web.filter.CorsFilter
 import javax.servlet.http.HttpServletResponse
 
 @EnableWebSecurity
-class WebSecurityConfig(private val jwtService: JwtService) : WebSecurityConfigurerAdapter() {
+class WebSecurityConfig(
+    private val jwtFilter: JwtFilter,
+    private val userService: UserService,
+) : WebSecurityConfigurerAdapter() {
 
     override fun configure(http: HttpSecurity?) {
         http {
@@ -28,15 +33,21 @@ class WebSecurityConfig(private val jwtService: JwtService) : WebSecurityConfigu
                 authorize("/chats/unanswered/*/*", hasAuthority(Imam.name))
                 authorize("/chats/*/return-to-unanswered", hasAuthority(Imam.name))
                 authorize("/messages/audio", hasAuthority(Imam.name))
+                authorize("/authenticate", permitAll)
                 authorize()
             }
+
             exceptionHandling {
                 authenticationEntryPoint = AuthenticationEntryPoint { _, response, authException ->
                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.message)
                 }
             }
-            addFilterBefore(JwtFilter(jwtService), UsernamePasswordAuthenticationFilter::class.java)
+
+            addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter::class.java)
+
             sessionManagement { sessionCreationPolicy = SessionCreationPolicy.STATELESS }
+
+            logout { disable() }
             csrf { disable() }
             cors { }
         }
@@ -52,8 +63,16 @@ class WebSecurityConfig(private val jwtService: JwtService) : WebSecurityConfigu
                 addAllowedMethod("*")
             }
         )
+
         CorsFilter(it)
     }
+
+    override fun configure(auth: AuthenticationManagerBuilder?) {
+        auth?.userDetailsService(userService)
+    }
+
+    @Bean
+    fun authManager(): AuthenticationManager = authenticationManagerBean()
 
     @Bean
     fun passwordEncoder() = BCryptPasswordEncoder()

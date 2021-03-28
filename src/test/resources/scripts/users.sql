@@ -27,7 +27,7 @@ insert into users(
     'Jon',
     'Dow',
     1,
-    '$2y$12$YVshB8Gdf/S5tNB6kzSa9u0iebDtgDAv4tc47mtMYKW1dxTGfXvui' -- pwd
+    '$2y$12$4C3av3VYh/8CW7ITlH8Yeeza12Q9QR5QdWV04S4HcS896w0l0yBq.' -- passwd
 );
 
 

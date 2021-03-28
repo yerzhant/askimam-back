@@ -14,11 +14,14 @@ class UserService(private val userRepository: UserRepository) : UserDetailsServi
     private val active = 1
 
     override fun loadUserByUsername(username: String?): UserDetails {
-        println("User Service ************: $username")
-        val user = userRepository.findByUsernameAndStatus(username, active).getOrElseThrow { reason ->
-            UsernameNotFoundException("The user '$username' is not found: $reason")
-        }
+        if (username.isNullOrBlank()) throw UsernameNotFoundException("The user name may not be blank")
 
+        val user = find(username)
         return User(username, user.passwordHash.value, setOf(SimpleGrantedAuthority(user.type.toString())))
     }
+
+    fun find(username: String): kz.azan.askimam.user.domain.model.User =
+        userRepository.findByUsernameAndStatus(username, active).getOrElseThrow { reason ->
+            UsernameNotFoundException("The user '$username' is not found: $reason")
+        }
 }
