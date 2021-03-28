@@ -3,6 +3,7 @@ package kz.azan.askimam.chat.infra
 import io.vavr.control.Either
 import io.vavr.control.Option
 import io.vavr.kotlin.Try
+import io.vavr.kotlin.failure
 import io.vavr.kotlin.none
 import io.vavr.kotlin.some
 import kz.azan.askimam.chat.domain.model.Chat
@@ -45,11 +46,21 @@ class ChatJdbcRepository(
 
     override fun findMyChats(offset: Int, pageSize: Int): Either<Declination, List<Chat>> =
         Try {
-            val user = getCurrentUser()
-            when (user.type) {
-                Imam -> dao.findByAnsweredByOrderByUpdatedAtDesc(user.id.value, PageRequest.of(offset, pageSize))
-                Inquirer -> dao.findByAskedByOrderByUpdatedAtDesc(user.id.value, PageRequest.of(offset, pageSize))
-            }
+            getCurrentUser().fold(
+                { failure(Exception("Who are you?")) },
+                { user ->
+                    when (user.type) {
+                        Imam -> dao.findByAnsweredByOrderByUpdatedAtDesc(
+                            user.id.value,
+                            PageRequest.of(offset, pageSize)
+                        )
+                        Inquirer -> dao.findByAskedByOrderByUpdatedAtDesc(
+                            user.id.value,
+                            PageRequest.of(offset, pageSize)
+                        )
+                    }
+                }
+            )
         }.toEither()
             .bimap(
                 { Declination.from(it) },

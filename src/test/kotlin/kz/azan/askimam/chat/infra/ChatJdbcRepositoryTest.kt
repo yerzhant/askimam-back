@@ -3,8 +3,9 @@ package kz.azan.askimam.chat.infra
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kz.azan.askimam.chat.domain.model.Chat.Type.Public
+import io.vavr.kotlin.some
 import kz.azan.askimam.chat.ChatFixtures
+import kz.azan.askimam.chat.domain.model.Chat.Type.Public
 import kz.azan.askimam.chat.domain.model.Message
 import kz.azan.askimam.common.domain.Declination
 import org.assertj.core.api.Assertions.assertThat
@@ -86,7 +87,7 @@ internal class ChatJdbcRepositoryTest : ChatFixtures() {
     @Test
     internal fun `should find my chats - inquirer`() {
         fixtureClock()
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         every {
             dao.findByAskedByOrderByUpdatedAtDesc(fixtureInquirerId.value, any())
         } returns fixtureSavedTwoChats().map { ChatRow.from(it) }
@@ -97,7 +98,7 @@ internal class ChatJdbcRepositoryTest : ChatFixtures() {
     @Test
     internal fun `should find my chats - imam`() {
         fixtureClock()
-        every { getCurrentUser() } returns fixtureImam
+        every { getCurrentUser() } returns some(fixtureImam)
         every {
             dao.findByAnsweredByOrderByUpdatedAtDesc(fixtureImamId.value, any())
         } returns fixtureSavedTwoChats().map { ChatRow.from(it) }
@@ -127,7 +128,7 @@ internal class ChatJdbcRepositoryTest : ChatFixtures() {
     @Test
     internal fun `should create a chat`() {
         fixtureClock()
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         val chatRow = ChatRow.from(fixtureChat())
         every { dao.save(chatRow) } returns chatRow
 
@@ -139,7 +140,7 @@ internal class ChatJdbcRepositoryTest : ChatFixtures() {
     @Test
     internal fun `should not create a chat`() {
         fixtureClock()
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         val chatRow = ChatRow.from(fixtureChat())
         every { dao.save(chatRow) } throws Exception("ta da")
 
@@ -151,7 +152,7 @@ internal class ChatJdbcRepositoryTest : ChatFixtures() {
     @Test
     internal fun `should delete a chat`() {
         fixtureClock()
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         val chat = fixtureSavedChat()
         val chatRow = ChatRow.from(chat)
         every { dao.delete(chatRow) } returns Unit
@@ -164,7 +165,7 @@ internal class ChatJdbcRepositoryTest : ChatFixtures() {
     @Test
     internal fun `should not delete a chat`() {
         fixtureClock()
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         val chat = fixtureSavedChat()
         val chatRow = ChatRow.from(chat)
         every { dao.delete(chatRow) } throws Exception("x")
@@ -175,7 +176,7 @@ internal class ChatJdbcRepositoryTest : ChatFixtures() {
     @Test
     internal fun `should update a chat`() {
         fixtureClock()
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         val chat = fixtureChat()
         val chatRow = ChatRow.from(chat)
         every { dao.save(chatRow) } returns chatRow
@@ -188,7 +189,7 @@ internal class ChatJdbcRepositoryTest : ChatFixtures() {
     @Test
     internal fun `should not update a chat`() {
         fixtureClock()
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         val chat = fixtureChat()
         val chatRow = ChatRow.from(chat)
         every { dao.save(chatRow) } throws Exception()

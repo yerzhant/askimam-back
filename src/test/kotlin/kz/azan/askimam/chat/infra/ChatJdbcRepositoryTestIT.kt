@@ -1,14 +1,15 @@
 package kz.azan.askimam.chat.infra
 
 import io.mockk.every
+import io.vavr.kotlin.some
+import kz.azan.askimam.chat.ChatFixtures
 import kz.azan.askimam.chat.domain.model.Chat
 import kz.azan.askimam.chat.domain.model.Chat.Type.Public
-import kz.azan.askimam.chat.ChatFixtures
 import kz.azan.askimam.chat.domain.model.Message
 import kz.azan.askimam.chat.domain.model.Subject
 import kz.azan.askimam.common.domain.Declination
-import kz.azan.askimam.meta.DataJdbcIT
 import kz.azan.askimam.common.type.NonBlankString
+import kz.azan.askimam.meta.DataJdbcIT
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.data.TemporalUnitWithinOffset
 import org.junit.jupiter.api.Test
@@ -117,14 +118,14 @@ internal class ChatJdbcRepositoryTestIT(
 
     @Test
     internal fun `should find my chats - inquirer`() {
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
 
         assertThat(repository.findMyChats(0, 20).get()).hasSize(4)
     }
 
     @Test
     internal fun `should find my chats - imam`() {
-        every { getCurrentUser() } returns fixtureImam
+        every { getCurrentUser() } returns some(fixtureImam)
 
         assertThat(repository.findMyChats(0, 20).get()).hasSize(1)
     }
@@ -136,7 +137,7 @@ internal class ChatJdbcRepositoryTestIT(
 
     @Test
     internal fun `should create a chat`() {
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         fixtureClock()
 
         assertThat(repository.create(fixtureChat()).isEmpty).isTrue
@@ -159,7 +160,7 @@ internal class ChatJdbcRepositoryTestIT(
     @Test
     internal fun `should update a chat`() {
         fixtureClock()
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         every { eventPublisher.publish(any()) } returns Unit
         val chat = fixtureSavedChat(id = Chat.Id(1))
         chat.updateSubject(Subject.from("Hello"))
