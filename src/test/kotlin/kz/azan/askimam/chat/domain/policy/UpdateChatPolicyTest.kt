@@ -14,18 +14,16 @@ internal class UpdateChatPolicyTest : ChatFixtures() {
     @Test
     internal fun `should allow to edit a chat by any imam`() {
         fixtureClock()
-        every { getCurrentUser() } returnsMany listOf(
-            fixtureInquirer
-        )
+        every { getCurrentUser() } returns some(fixtureInquirer)
+
         assertThat(forImam.isAllowed(fixtureChat(), fixtureImam).isEmpty).isTrue
     }
 
     @Test
     internal fun `should not allow to edit a chat by anyone when used in conjunction with imam's policy`() {
         fixtureClock()
-        every { getCurrentUser() } returnsMany listOf(
-            fixtureInquirer
-        )
+        every { getCurrentUser() } returns some(fixtureInquirer)
+
         assertThat(
             forImam.isAllowed(
                 fixtureChat(),
@@ -37,18 +35,16 @@ internal class UpdateChatPolicyTest : ChatFixtures() {
     @Test
     internal fun `should allow to edit a chat by its author`() {
         fixtureClock()
-        every { getCurrentUser() } returnsMany listOf(
-            fixtureInquirer
-        )
+        every { getCurrentUser() } returns some(fixtureInquirer)
+
         assertThat(forInquirer.isAllowed(fixtureChat(), fixtureInquirer).isEmpty).isTrue
     }
 
     @Test
     internal fun `should not allow not an author to edit a chat`() {
         fixtureClock()
-        every { getCurrentUser() } returnsMany listOf(
-            fixtureInquirer
-        )
+        every { getCurrentUser() } returns some(fixtureInquirer)
+
         assertThat(
             forInquirer.isAllowed(
                 fixtureChat(),

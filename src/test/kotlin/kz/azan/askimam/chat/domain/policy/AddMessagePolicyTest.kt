@@ -17,9 +17,7 @@ class AddMessagePolicyTest : ChatFixtures() {
     @Test
     internal fun `should allow to add a new message by an imam`() {
         fixtureClock()
-        every { getCurrentUser() } returnsMany listOf(
-            fixtureInquirer
-        )
+        every { getCurrentUser() } returns some(fixtureInquirer)
 
         assertThat(forImam.isAllowed(fixtureChat(), fixtureImam).isEmpty).isTrue
     }
@@ -27,9 +25,7 @@ class AddMessagePolicyTest : ChatFixtures() {
     @Test
     internal fun `should not allow to add a new message as it's not an imam`() {
         fixtureClock()
-        every { getCurrentUser() } returnsMany listOf(
-            fixtureInquirer
-        )
+        every { getCurrentUser() } returns some(fixtureInquirer)
 
         assertThat(
             forImam.isAllowed(
@@ -42,9 +38,7 @@ class AddMessagePolicyTest : ChatFixtures() {
     @Test
     internal fun `should allow an inquirer to add a message to his own chat`() {
         fixtureClock()
-        every { getCurrentUser() } returnsMany listOf(
-            fixtureInquirer
-        )
+        every { getCurrentUser() } returns some(fixtureInquirer)
 
         assertThat(forInquirer.isAllowed(fixtureChat(), fixtureInquirer).isEmpty).isTrue
     }
@@ -52,9 +46,7 @@ class AddMessagePolicyTest : ChatFixtures() {
     @Test
     internal fun `should not allow an inquirer to add a message to someone else's chat`() {
         fixtureClock()
-        every { getCurrentUser() } returnsMany listOf(
-            fixtureInquirer
-        )
+        every { getCurrentUser() } returns some(fixtureInquirer)
 
         assertThat(
             forInquirer.isAllowed(fixtureChat(), fixtureAnotherInquirer)

@@ -25,9 +25,7 @@ internal class DeleteChatPolicyTest : ChatFixtures() {
     @Test
     internal fun `should allow to delete a chat by any imam`() {
         fixtureClock()
-        every { getCurrentUser() } returnsMany listOf(
-            fixtureInquirer
-        )
+        every { getCurrentUser() } returns some(fixtureInquirer)
 
         assertThat(forImam.isAllowed(fixtureChat(), fixtureImam).isEmpty).isTrue
     }
@@ -35,9 +33,7 @@ internal class DeleteChatPolicyTest : ChatFixtures() {
     @Test
     internal fun `should not allow to delete a chat by not an imam through the imam's policy`() {
         fixtureClock()
-        every { getCurrentUser() } returnsMany listOf(
-            fixtureInquirer
-        )
+        every { getCurrentUser() } returns some(fixtureInquirer)
 
         assertThat(
             forImam.isAllowed(
@@ -50,9 +46,7 @@ internal class DeleteChatPolicyTest : ChatFixtures() {
     @Test
     internal fun `should allow to delete a chat by its author`() {
         fixtureClock()
-        every { getCurrentUser() } returnsMany listOf(
-            fixtureInquirer
-        )
+        every { getCurrentUser() } returns some(fixtureInquirer)
 
         assertThat(forInquirer.isAllowed(fixtureChat(), fixtureInquirer).isEmpty).isTrue
     }
@@ -60,9 +54,7 @@ internal class DeleteChatPolicyTest : ChatFixtures() {
     @Test
     internal fun `should not allow to delete a chat by not its author`() {
         fixtureClock()
-        every { getCurrentUser() } returnsMany listOf(
-            fixtureInquirer
-        )
+        every { getCurrentUser() } returns some(fixtureInquirer)
 
         assertThat(
             forInquirer.isAllowed(
