@@ -1,5 +1,6 @@
-package kz.azan.askimam.common.web.security
+package kz.azan.askimam.security.web.filter
 
+import kz.azan.askimam.security.service.JwtService
 import org.springframework.http.HttpHeaders
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority

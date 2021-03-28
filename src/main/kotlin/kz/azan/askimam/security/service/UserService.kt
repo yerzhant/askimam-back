@@ -1,4 +1,4 @@
-package kz.azan.askimam.common.web.security
+package kz.azan.askimam.security.service
 
 import kz.azan.askimam.user.domain.model.UserRepository
 import org.springframework.security.core.authority.SimpleGrantedAuthority

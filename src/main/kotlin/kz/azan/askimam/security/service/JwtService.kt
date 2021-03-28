@@ -1,4 +1,4 @@
-package kz.azan.askimam.common.web.security
+package kz.azan.askimam.security.service
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm

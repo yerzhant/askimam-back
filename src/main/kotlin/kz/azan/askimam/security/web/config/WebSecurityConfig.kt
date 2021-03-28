@@ -1,7 +1,7 @@
-package kz.azan.askimam.common.web.config
+package kz.azan.askimam.security.web.config
 
-import kz.azan.askimam.common.web.security.JwtFilter
-import kz.azan.askimam.common.web.security.JwtService
+import kz.azan.askimam.security.web.filter.JwtFilter
+import kz.azan.askimam.security.service.JwtService
 import kz.azan.askimam.user.domain.model.User.Type.Imam
 import org.springframework.context.annotation.Bean
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
