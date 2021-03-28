@@ -25,9 +25,10 @@ data class UserRow(
 ) {
 
     fun toDomain() = User(
-        User.Id(id),
-        getType(),
-        NonBlankString.of(name()),
+        id = User.Id(id),
+        type = getType(),
+        name = NonBlankString.of(name()),
+        passwordHash = NonBlankString.of(passwordHash),
     )
 
     private fun name() = "$firstName $lastName"

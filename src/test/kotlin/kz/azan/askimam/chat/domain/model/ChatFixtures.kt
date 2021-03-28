@@ -10,11 +10,11 @@ import kz.azan.askimam.chat.domain.event.MessageAdded
 import kz.azan.askimam.chat.domain.model.Chat.Type.Public
 import kz.azan.askimam.chat.domain.model.Message.Type.Audio
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
-import kz.azan.askimam.user.domain.service.GetCurrentUser
 import kz.azan.askimam.common.domain.EventPublisher
 import kz.azan.askimam.common.type.NonBlankString
 import kz.azan.askimam.user.domain.model.User
 import kz.azan.askimam.user.domain.model.UserRepository
+import kz.azan.askimam.user.domain.service.GetCurrentUser
 import java.time.*
 
 open class ChatFixtures {
@@ -261,16 +261,19 @@ open class ChatFixtures {
         clock = clock,
     )
 
-    val fixtureImam = User(User.Id(1), User.Type.Imam, NonBlankString.of("Imam"))
+    val fixturePasswordHash = NonBlankString.of("\$2y\$12\$YVshB8Gdf/S5tNB6kzSa9u0iebDtgDAv4tc47mtMYKW1dxTGfXvui")
+
+    val fixtureImam = User(User.Id(1), User.Type.Imam, NonBlankString.of("Imam"), fixturePasswordHash)
     val fixtureImamId = fixtureImam.id
     val fixtureImamFcmToken = FcmToken(NonBlankString.of("123"))
 
-    val fixtureInquirer = User(User.Id(2), User.Type.Inquirer, NonBlankString.of("Inquirer"))
+    val fixtureInquirer = User(User.Id(2), User.Type.Inquirer, NonBlankString.of("Inquirer"), fixturePasswordHash)
     val fixtureInquirerId = fixtureInquirer.id
     val fixtureInquirerFcmToken = FcmToken(NonBlankString.of("456"))
 
-    val fixtureAnotherInquirer = User(User.Id(20), User.Type.Inquirer, NonBlankString.of("Some guy"))
-    val fixtureAnotherImam = User(User.Id(30), User.Type.Imam, NonBlankString.of("Some imam"))
+    val fixtureAnotherInquirer =
+        User(User.Id(20), User.Type.Inquirer, NonBlankString.of("Some guy"), fixturePasswordHash)
+    val fixtureAnotherImam = User(User.Id(30), User.Type.Imam, NonBlankString.of("Some imam"), fixturePasswordHash)
 
     val fixtureChatId1 = Chat.Id(1)
     val fixtureChatId2 = Chat.Id(2)

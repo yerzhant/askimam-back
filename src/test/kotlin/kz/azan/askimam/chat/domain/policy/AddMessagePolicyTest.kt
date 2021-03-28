@@ -34,7 +34,7 @@ class AddMessagePolicyTest : ChatFixtures() {
         assertThat(
             forImam.isAllowed(
                 fixtureChat(),
-                User(fixtureImamId, Inquirer, NonBlankString.of("A name"))
+                User(fixtureImamId, Inquirer, NonBlankString.of("A name"), fixturePasswordHash)
             )
         ).isEqualTo(some(Declination.withReason("This operation is only allowed to imams")))
     }
