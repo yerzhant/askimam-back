@@ -55,11 +55,11 @@ internal class JwtServiceTest : ChatFixtures() {
     internal fun `should return a user`() {
         fixtureClock()
         val token = service.sign(fixtureImam).get()
+        val decodedJWT = service.verify(token).get()
 
-        val user = service.getUser(token).get()
+        val user = service.getUser(decodedJWT)
 
         assertThat(user.id).isEqualTo(fixtureImam.id)
         assertThat(user.type).isEqualTo(fixtureImam.type)
     }
-
 }

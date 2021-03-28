@@ -63,12 +63,11 @@ class JwtService(
                 { it }
             )
 
-    fun getUser(token: String): Either<Declination, User> = verify(token).map {
+    fun getUser(decodedJWT: DecodedJWT) =
         User(
-            User.Id(it.getClaim(idClaim).asLong()),
-            User.Type.valueOf(it.getClaim(typeClaim).asString()),
+            User.Id(decodedJWT.getClaim(idClaim).asLong()),
+            User.Type.valueOf(decodedJWT.getClaim(typeClaim).asString()),
             NonBlankString.of("A hydrated user"),
             NonBlankString.of("--- unused ---"),
         )
-    }
 }
