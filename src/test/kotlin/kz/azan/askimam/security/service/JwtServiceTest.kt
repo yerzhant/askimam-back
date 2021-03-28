@@ -1,8 +1,8 @@
-package kz.azan.askimam.common.web.security
+package kz.azan.askimam.security.service
 
 import com.auth0.jwt.interfaces.DecodedJWT
 import kz.azan.askimam.AppProperties
-import kz.azan.askimam.chat.domain.model.ChatFixtures
+import kz.azan.askimam.chat.ChatFixtures
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
