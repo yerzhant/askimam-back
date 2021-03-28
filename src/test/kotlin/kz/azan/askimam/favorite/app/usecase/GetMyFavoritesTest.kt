@@ -3,6 +3,7 @@ package kz.azan.askimam.favorite.app.usecase
 import io.mockk.every
 import io.vavr.kotlin.left
 import io.vavr.kotlin.right
+import io.vavr.kotlin.some
 import kz.azan.askimam.chat.app.projection.ChatProjection
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.favorite.FavoriteFixtures
@@ -14,7 +15,7 @@ internal class GetMyFavoritesTest : FavoriteFixtures() {
     @Test
     internal fun `should return favorites`() {
         fixtureClock()
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         every { userRepository.findById(fixtureImamId) } returns right(fixtureImam)
         every { favoriteRepository.findByUserId(fixtureInquirerId) } returns right(listOfFavoritesFixture)
         every { getChat(any()) } returns ChatProjection.from(fixtureSavedChat(), userRepository)
@@ -30,7 +31,7 @@ internal class GetMyFavoritesTest : FavoriteFixtures() {
     @Test
     internal fun `should fail on a second chat`() {
         fixtureClock()
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         every { userRepository.findById(fixtureImamId) } returns right(fixtureImam)
         every { favoriteRepository.findByUserId(fixtureInquirerId) } returns right(listOfFavoritesFixture)
         every { getChat(any()) } returnsMany listOf(
@@ -44,7 +45,7 @@ internal class GetMyFavoritesTest : FavoriteFixtures() {
 
     @Test
     internal fun `should not return favorites`() {
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         every { favoriteRepository.findByUserId(fixtureInquirerId) } returns left(Declination.withReason("boom!"))
 
         assertThat(GetMyFavorites(getCurrentUser, favoriteRepository, getChat)().left)

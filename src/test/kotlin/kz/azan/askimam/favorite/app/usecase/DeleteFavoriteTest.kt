@@ -14,7 +14,7 @@ internal class DeleteFavoriteTest : FavoriteFixtures() {
 
     @Test
     internal fun `should delete a favorite`() {
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         every { favoriteRepository.findByUserIdAndChatId(fixtureInquirerId, fixtureChatId1) } returns right(
             fixtureFavorite
         )
@@ -25,7 +25,7 @@ internal class DeleteFavoriteTest : FavoriteFixtures() {
 
     @Test
     internal fun `should not delete a favorite - no such chat`() {
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         every { favoriteRepository.findByUserIdAndChatId(fixtureInquirerId, fixtureChatId1) } returns left(
             Declination.withReason("oops")
         )
@@ -37,7 +37,7 @@ internal class DeleteFavoriteTest : FavoriteFixtures() {
 
     @Test
     internal fun `should not delete a favorite - db error`() {
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         every { favoriteRepository.findByUserIdAndChatId(fixtureInquirerId, fixtureChatId1) } returns right(
             fixtureFavorite
         )
@@ -50,7 +50,7 @@ internal class DeleteFavoriteTest : FavoriteFixtures() {
 
     @Test
     internal fun `should not delete a favorite (mistake in infra - policy in action)`() {
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         every { favoriteRepository.findByUserIdAndChatId(fixtureInquirerId, fixtureChatId1) } returns right(
             fixtureFavorite.copy(userId = fixtureAnotherInquirer.id)
         )
