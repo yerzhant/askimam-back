@@ -1,4 +1,4 @@
-package kz.azan.askimam.common.test
+package kz.azan.askimam.test
 
 import org.testcontainers.utility.DockerImageName
 import org.testcontainers.utility.ImageNameSubstitutor
