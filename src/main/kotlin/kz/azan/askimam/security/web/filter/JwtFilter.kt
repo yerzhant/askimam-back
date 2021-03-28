@@ -31,7 +31,7 @@ class JwtFilter(private val jwtService: JwtService) : OncePerRequestFilter() {
 
         jwtService.verify(token).map { jwtService.decode(it) }.bimap(
             {
-                logger.error("Jwt verification failed for: $it")
+                logger.error("Jwt verification failed for: ${it.reason.value}")
                 filterChain.doFilter(request, response)
             },
             {
