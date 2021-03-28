@@ -1,7 +1,7 @@
 package kz.azan.askimam.chat.domain.policy
 
 import io.vavr.kotlin.some
-import kz.azan.askimam.chat.domain.model.ChatFixtures
+import kz.azan.askimam.chat.ChatFixtures
 import kz.azan.askimam.chat.domain.model.Message.Type.Audio
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
 import kz.azan.askimam.chat.domain.policy.UpdateMessagePolicy.Companion.forAll

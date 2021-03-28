@@ -1,4 +1,4 @@
-package kz.azan.askimam.chat.domain.model
+package kz.azan.askimam.chat
 
 import io.mockk.every
 import io.mockk.mockk
@@ -7,6 +7,7 @@ import kz.azan.askimam.chat.app.projection.ChatProjection
 import kz.azan.askimam.chat.app.usecase.GetChat
 import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.event.MessageAdded
+import kz.azan.askimam.chat.domain.model.*
 import kz.azan.askimam.chat.domain.model.Chat.Type.Public
 import kz.azan.askimam.chat.domain.model.Message.Type.Audio
 import kz.azan.askimam.chat.domain.model.Message.Type.Text

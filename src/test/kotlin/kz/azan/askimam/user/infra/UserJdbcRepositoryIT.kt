@@ -1,6 +1,6 @@
 package kz.azan.askimam.user.infra
 
-import kz.azan.askimam.chat.domain.model.ChatFixtures
+import kz.azan.askimam.chat.ChatFixtures
 import kz.azan.askimam.common.type.NonBlankString
 import kz.azan.askimam.meta.DataJdbcIT
 import kz.azan.askimam.user.domain.model.User

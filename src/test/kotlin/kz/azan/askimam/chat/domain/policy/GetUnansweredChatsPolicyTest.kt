@@ -1,6 +1,6 @@
 package kz.azan.askimam.chat.domain.policy
 
-import kz.azan.askimam.chat.domain.model.ChatFixtures
+import kz.azan.askimam.chat.ChatFixtures
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 

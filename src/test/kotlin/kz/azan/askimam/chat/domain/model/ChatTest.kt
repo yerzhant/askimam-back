@@ -3,6 +3,7 @@ package kz.azan.askimam.chat.domain.model
 import io.mockk.every
 import io.mockk.verify
 import io.mockk.verifySequence
+import kz.azan.askimam.chat.ChatFixtures
 import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.event.MessageAdded
 import kz.azan.askimam.chat.domain.event.MessageDeleted

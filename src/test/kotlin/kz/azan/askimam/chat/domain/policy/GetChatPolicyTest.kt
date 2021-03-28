@@ -2,7 +2,7 @@ package kz.azan.askimam.chat.domain.policy
 
 import io.mockk.every
 import kz.azan.askimam.chat.domain.model.Chat.Type.Private
-import kz.azan.askimam.chat.domain.model.ChatFixtures
+import kz.azan.askimam.chat.ChatFixtures
 import kz.azan.askimam.chat.domain.policy.GetChatPolicy.Companion.forImam
 import kz.azan.askimam.chat.domain.policy.GetChatPolicy.Companion.forInquirer
 import kz.azan.askimam.chat.domain.policy.GetChatPolicy.Companion.getFor

@@ -3,7 +3,7 @@ package kz.azan.askimam.user.infra
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kz.azan.askimam.chat.domain.model.ChatFixtures
+import kz.azan.askimam.chat.ChatFixtures
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.common.type.NonBlankString
 import org.assertj.core.api.Assertions.assertThat

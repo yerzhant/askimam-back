@@ -3,6 +3,7 @@ package kz.azan.askimam.chat.domain.model
 import io.mockk.every
 import io.mockk.verify
 import io.vavr.kotlin.some
+import kz.azan.askimam.chat.ChatFixtures
 import kz.azan.askimam.chat.domain.event.MessageDeleted
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.common.type.NonBlankString

@@ -2,7 +2,7 @@ package kz.azan.askimam.chat.domain.policy
 
 import io.mockk.every
 import io.vavr.kotlin.some
-import kz.azan.askimam.chat.domain.model.ChatFixtures
+import kz.azan.askimam.chat.ChatFixtures
 import kz.azan.askimam.chat.domain.policy.UpdateChatPolicy.Companion.forImam
 import kz.azan.askimam.chat.domain.policy.UpdateChatPolicy.Companion.forInquirer
 import kz.azan.askimam.common.domain.Declination

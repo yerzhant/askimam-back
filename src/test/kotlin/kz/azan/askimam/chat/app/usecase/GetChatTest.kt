@@ -5,7 +5,7 @@ import io.vavr.kotlin.left
 import io.vavr.kotlin.right
 import kz.azan.askimam.chat.app.projection.ChatProjection
 import kz.azan.askimam.chat.domain.model.Chat.Type.Private
-import kz.azan.askimam.chat.domain.model.ChatFixtures
+import kz.azan.askimam.chat.ChatFixtures
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
 import kz.azan.askimam.common.domain.Declination
 import org.assertj.core.api.Assertions.assertThat

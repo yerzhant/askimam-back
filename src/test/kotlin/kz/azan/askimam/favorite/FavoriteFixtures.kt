@@ -2,7 +2,7 @@ package kz.azan.askimam.favorite
 
 import io.mockk.mockk
 import io.vavr.kotlin.toVavrList
-import kz.azan.askimam.chat.domain.model.ChatFixtures
+import kz.azan.askimam.chat.ChatFixtures
 import kz.azan.askimam.chat.domain.model.Subject
 import kz.azan.askimam.favorite.app.projection.FavoriteProjection
 import kz.azan.askimam.favorite.domain.model.Favorite

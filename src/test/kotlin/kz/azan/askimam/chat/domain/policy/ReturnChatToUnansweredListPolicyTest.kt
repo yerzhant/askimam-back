@@ -1,6 +1,6 @@
 package kz.azan.askimam.chat.domain.policy
 
-import kz.azan.askimam.chat.domain.model.ChatFixtures
+import kz.azan.askimam.chat.ChatFixtures
 import kz.azan.askimam.chat.domain.policy.ReturnChatToUnansweredListPolicy.Companion.forAll
 import kz.azan.askimam.common.domain.Declination
 import org.assertj.core.api.Assertions.assertThat

@@ -3,7 +3,7 @@ package kz.azan.askimam.chat.infra
 import io.mockk.every
 import kz.azan.askimam.chat.domain.model.Chat
 import kz.azan.askimam.chat.domain.model.Chat.Type.Public
-import kz.azan.askimam.chat.domain.model.ChatFixtures
+import kz.azan.askimam.chat.ChatFixtures
 import kz.azan.askimam.chat.domain.model.Message
 import kz.azan.askimam.chat.domain.model.Subject
 import kz.azan.askimam.common.domain.Declination
