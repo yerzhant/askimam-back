@@ -5,9 +5,11 @@ import io.vavr.kotlin.some
 import kz.azan.askimam.chat.domain.model.Chat
 import kz.azan.askimam.chat.domain.model.ChatRepository
 import kz.azan.askimam.chat.domain.policy.DeleteChatPolicy
+import kz.azan.askimam.common.app.meta.UseCase
 import kz.azan.askimam.user.domain.service.GetCurrentUser
 import kz.azan.askimam.common.domain.Declination
 
+@UseCase
 class DeleteChat(
     private val getCurrentUser: GetCurrentUser,
     private val chatRepository: ChatRepository,

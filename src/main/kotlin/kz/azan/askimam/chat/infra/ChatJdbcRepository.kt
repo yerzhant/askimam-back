@@ -14,8 +14,10 @@ import kz.azan.askimam.user.domain.model.User.Type.Imam
 import kz.azan.askimam.user.domain.model.User.Type.Inquirer
 import kz.azan.askimam.user.domain.service.GetCurrentUser
 import org.springframework.data.domain.PageRequest
+import org.springframework.stereotype.Component
 import java.time.Clock
 
+@Component
 class ChatJdbcRepository(
     private val dao: ChatDao,
 

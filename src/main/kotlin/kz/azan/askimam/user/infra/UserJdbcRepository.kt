@@ -5,7 +5,9 @@ import io.vavr.kotlin.Try
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.user.domain.model.User
 import kz.azan.askimam.user.domain.model.UserRepository
+import org.springframework.stereotype.Component
 
+@Component
 class UserJdbcRepository(private val dao: UserDao) : UserRepository {
 
     override fun findById(id: User.Id): Either<Declination, User> =

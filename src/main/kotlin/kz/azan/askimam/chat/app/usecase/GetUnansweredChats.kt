@@ -5,9 +5,11 @@ import io.vavr.kotlin.left
 import kz.azan.askimam.chat.app.projection.ChatProjection
 import kz.azan.askimam.chat.domain.model.ChatRepository
 import kz.azan.askimam.chat.domain.policy.GetUnansweredChatsPolicy
-import kz.azan.askimam.user.domain.service.GetCurrentUser
+import kz.azan.askimam.common.app.meta.UseCase
 import kz.azan.askimam.common.domain.Declination
+import kz.azan.askimam.user.domain.service.GetCurrentUser
 
+@UseCase
 class GetUnansweredChats(
     private val chatRepository: ChatRepository,
     private val getCurrentUser: GetCurrentUser,

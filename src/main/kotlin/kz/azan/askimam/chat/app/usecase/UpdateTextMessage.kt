@@ -6,9 +6,11 @@ import kz.azan.askimam.chat.domain.model.Chat
 import kz.azan.askimam.chat.domain.model.ChatRepository
 import kz.azan.askimam.chat.domain.model.FcmToken
 import kz.azan.askimam.chat.domain.model.Message
+import kz.azan.askimam.common.app.meta.UseCase
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.common.type.NonBlankString
 
+@UseCase
 class UpdateTextMessage(private val chatRepository: ChatRepository) {
 
     operator fun invoke(

@@ -5,4 +5,4 @@ spring:
 
 app:
   jwt:
-    key: test-key
+    key: 012345678901234567890123456789AB

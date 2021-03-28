@@ -10,7 +10,9 @@ import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.favorite.domain.model.Favorite
 import kz.azan.askimam.favorite.domain.model.FavoriteRepository
 import kz.azan.askimam.user.domain.model.User
+import org.springframework.stereotype.Component
 
+@Component
 class FavoriteJdbcRepository(private val favoriteDao: FavoriteDao) : FavoriteRepository {
 
     override fun findByUserId(id: User.Id): Either<Declination, List<Favorite>> =

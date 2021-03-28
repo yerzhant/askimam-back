@@ -5,10 +5,16 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.ConstructorBinding
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
+import org.springframework.context.annotation.Bean
+import java.time.Clock
 
 @SpringBootApplication
 @EnableConfigurationProperties(AppProperties::class)
-class AskimamApplication
+class AskimamApplication {
+
+    @Bean
+    fun clock(): Clock = Clock.systemDefaultZone()
+}
 
 fun main(args: Array<String>) {
     runApplication<AskimamApplication>(*args)
