@@ -18,12 +18,17 @@ class SetViewedBy(
     operator fun invoke(id: Chat.Id): Option<Declination> = chatRepository.findById(id).fold(
         { some(it) },
         {
-            when (getCurrentUser().type) {
-                Imam -> it.viewedByImam()
-                Inquirer -> it.viewedByInquirer()
-            }.orElse {
-                chatRepository.update(it)
-            }
+            getCurrentUser().fold(
+                { some(Declination.withReason("Who are you?")) },
+                { user ->
+                    when (user.type) {
+                        Imam -> it.viewedByImam()
+                        Inquirer -> it.viewedByInquirer()
+                    }.orElse {
+                        chatRepository.update(it)
+                    }
+                }
+            )
         }
     )
 }

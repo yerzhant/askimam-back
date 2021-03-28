@@ -3,9 +3,10 @@ package kz.azan.askimam.chat.app.usecase
 import io.mockk.every
 import io.vavr.kotlin.left
 import io.vavr.kotlin.right
+import io.vavr.kotlin.some
+import kz.azan.askimam.chat.ChatFixtures
 import kz.azan.askimam.chat.app.projection.ChatProjection
 import kz.azan.askimam.chat.domain.model.Chat.Type.Private
-import kz.azan.askimam.chat.ChatFixtures
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
 import kz.azan.askimam.common.domain.Declination
 import org.assertj.core.api.Assertions.assertThat
@@ -16,7 +17,7 @@ internal class GetChatTest : ChatFixtures() {
     @Test
     internal fun `should return a chat`() {
         val chatProjection = fixtures()
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
 
         val result = underTest().get()
 
@@ -41,7 +42,7 @@ internal class GetChatTest : ChatFixtures() {
     @Test
     internal fun `should not return a chat`() {
         fixtures()
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         every { userRepository.findById(fixtureImamId) } returns left(Declination.withReason("db err"))
 
         val result = underTest()
@@ -52,7 +53,7 @@ internal class GetChatTest : ChatFixtures() {
     @Test
     internal fun `should return a chat to an imam`() {
         val chatProjection = fixtures()
-        every { getCurrentUser() } returns fixtureImam
+        every { getCurrentUser() } returns some(fixtureImam)
 
         assertThat(underTest().get()).isEqualTo(chatProjection)
     }
@@ -60,7 +61,7 @@ internal class GetChatTest : ChatFixtures() {
     @Test
     internal fun `chat is not found`() {
         val declination = Declination.withReason("Chat is not found")
-        every { getCurrentUser() } returns fixtureImam
+        every { getCurrentUser() } returns some(fixtureImam)
         every { chatRepository.findById(fixtureChatId1) } returns left(declination)
 
         assertThat(underTest().left).isEqualTo(declination)
@@ -69,7 +70,7 @@ internal class GetChatTest : ChatFixtures() {
     @Test
     internal fun `should return a publicly visible chat`() {
         val chatProjection = fixtures()
-        every { getCurrentUser() } returns fixtureAnotherInquirer
+        every { getCurrentUser() } returns some(fixtureAnotherInquirer)
 
         assertThat(underTest().get()).isEqualTo(chatProjection)
     }
@@ -79,7 +80,7 @@ internal class GetChatTest : ChatFixtures() {
         fixtureClock()
         val chat = fixtureSavedChat(Private)
         val declination = Declination.withReason("The operation is not permitted")
-        every { getCurrentUser() } returns fixtureAnotherInquirer
+        every { getCurrentUser() } returns some(fixtureAnotherInquirer)
         every { chatRepository.findById(fixtureChatId1) } returns right(chat)
 
         assertThat(underTest().left).isEqualTo(declination)

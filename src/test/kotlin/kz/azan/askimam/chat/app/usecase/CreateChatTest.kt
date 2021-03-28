@@ -4,9 +4,9 @@ import io.mockk.every
 import io.mockk.verifySequence
 import io.vavr.kotlin.none
 import io.vavr.kotlin.some
+import kz.azan.askimam.chat.ChatFixtures
 import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.model.Chat.Type.Public
-import kz.azan.askimam.chat.ChatFixtures
 import kz.azan.askimam.common.domain.Declination
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -56,7 +56,7 @@ internal class CreateChatTest : ChatFixtures() {
 
     private fun fixtures() {
         fixtureClock()
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         every { chatRepository.create(any()) } returns none()
         every { eventPublisher.publish(any()) } returns Unit
     }

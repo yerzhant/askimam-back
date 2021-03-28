@@ -15,15 +15,19 @@ class GetUnansweredChats(
     private val getCurrentUser: GetCurrentUser,
 ) {
 
-    operator fun invoke(offset: Int, pageSize: Int): Either<Declination, List<ChatProjection>> =
-        GetUnansweredChatsPolicy.forAll.isAllowed(getCurrentUser()).fold(
-            {
-                chatRepository.findUnansweredChats(offset, pageSize).map { chats ->
-                    chats.map { chat ->
-                        ChatProjection(chat.id!!, chat.subjectText())
+    operator fun invoke(offset: Int, pageSize: Int): Either<Declination, List<ChatProjection>> = getCurrentUser().fold(
+        { left(Declination.withReason("Who are you?")) },
+        { user ->
+            GetUnansweredChatsPolicy.forAll.isAllowed(user).fold(
+                {
+                    chatRepository.findUnansweredChats(offset, pageSize).map { chats ->
+                        chats.map { chat ->
+                            ChatProjection(chat.id!!, chat.subjectText())
+                        }
                     }
-                }
-            },
-            { left(it) }
-        )
+                },
+                { left(it) }
+            )
+        }
+    )
 }

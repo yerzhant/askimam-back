@@ -6,8 +6,8 @@ import io.vavr.kotlin.left
 import io.vavr.kotlin.none
 import io.vavr.kotlin.right
 import io.vavr.kotlin.some
-import kz.azan.askimam.chat.domain.event.MessageAdded
 import kz.azan.askimam.chat.ChatFixtures
+import kz.azan.askimam.chat.domain.event.MessageAdded
 import kz.azan.askimam.common.domain.Declination
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -16,7 +16,7 @@ internal class AddTextMessageTest : ChatFixtures() {
 
     @Test
     internal fun `should add a text message`() {
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         fixtures()
 
         assertThat(
@@ -36,7 +36,7 @@ internal class AddTextMessageTest : ChatFixtures() {
 
     @Test
     internal fun `should not add a text message - chat not found`() {
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         every { chatRepository.findById(any()) } returns left(Declination.withReason("not found"))
 
         assertThat(
@@ -50,7 +50,7 @@ internal class AddTextMessageTest : ChatFixtures() {
 
     @Test
     internal fun `should not add a text message - update error`() {
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         fixtures()
         every { chatRepository.update(any()) } returns some(Declination.withReason("not found"))
 
@@ -65,7 +65,7 @@ internal class AddTextMessageTest : ChatFixtures() {
 
     @Test
     internal fun `should add a text message by an imam`() {
-        every { getCurrentUser() } returns fixtureImam
+        every { getCurrentUser() } returns some(fixtureImam)
         fixtures()
 
         assertThat(
@@ -79,7 +79,7 @@ internal class AddTextMessageTest : ChatFixtures() {
 
     @Test
     internal fun `should not add a text message by a public reader`() {
-        every { getCurrentUser() } returns fixtureAnotherInquirer
+        every { getCurrentUser() } returns some(fixtureAnotherInquirer)
         fixtures()
 
         assertThat(
@@ -93,7 +93,7 @@ internal class AddTextMessageTest : ChatFixtures() {
 
     @Test
     internal fun `should not add a text message as a chat is not found`() {
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         fixtures()
         every { chatRepository.findById(any()) } returns left(Declination.withReason("not found"))
 

@@ -1,11 +1,14 @@
 package kz.azan.askimam.chat.app.usecase
 
+import io.vavr.control.Option
+import io.vavr.kotlin.some
 import kz.azan.askimam.chat.domain.model.Chat
 import kz.azan.askimam.chat.domain.model.Chat.Type
 import kz.azan.askimam.chat.domain.model.ChatRepository
 import kz.azan.askimam.chat.domain.model.FcmToken
 import kz.azan.askimam.chat.domain.model.Subject
 import kz.azan.askimam.common.app.meta.UseCase
+import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.common.domain.EventPublisher
 import kz.azan.askimam.common.type.NonBlankString
 import kz.azan.askimam.user.domain.service.GetCurrentUser
@@ -18,7 +21,7 @@ class CreateChat(
     private val getCurrentUser: GetCurrentUser,
     private val chatRepository: ChatRepository,
 ) {
-    operator fun invoke(type: Type, text: NonBlankString, fcmToken: FcmToken) = chatRepository.create(
+    operator fun invoke(type: Type, text: NonBlankString, fcmToken: FcmToken): Option<Declination> =
         Chat.new(
             type = type,
             messageText = text,
@@ -28,10 +31,12 @@ class CreateChat(
             clock = clock,
             eventPublisher = eventPublisher,
             getCurrentUser = getCurrentUser,
+        ).fold(
+            { some(it) },
+            { chatRepository.create(it) }
         )
-    )
 
-    fun withSubject(type: Type, subject: Subject, text: NonBlankString, fcmToken: FcmToken) = chatRepository.create(
+    fun withSubject(type: Type, subject: Subject, text: NonBlankString, fcmToken: FcmToken): Option<Declination> =
         Chat.newWithSubject(
             type = type,
             subject = subject,
@@ -42,6 +47,8 @@ class CreateChat(
             clock = clock,
             eventPublisher = eventPublisher,
             getCurrentUser = getCurrentUser,
+        ).fold(
+            { some(it) },
+            { chatRepository.create(it) }
         )
-    )
 }

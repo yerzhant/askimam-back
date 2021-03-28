@@ -15,7 +15,7 @@ internal class SetViewedByTest : ChatFixtures() {
 
     @Test
     internal fun `should set viewed by an inquirer`() {
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         fixtures()
 
         assertThat(SetViewedBy(getCurrentUser, chatRepository)(fixtureChatId1).isEmpty).isTrue
@@ -25,7 +25,7 @@ internal class SetViewedByTest : ChatFixtures() {
 
     @Test
     internal fun `should not set viewed by an inquirer - update error`() {
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         fixtures()
         every { chatRepository.update(any()) } returns some(Declination.withReason("x"))
 
@@ -34,7 +34,7 @@ internal class SetViewedByTest : ChatFixtures() {
 
     @Test
     internal fun `should set viewed by an imam`() {
-        every { getCurrentUser() } returns fixtureImam
+        every { getCurrentUser() } returns some(fixtureImam)
         fixtures()
 
         assertThat(SetViewedBy(getCurrentUser, chatRepository)(fixtureChatId1).isEmpty).isTrue
@@ -45,7 +45,7 @@ internal class SetViewedByTest : ChatFixtures() {
     @Test
     internal fun `should not set viewed by an inquirer - the chat is not yours`() {
         fixtureClock()
-        every { getCurrentUser() } returns fixtureAnotherInquirer
+        every { getCurrentUser() } returns some(fixtureAnotherInquirer)
         every { chatRepository.findById(any()) } returns right(fixtureSavedChat())
 
         assertThat(SetViewedBy(getCurrentUser, chatRepository)(fixtureChatId1).isDefined).isTrue
@@ -53,7 +53,7 @@ internal class SetViewedByTest : ChatFixtures() {
 
     @Test
     internal fun `should not set the flag - id not found`() {
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         every { chatRepository.findById(any()) } returns left(Declination.withReason("id not found"))
 
         assertThat(

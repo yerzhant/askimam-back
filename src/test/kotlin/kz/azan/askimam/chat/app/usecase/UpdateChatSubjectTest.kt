@@ -16,7 +16,7 @@ internal class UpdateChatSubjectTest : ChatFixtures() {
     @Test
     internal fun `should update a chat's subject`() {
         fixtureClock()
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         every { chatRepository.findById(any()) } returns right(fixtureSavedChat())
         every { chatRepository.update(any()) } returns none()
 
@@ -27,7 +27,7 @@ internal class UpdateChatSubjectTest : ChatFixtures() {
 
     @Test
     internal fun `should not update a chat's - id not found`() {
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         every { chatRepository.findById(any()) } returns left(Declination.withReason("id not found"))
 
         assertThat(
@@ -38,7 +38,7 @@ internal class UpdateChatSubjectTest : ChatFixtures() {
     @Test
     internal fun `should not update a chat's - update failed`() {
         fixtureClock()
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         every { chatRepository.findById(any()) } returns right(fixtureSavedChat())
         every { chatRepository.update(any()) } returns some(Declination.withReason("x"))
 

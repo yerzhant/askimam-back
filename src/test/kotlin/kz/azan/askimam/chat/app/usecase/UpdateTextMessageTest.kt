@@ -15,7 +15,7 @@ internal class UpdateTextMessageTest : ChatFixtures() {
 
     @Test
     internal fun `should update a text message`() {
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         fixtures()
 
         assertThat(
@@ -32,7 +32,7 @@ internal class UpdateTextMessageTest : ChatFixtures() {
 
     @Test
     internal fun `should not update a text message - id not found`() {
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         every { chatRepository.findById(any()) } returns left(Declination.withReason("x"))
 
         assertThat(
@@ -48,7 +48,7 @@ internal class UpdateTextMessageTest : ChatFixtures() {
     @Test
     internal fun `should not update a text message - update error`() {
         fixtures()
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         every { chatRepository.update(any()) } returns some(Declination.withReason("x"))
 
         assertThat(
@@ -65,7 +65,7 @@ internal class UpdateTextMessageTest : ChatFixtures() {
 
     @Test
     internal fun `should not update a text message by an imam`() {
-        every { getCurrentUser() } returns fixtureImam
+        every { getCurrentUser() } returns some(fixtureImam)
         fixtures()
 
         assertThat(

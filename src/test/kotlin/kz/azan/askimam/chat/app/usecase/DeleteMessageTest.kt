@@ -15,7 +15,7 @@ internal class DeleteMessageTest : ChatFixtures() {
 
     @Test
     internal fun `should delete a message`() {
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         fixtures()
 
         assertThat(DeleteMessage(chatRepository)(fixtureChatId1, fixtureMessageId1).isEmpty).isTrue
@@ -36,7 +36,7 @@ internal class DeleteMessageTest : ChatFixtures() {
     @Test
     internal fun `should not delete a message - update error`() {
         fixtures()
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         every { chatRepository.update(any()) } returns some(Declination.withReason("x"))
 
         assertThat(DeleteMessage(chatRepository)(fixtureChatId1, fixtureMessageId1).isDefined).isTrue
@@ -44,7 +44,7 @@ internal class DeleteMessageTest : ChatFixtures() {
 
     @Test
     internal fun `should delete a message by an imam`() {
-        every { getCurrentUser() } returns fixtureImam
+        every { getCurrentUser() } returns some(fixtureImam)
         fixtures()
 
         assertThat(DeleteMessage(chatRepository)(fixtureChatId1, fixtureMessageId1).isEmpty).isTrue
@@ -52,7 +52,7 @@ internal class DeleteMessageTest : ChatFixtures() {
 
     @Test
     internal fun `should not delete a message`() {
-        every { getCurrentUser() } returns fixtureAnotherInquirer
+        every { getCurrentUser() } returns some(fixtureAnotherInquirer)
         fixtures()
 
         assertThat(DeleteMessage(chatRepository)(fixtureChatId1, fixtureMessageId1).isDefined).isTrue

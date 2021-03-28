@@ -6,8 +6,8 @@ import io.vavr.kotlin.left
 import io.vavr.kotlin.none
 import io.vavr.kotlin.right
 import io.vavr.kotlin.some
-import kz.azan.askimam.chat.domain.event.MessageAdded
 import kz.azan.askimam.chat.ChatFixtures
+import kz.azan.askimam.chat.domain.event.MessageAdded
 import kz.azan.askimam.common.domain.Declination
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -16,7 +16,7 @@ internal class AddAudioMessageTest : ChatFixtures() {
 
     @Test
     internal fun `should add an audio message`() {
-        every { getCurrentUser() } returns fixtureImam
+        every { getCurrentUser() } returns some(fixtureImam)
         fixtures()
 
         assertThat(AddAudioMessage(chatRepository)(fixtureChatId1, fixtureAudio, fixtureImamFcmToken).isEmpty).isTrue
@@ -30,7 +30,7 @@ internal class AddAudioMessageTest : ChatFixtures() {
 
     @Test
     internal fun `should not add an audio message - id not found`() {
-        every { getCurrentUser() } returns fixtureImam
+        every { getCurrentUser() } returns some(fixtureImam)
         every { chatRepository.findById(any()) } returns left(Declination.withReason("error"))
 
         assertThat(AddAudioMessage(chatRepository)(fixtureChatId1, fixtureAudio, fixtureImamFcmToken).get()).isEqualTo(
@@ -40,7 +40,7 @@ internal class AddAudioMessageTest : ChatFixtures() {
 
     @Test
     internal fun `should not add an audio message - update error`() {
-        every { getCurrentUser() } returns fixtureImam
+        every { getCurrentUser() } returns some(fixtureImam)
         fixtures()
         every { chatRepository.update(any()) } returns some(Declination.withReason("error"))
 
@@ -51,7 +51,7 @@ internal class AddAudioMessageTest : ChatFixtures() {
 
     @Test
     internal fun `should not add an audio message`() {
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         fixtures()
 
         assertThat(AddAudioMessage(chatRepository)(fixtureChatId1, fixtureAudio, fixtureImamFcmToken).isDefined).isTrue

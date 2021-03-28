@@ -6,8 +6,8 @@ import io.vavr.kotlin.left
 import io.vavr.kotlin.none
 import io.vavr.kotlin.right
 import io.vavr.kotlin.some
-import kz.azan.askimam.chat.domain.model.Chat
 import kz.azan.askimam.chat.ChatFixtures
+import kz.azan.askimam.chat.domain.model.Chat
 import kz.azan.askimam.common.domain.Declination
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
@@ -36,7 +36,7 @@ internal class DeleteChatTest : ChatFixtures() {
     @Test
     internal fun `should delete a chat by an imam`() {
         val chat = fixtures()
-        every { getCurrentUser() } returns fixtureImam
+        every { getCurrentUser() } returns some(fixtureImam)
 
         Assertions.assertThat(DeleteChat(getCurrentUser, chatRepository)(fixtureChatId1).isEmpty).isTrue
 
@@ -49,7 +49,7 @@ internal class DeleteChatTest : ChatFixtures() {
     internal fun `should not delete someone else's chat`() {
         fixtureClock()
         val chat = fixtureSavedChat()
-        every { getCurrentUser() } returns fixtureAnotherInquirer
+        every { getCurrentUser() } returns some(fixtureAnotherInquirer)
         every { chatRepository.findById(fixtureChatId1) } returns right(chat)
 
         Assertions.assertThat(DeleteChat(getCurrentUser, chatRepository)(fixtureChatId1).isDefined).isTrue
@@ -61,7 +61,7 @@ internal class DeleteChatTest : ChatFixtures() {
 
     @Test
     internal fun `should not find a chat`() {
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         every { chatRepository.findById(fixtureChatId1) } returns left(Declination.withReason("Not found"))
 
         Assertions.assertThat(DeleteChat(getCurrentUser, chatRepository)(fixtureChatId1).isDefined).isTrue
@@ -74,7 +74,7 @@ internal class DeleteChatTest : ChatFixtures() {
     private fun fixtures(): Chat {
         fixtureClock()
         val chat = fixtureSavedChat()
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         every { chatRepository.findById(fixtureChatId1) } returns right(chat)
         every { chatRepository.delete(chat) } returns none()
         return chat

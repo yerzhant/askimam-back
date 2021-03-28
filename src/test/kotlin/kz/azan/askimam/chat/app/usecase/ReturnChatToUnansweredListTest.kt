@@ -6,8 +6,8 @@ import io.vavr.kotlin.left
 import io.vavr.kotlin.none
 import io.vavr.kotlin.right
 import io.vavr.kotlin.some
-import kz.azan.askimam.chat.domain.model.Chat
 import kz.azan.askimam.chat.ChatFixtures
+import kz.azan.askimam.chat.domain.model.Chat
 import kz.azan.askimam.common.domain.Declination
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -42,7 +42,7 @@ internal class ReturnChatToUnansweredListTest : ChatFixtures() {
     private fun fixtures(): Chat {
         fixtureClock()
         val chat = fixtureSavedChat()
-        every { getCurrentUser() } returns fixtureImam
+        every { getCurrentUser() } returns some(fixtureImam)
         every { chatRepository.findById(fixtureChatId1) } returns right(chat)
         every { chatRepository.update(chat) } returns none()
         return chat
