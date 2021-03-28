@@ -24,21 +24,21 @@ class WebSecurityConfig(private val jwtService: JwtService) : WebSecurityConfigu
         http {
             authorizeRequests {
                 authorize("/chats/public/*/*", permitAll)
-                authorize("/chats/messages/*/*", permitAll)
+                authorize("/chats/messages/*", permitAll)
                 authorize("/chats/unanswered/*/*", hasAuthority(Imam.name))
                 authorize("/chats/*/return-to-unanswered", hasAuthority(Imam.name))
                 authorize("/messages/audio", hasAuthority(Imam.name))
                 authorize()
             }
-            cors { }
-            csrf { disable() }
-            addFilterBefore(JwtFilter(jwtService), UsernamePasswordAuthenticationFilter::class.java)
             exceptionHandling {
                 authenticationEntryPoint = AuthenticationEntryPoint { _, response, authException ->
                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.message)
                 }
             }
+            addFilterBefore(JwtFilter(jwtService), UsernamePasswordAuthenticationFilter::class.java)
             sessionManagement { sessionCreationPolicy = SessionCreationPolicy.STATELESS }
+            csrf { disable() }
+            cors { }
         }
     }
 
