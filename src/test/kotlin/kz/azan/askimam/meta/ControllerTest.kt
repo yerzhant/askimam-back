@@ -2,8 +2,9 @@ package kz.azan.askimam.meta
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
-import kz.azan.askimam.security.service.JwtService
 import kz.azan.askimam.favorite.FavoriteFixtures
+import kz.azan.askimam.security.service.JwtService
+import kz.azan.askimam.security.service.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.TestConstructor
 import org.springframework.test.context.TestConstructor.AutowireMode.ALL
@@ -20,4 +21,7 @@ open class ControllerTest : FavoriteFixtures() {
 
     @MockkBean
     protected lateinit var jwtService: JwtService
+
+    @MockkBean
+    protected lateinit var userService: UserService
 }

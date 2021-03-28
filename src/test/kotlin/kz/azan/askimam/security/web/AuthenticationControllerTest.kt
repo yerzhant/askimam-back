@@ -1,12 +1,10 @@
 package kz.azan.askimam.security.web
 
-import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.vavr.control.Either.right
 import io.vavr.kotlin.left
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.meta.ControllerTest
-import kz.azan.askimam.security.service.UserService
 import kz.azan.askimam.security.web.dto.AuthenticationDto
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -19,9 +17,6 @@ import org.springframework.test.web.servlet.post
 internal class AuthenticationControllerTest : ControllerTest() {
 
     private val url = "/authenticate"
-
-    @MockkBean
-    private lateinit var userService: UserService
 
     @Test
     internal fun `should authenticate a user`() {
