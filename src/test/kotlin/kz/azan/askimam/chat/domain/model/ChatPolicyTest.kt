@@ -16,8 +16,8 @@ class ChatPolicyTest : ChatFixtures() {
     internal fun `should not update a subject by not an author`() {
         fixtureClock()
         every { getCurrentUser() } returnsMany listOf(
-            fixtureInquirer,
-            fixtureAnotherInquirer
+            some(fixtureInquirer),
+            some(fixtureAnotherInquirer)
         )
 
         fixtureChat().run {
@@ -31,7 +31,7 @@ class ChatPolicyTest : ChatFixtures() {
     @Test
     internal fun `should not set 'Is viewed by imam' by non imam`() {
         fixtureClock()
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         val chat = fixtureChat()
 
         chat.run {
@@ -44,9 +44,9 @@ class ChatPolicyTest : ChatFixtures() {
     internal fun `should not set 'Is viewed by an inquirer' flag`() {
         fixtureClock()
         every { getCurrentUser() } returnsMany listOf(
-            fixtureInquirer,
-            fixtureImam,
-            fixtureAnotherInquirer
+            some(fixtureInquirer),
+            some(fixtureImam),
+            some(fixtureAnotherInquirer)
         )
         val chat = fixtureChat(fixtureNewReply)
 
@@ -61,8 +61,8 @@ class ChatPolicyTest : ChatFixtures() {
     internal fun `should not add a new message`() {
         fixtureClockAndThen(30)
         every { getCurrentUser() } returnsMany listOf(
-            fixtureInquirer,
-            fixtureAnotherInquirer,
+            some(fixtureInquirer),
+            some(fixtureAnotherInquirer),
         )
 
         fixtureChat().run {
@@ -76,7 +76,7 @@ class ChatPolicyTest : ChatFixtures() {
     internal fun `should not add a new audio`() {
         val audio = NonBlankString.of("Аудио")
         fixtureClock()
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
 
         fixtureChat(audio).run {
             val option = addAudioMessage(fixtureAudio, fixtureImamFcmToken)
@@ -88,7 +88,7 @@ class ChatPolicyTest : ChatFixtures() {
     @Test
     internal fun `should not delete a message by an inquirer`() {
         fixtureClock()
-        every { getCurrentUser() } returns fixtureAnotherInquirer
+        every { getCurrentUser() } returns some(fixtureAnotherInquirer)
 
         with(fixtureSavedChat()) {
             val option = deleteMessage(fixtureMessageId1)
@@ -105,7 +105,7 @@ class ChatPolicyTest : ChatFixtures() {
     @Test
     internal fun `should not update a message`() {
         fixtureClock()
-        every { getCurrentUser() } returns fixtureAnotherInquirer
+        every { getCurrentUser() } returns some(fixtureAnotherInquirer)
 
         with(fixtureSavedChat()) {
             val option = updateTextMessage(fixtureMessageId1, fixtureNewMessage, fixtureInquirerFcmToken)
@@ -123,7 +123,7 @@ class ChatPolicyTest : ChatFixtures() {
     @Test
     internal fun `should not update an audio message`() {
         fixtureClock()
-        every { getCurrentUser() } returns fixtureImam
+        every { getCurrentUser() } returns some(fixtureImam)
 
         with(fixtureSavedChat()) {
             val option = updateTextMessage(fixtureMessageId3, fixtureNewReply, fixtureImamFcmToken)
@@ -136,7 +136,7 @@ class ChatPolicyTest : ChatFixtures() {
     @Test
     internal fun `should not return a chat by a not imam to not answered`() {
         fixtureClock()
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
 
         with(fixtureSavedChat()) {
             assertThat(returnToUnansweredList().isDefined).isTrue

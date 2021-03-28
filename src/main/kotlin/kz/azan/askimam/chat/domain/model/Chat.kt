@@ -1,6 +1,9 @@
 package kz.azan.askimam.chat.domain.model
 
+import io.vavr.control.Either
 import io.vavr.control.Option
+import io.vavr.kotlin.left
+import io.vavr.kotlin.right
 import io.vavr.kotlin.some
 import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.event.MessageAdded
@@ -8,13 +11,13 @@ import kz.azan.askimam.chat.domain.event.MessageDeleted
 import kz.azan.askimam.chat.domain.event.MessageUpdated
 import kz.azan.askimam.chat.domain.model.Chat.Type.Public
 import kz.azan.askimam.chat.domain.policy.*
-import kz.azan.askimam.user.domain.service.GetCurrentUser
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.common.domain.EventPublisher
 import kz.azan.askimam.common.type.NonBlankString
 import kz.azan.askimam.user.domain.model.User
 import kz.azan.askimam.user.domain.model.User.Type.Imam
 import kz.azan.askimam.user.domain.model.User.Type.Inquirer
+import kz.azan.askimam.user.domain.service.GetCurrentUser
 import java.time.Clock
 import java.time.LocalDateTime
 
@@ -68,43 +71,59 @@ class Chat private constructor(
     fun isViewedByImam() = isViewedByImam
     fun isViewedByInquirer() = isViewedByInquirer
 
-    fun viewedByImam(): Option<Declination> =
-        UpdateChatPolicy.forImam.isAllowed(this, getCurrentUser()).onEmpty {
-            isViewedByImam = true
+    fun viewedByImam(): Option<Declination> = getCurrentUser().fold(
+        { some(Declination.withReason("Who are you?")) },
+        {
+            UpdateChatPolicy.forImam.isAllowed(this, it).onEmpty {
+                isViewedByImam = true
+            }
         }
+    )
 
-    fun viewedByInquirer(): Option<Declination> =
-        UpdateChatPolicy.forInquirer.isAllowed(this, getCurrentUser()).onEmpty {
-            isViewedByInquirer = true
+    fun viewedByInquirer(): Option<Declination> = getCurrentUser().fold(
+        { some(Declination.withReason("Who are you?")) },
+        {
+            UpdateChatPolicy.forInquirer.isAllowed(this, it).onEmpty {
+                isViewedByInquirer = true
+            }
         }
+    )
 
-    fun updateSubject(newSubject: Subject): Option<Declination> {
-        val user = getCurrentUser()
-        return UpdateChatPolicy.getFor(user).isAllowed(this, user).onEmpty {
-            subject = newSubject
+    fun updateSubject(newSubject: Subject): Option<Declination> = getCurrentUser().fold(
+        { some(Declination.withReason("Who are you?")) },
+        {
+            UpdateChatPolicy.getFor(it).isAllowed(this, it).onEmpty {
+                subject = newSubject
+            }
         }
-    }
+    )
 
-    fun addTextMessage(text: NonBlankString, fcmToken: FcmToken): Option<Declination> {
-        val author = getCurrentUser()
-        val message = Message.newText(
-            text = text,
-            authorId = author.id,
-            authorType = author.type,
-            clock = clock,
-        )
-        return addMessage(message, AddMessagePolicy.getFor(author), author, fcmToken)
-    }
+    fun addTextMessage(text: NonBlankString, fcmToken: FcmToken): Option<Declination> = getCurrentUser().fold(
+        { some(Declination.withReason("Who are you?")) },
+        { author ->
+            val message = Message.newText(
+                text = text,
+                authorId = author.id,
+                authorType = author.type,
+                clock = clock,
+            )
+            addMessage(message, AddMessagePolicy.getFor(author), author, fcmToken)
+        }
+    )
 
-    fun addAudioMessage(audio: NonBlankString, fcmToken: FcmToken): Option<Declination> {
-        val imam = getCurrentUser()
-        val message = Message.newAudio(
-            authorId = imam.id,
-            audio = audio,
-            clock = clock,
-        )
-        return addMessage(message, AddMessagePolicy.forImam, imam, fcmToken)
-    }
+
+    fun addAudioMessage(audio: NonBlankString, fcmToken: FcmToken): Option<Declination> = getCurrentUser().fold(
+        { some(Declination.withReason("Who are you?")) },
+        { imam ->
+            val message = Message.newAudio(
+                authorId = imam.id,
+                audio = audio,
+                clock = clock,
+            )
+            addMessage(message, AddMessagePolicy.forImam, imam, fcmToken)
+        }
+    )
+
 
     private fun addMessage(
         message: Message,
@@ -137,17 +156,20 @@ class Chat private constructor(
         val message = messages.find { it.id == id } ?: return some(Declination.withReason("Invalid id"))
 
         return message.run {
-            val currentUser = getCurrentUser()
+            getCurrentUser().fold(
+                { some(Declination.withReason("Who are you?")) },
+                { currentUser ->
+                    UpdateMessagePolicy.forAll.isAllowed(authorId, currentUser, type).onEmpty {
+                        when (currentUser.type) {
+                            Imam -> imamFcmToken = fcmToken
+                            Inquirer -> inquirerFcmToken = fcmToken
+                        }
 
-            UpdateMessagePolicy.forAll.isAllowed(authorId, currentUser, type).onEmpty {
-                when (currentUser.type) {
-                    Imam -> imamFcmToken = fcmToken
-                    Inquirer -> inquirerFcmToken = fcmToken
+                        updateText(text)
+                        eventPublisher.publish(MessageUpdated(id, text, this.updatedAt()!!))
+                    }
                 }
-
-                updateText(text)
-                eventPublisher.publish(MessageUpdated(id, text, this.updatedAt()!!))
-            }
+            )
         }
     }
 
@@ -157,20 +179,27 @@ class Chat private constructor(
         val message = messages.find { it.id == id } ?: return some(Declination.withReason("Invalid id"))
 
         return message.run {
-            val user = getCurrentUser()
-
-            DeleteMessagePolicy.forThe(user).isAllowed(authorId, user).onEmpty {
-                messages.remove(this)
-                eventPublisher.publish(MessageDeleted(id))
-            }
+            getCurrentUser().fold(
+                { some(Declination.withReason("Who are you?")) },
+                { user ->
+                    DeleteMessagePolicy.forThe(user).isAllowed(authorId, user).onEmpty {
+                        messages.remove(this)
+                        eventPublisher.publish(MessageDeleted(id))
+                    }
+                }
+            )
         }
     }
 
-    fun returnToUnansweredList(): Option<Declination> =
-        ReturnChatToUnansweredListPolicy.forAll.isAllowed(getCurrentUser()).onEmpty {
-            answeredBy = null
-            imamFcmToken = null
+    fun returnToUnansweredList(): Option<Declination> = getCurrentUser().fold(
+        { some(Declination.withReason("Who are you?")) },
+        {
+            ReturnChatToUnansweredListPolicy.forAll.isAllowed(it).onEmpty {
+                answeredBy = null
+                imamFcmToken = null
+            }
         }
+    )
 
     companion object {
         fun newWithSubject(
@@ -183,23 +212,28 @@ class Chat private constructor(
             clock: Clock,
             eventPublisher: EventPublisher,
             getCurrentUser: GetCurrentUser,
-        ): Chat {
-            val now = LocalDateTime.now(clock)
-            return Chat(
-                type = type,
-                subject = subject,
-                askedBy = getCurrentUser().id,
+        ): Either<Declination, Chat> = getCurrentUser().fold(
+            { left(Declination.withReason("Who are you?")) },
+            {
+                val now = LocalDateTime.now(clock)
+                right(
+                    Chat(
+                        type = type,
+                        subject = subject,
+                        askedBy = it.id,
 
-                inquirerFcmToken = inquirerFcmToken,
+                        inquirerFcmToken = inquirerFcmToken,
 
-                createdAt = now,
-                updatedAt = now,
+                        createdAt = now,
+                        updatedAt = now,
 
-                clock = clock,
-                eventPublisher = eventPublisher,
-                getCurrentUser = getCurrentUser,
-            ).apply { init(messageText) }
-        }
+                        clock = clock,
+                        eventPublisher = eventPublisher,
+                        getCurrentUser = getCurrentUser,
+                    ).apply { init(messageText) }
+                )
+            }
+        )
 
         fun new(
             type: Type,
@@ -210,22 +244,27 @@ class Chat private constructor(
             clock: Clock,
             eventPublisher: EventPublisher,
             getCurrentUser: GetCurrentUser,
-        ): Chat {
-            val now = LocalDateTime.now(clock)
-            return Chat(
-                type = type,
-                askedBy = getCurrentUser().id,
+        ): Either<Declination, Chat> = getCurrentUser().fold(
+            { left(Declination.withReason("Who are you?")) },
+            {
+                val now = LocalDateTime.now(clock)
+                right(
+                    Chat(
+                        type = type,
+                        askedBy = it.id,
 
-                inquirerFcmToken = inquirerFcmToken,
+                        inquirerFcmToken = inquirerFcmToken,
 
-                createdAt = now,
-                updatedAt = now,
+                        createdAt = now,
+                        updatedAt = now,
 
-                clock = clock,
-                eventPublisher = eventPublisher,
-                getCurrentUser = getCurrentUser,
-            ).apply { init(messageText) }
-        }
+                        clock = clock,
+                        eventPublisher = eventPublisher,
+                        getCurrentUser = getCurrentUser,
+                    ).apply { init(messageText) }
+                )
+            }
+        )
 
         fun restore(
             id: Id,

@@ -3,6 +3,7 @@ package kz.azan.askimam.chat.domain.model
 import io.mockk.every
 import io.mockk.verify
 import io.mockk.verifySequence
+import io.vavr.kotlin.some
 import kz.azan.askimam.chat.ChatFixtures
 import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.event.MessageAdded
@@ -22,7 +23,7 @@ internal class ChatTest : ChatFixtures() {
     @Test
     internal fun `should create a chat`() {
         fixtureClock()
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
 
         with(fixtureChat()) {
             assertThat(type).isEqualTo(Public)
@@ -60,7 +61,7 @@ internal class ChatTest : ChatFixtures() {
     @Test
     internal fun `should create a chat without a subject`() {
         fixtureClock()
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         every { eventPublisher.publish(ChatCreated(null, fixtureMessage)) } returns Unit
 
         Chat.new(
@@ -71,7 +72,7 @@ internal class ChatTest : ChatFixtures() {
             clock = clock,
             eventPublisher = eventPublisher,
             getCurrentUser = getCurrentUser,
-        ).run {
+        ).get().run {
             assertThat(subject()).isNull()
             assertThat(subjectText()).isEqualTo(Subject(fixtureMessage))
         }
@@ -84,7 +85,7 @@ internal class ChatTest : ChatFixtures() {
     @Test
     internal fun `should update a subject by an author`() {
         fixtureClock()
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         val chat = fixtureChat()
 
         chat.run {
@@ -99,8 +100,8 @@ internal class ChatTest : ChatFixtures() {
     internal fun `should update a subject by an imam`() {
         fixtureClock()
         every { getCurrentUser() } returnsMany listOf(
-            fixtureInquirer,
-            fixtureImam
+            some(fixtureInquirer),
+            some(fixtureImam)
         )
         val chat = fixtureChat()
 
@@ -115,7 +116,7 @@ internal class ChatTest : ChatFixtures() {
     @Test
     internal fun `should add a new message`() {
         fixtureClockAndThen(30)
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         val chat = fixtureChat()
 
         chat.run {
@@ -142,7 +143,7 @@ internal class ChatTest : ChatFixtures() {
     @Test
     internal fun `should replace an inquirer's fcm token on adding a new message from another device`() {
         fixtureClockAndThen(30)
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         val chat = fixtureChat()
 
         chat.run {
@@ -157,8 +158,8 @@ internal class ChatTest : ChatFixtures() {
     internal fun `should be viewed by an imam`() {
         fixtureClock()
         every { getCurrentUser() } returnsMany listOf(
-            fixtureInquirer,
-            fixtureImam
+            some(fixtureInquirer),
+            some(fixtureImam)
         )
         val chat = fixtureChat()
 
@@ -173,9 +174,9 @@ internal class ChatTest : ChatFixtures() {
     internal fun `should reset Is viewed by an imam flag after a new message`() {
         fixtureClock()
         every { getCurrentUser() } returnsMany listOf(
-            fixtureInquirer,
-            fixtureImam,
-            fixtureInquirer,
+            some(fixtureInquirer),
+            some(fixtureImam),
+            some(fixtureInquirer),
         )
         val chat = fixtureChat()
 
@@ -192,8 +193,8 @@ internal class ChatTest : ChatFixtures() {
     internal fun `should add a new reply by an imam`() {
         fixtureClockAndThen(31)
         every { getCurrentUser() } returnsMany listOf(
-            fixtureInquirer,
-            fixtureImam
+            some(fixtureInquirer),
+            some(fixtureImam)
         )
 
         fixtureChat(fixtureNewReply).run {
@@ -219,8 +220,8 @@ internal class ChatTest : ChatFixtures() {
     internal fun `should replace an fcm token when adding a new reply by another imam`() {
         fixtureClockAndThen(31)
         every { getCurrentUser() } returnsMany listOf(
-            fixtureInquirer,
-            fixtureAnotherImam
+            some(fixtureInquirer),
+            some(fixtureAnotherImam)
         )
 
         fixtureChat(fixtureNewReply).run {
@@ -233,7 +234,7 @@ internal class ChatTest : ChatFixtures() {
     @Test
     internal fun `should return a chat by an imam to not answered`() {
         fixtureClock()
-        every { getCurrentUser() } returns fixtureImam
+        every { getCurrentUser() } returns some(fixtureImam)
 
         with(fixtureSavedChat()) {
             assertThat(returnToUnansweredList().isEmpty).isTrue
@@ -246,8 +247,8 @@ internal class ChatTest : ChatFixtures() {
     internal fun `should not make a message visible to public if it's private`() {
         fixtureClockAndThen(31)
         every { getCurrentUser() } returnsMany listOf(
-            fixtureInquirer,
-            fixtureImam
+            some(fixtureInquirer),
+            some(fixtureImam)
         )
 
         fixtureChat(fixtureNewReply, Private).run {
@@ -262,9 +263,9 @@ internal class ChatTest : ChatFixtures() {
     internal fun `should set Is viewed by an inquirer flag`() {
         fixtureClock()
         every { getCurrentUser() } returnsMany listOf(
-            fixtureInquirer,
-            fixtureImam,
-            fixtureInquirer,
+            some(fixtureInquirer),
+            some(fixtureImam),
+            some(fixtureInquirer),
         )
         val chat = fixtureChat(fixtureNewReply)
 
@@ -283,8 +284,8 @@ internal class ChatTest : ChatFixtures() {
         val audio = NonBlankString.of("Аудио")
         fixtureClock()
         every { getCurrentUser() } returnsMany listOf(
-            fixtureInquirer,
-            fixtureImam
+            some(fixtureInquirer),
+            some(fixtureImam)
         )
 
         fixtureChat(audio).run {
@@ -308,7 +309,7 @@ internal class ChatTest : ChatFixtures() {
     @Test
     internal fun `should delete a message by an inquirer`() {
         fixtureClock()
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         every { eventPublisher.publish(MessageDeleted(fixtureMessageId1)) } returns Unit
 
         with(fixtureSavedChat()) {
@@ -326,7 +327,7 @@ internal class ChatTest : ChatFixtures() {
     @Test
     internal fun `should not delete last message`() {
         fixtureClock()
-        every { getCurrentUser() } returns fixtureImam
+        every { getCurrentUser() } returns some(fixtureImam)
         every { eventPublisher.publish(any()) } returns Unit
 
         with(fixtureSavedChat()) {
@@ -339,7 +340,7 @@ internal class ChatTest : ChatFixtures() {
     @Test
     internal fun `should delete a message by an imam`() {
         fixtureClock()
-        every { getCurrentUser() } returns fixtureImam
+        every { getCurrentUser() } returns some(fixtureImam)
         every { eventPublisher.publish(MessageDeleted(fixtureMessageId1)) } returns Unit
 
         with(fixtureSavedChat()) {
@@ -357,7 +358,7 @@ internal class ChatTest : ChatFixtures() {
     @Test
     internal fun `should update a message by an inquirer`() {
         fixtureClockAndThen(10, nowTimes = 1)
-        every { getCurrentUser() } returns fixtureInquirer
+        every { getCurrentUser() } returns some(fixtureInquirer)
         every {
             eventPublisher.publish(
                 MessageUpdated(
@@ -385,7 +386,7 @@ internal class ChatTest : ChatFixtures() {
     @Test
     internal fun `should update a message by an imam`() {
         fixtureClockAndThen(11, nowTimes = 1)
-        every { getCurrentUser() } returns fixtureImam
+        every { getCurrentUser() } returns some(fixtureImam)
         every {
             eventPublisher.publish(
                 MessageUpdated(
