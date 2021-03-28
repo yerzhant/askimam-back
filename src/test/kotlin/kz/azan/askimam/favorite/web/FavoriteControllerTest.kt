@@ -17,10 +17,12 @@ import org.hamcrest.Matchers
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.security.test.context.support.WithAnonymousUser
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 
+@WithPrincipal
 @WebMvcTest(FavoriteController::class)
 internal class FavoriteControllerTest : ControllerTest() {
 
@@ -36,6 +38,7 @@ internal class FavoriteControllerTest : ControllerTest() {
     private lateinit var deleteFavorite: DeleteFavorite
 
     @Test
+    @WithAnonymousUser
     internal fun `should reject with 401s`() {
         mvc.get(url).andExpect { status { isUnauthorized() } }
         mvc.post(url).andExpect { status { isUnauthorized() } }
@@ -43,7 +46,6 @@ internal class FavoriteControllerTest : ControllerTest() {
     }
 
     @Test
-    @WithPrincipal
     internal fun `should get list of favorites`() {
         every { getMyFavorites() } returns right(sequenceOfFavoriteProjectionsFixture)
 
@@ -58,7 +60,6 @@ internal class FavoriteControllerTest : ControllerTest() {
     }
 
     @Test
-    @WithPrincipal
     internal fun `should not get list of favorites`() {
         every { getMyFavorites() } returns left(Declination.withReason("oops!"))
 
@@ -71,7 +72,6 @@ internal class FavoriteControllerTest : ControllerTest() {
     }
 
     @Test
-    @WithPrincipal
     internal fun `should add a chat to my favorites`() {
         every { addChatToFavorites(fixtureChatId1) } returns none()
 
@@ -85,7 +85,6 @@ internal class FavoriteControllerTest : ControllerTest() {
     }
 
     @Test
-    @WithPrincipal
     internal fun `should not add a chat to my favorites`() {
         every { addChatToFavorites(fixtureChatId1) } returns some(Declination.withReason("nope"))
 
@@ -100,7 +99,6 @@ internal class FavoriteControllerTest : ControllerTest() {
     }
 
     @Test
-    @WithPrincipal
     internal fun `should delete a favorite`() {
         every { deleteFavorite(fixtureChatId1) } returns none()
 
@@ -111,7 +109,6 @@ internal class FavoriteControllerTest : ControllerTest() {
     }
 
     @Test
-    @WithPrincipal
     internal fun `should not delete a favorite`() {
         every { deleteFavorite(fixtureChatId1) } returns some(Declination.withReason("x"))
 
