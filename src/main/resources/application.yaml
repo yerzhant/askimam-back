@@ -1,3 +1,7 @@
 spring:
   output:
     ansi.enabled: ALWAYS
+
+app:
+  jwt:
+    key: { jwt-key }

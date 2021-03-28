@@ -34,8 +34,12 @@ dependencies {
 //    implementation("org.springframework.integration:spring-integration-jdbc")
 //    implementation("org.springframework.integration:spring-integration-security")
     implementation("io.vavr:vavr-kotlin:0.10.2")
+    implementation("com.auth0:java-jwt:3.14.0")
+
     developmentOnly("org.springframework.boot:spring-boot-devtools")
+
     runtimeOnly("mysql:mysql-connector-java")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(module = "junit")
         exclude(module = "mockito-core")
