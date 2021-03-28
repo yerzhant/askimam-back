@@ -20,8 +20,9 @@ class JwtService(
     appProperties: AppProperties,
     private val clock: Clock,
 ) {
-
     private val issuer = "askimam.azan.kz"
+    private val idClaim = "id"
+    private val typeClaim = "type"
 
     init {
         if (appProperties.jwt.key.toByteArray().size < 32)
@@ -29,9 +30,6 @@ class JwtService(
     }
 
     private val algorithm = Algorithm.HMAC256(appProperties.jwt.key)
-
-    private val idClaim = "id"
-    private val typeClaim = "type"
 
     private val verifier = JWT.require(algorithm)
         .withIssuer(issuer)
@@ -63,7 +61,7 @@ class JwtService(
                 { it }
             )
 
-    fun getUser(decodedJWT: DecodedJWT) =
+    fun decode(decodedJWT: DecodedJWT) =
         User(
             User.Id(decodedJWT.getClaim(idClaim).asLong()),
             User.Type.valueOf(decodedJWT.getClaim(typeClaim).asString()),

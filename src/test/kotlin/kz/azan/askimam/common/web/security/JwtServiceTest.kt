@@ -57,7 +57,7 @@ internal class JwtServiceTest : ChatFixtures() {
         val token = service.sign(fixtureImam).get()
         val decodedJWT = service.verify(token).get()
 
-        val user = service.getUser(decodedJWT)
+        val user = service.decode(decodedJWT)
 
         assertThat(user.id).isEqualTo(fixtureImam.id)
         assertThat(user.type).isEqualTo(fixtureImam.type)
