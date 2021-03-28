@@ -61,7 +61,7 @@ open class ChatFixtures {
             clock = clock,
             eventPublisher = eventPublisher,
             getCurrentUser = getCurrentUser,
-        )
+        ).get()
     }
 
     fun fixtureSavedChat(type: Chat.Type = Public, id: Chat.Id = fixtureChatId1): Chat {
