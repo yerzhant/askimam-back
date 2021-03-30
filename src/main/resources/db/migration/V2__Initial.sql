@@ -1,5 +1,3 @@
-SET NAMES 'utf8';
-
 create table chats(
     id                      bigint          not null primary key auto_increment,
     asked_by                int             not null,
