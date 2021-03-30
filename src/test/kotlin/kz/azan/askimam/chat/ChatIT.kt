@@ -21,7 +21,7 @@ class ChatIT(
     private val jwtService: JwtService,
 ) : ChatFixtures() {
 
-    @Test
+//    @Test
     internal fun `should get public chats`() {
         val entity = rest.getForEntity<ResponseDto>("/chats/public/0/20")
 
@@ -34,8 +34,8 @@ class ChatIT(
         assertThat(list[0]["subject"]).isEqualTo("Subject")
     }
 
-    @Test
-    @Disabled
+//    @Test
+//    @Disabled
     internal fun `should get public messages`() {
         val headers = HttpHeaders().apply {
             add(HttpHeaders.AUTHORIZATION, "Bearer ${jwtService.sign(fixtureInquirer).get()}")

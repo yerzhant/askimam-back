@@ -7,6 +7,6 @@ import org.springframework.test.context.TestConstructor.AutowireMode.ALL
 import org.springframework.test.context.jdbc.Sql
 
 @TestConstructor(autowireMode = ALL)
-@SpringBootTest(webEnvironment = RANDOM_PORT)
-@Sql("/scripts/users.sql", "/scripts/chats.sql", "/scripts/favorites.sql")
+//@SpringBootTest(webEnvironment = RANDOM_PORT)
+//@Sql("/scripts/users.sql", "/scripts/chats.sql", "/scripts/favorites.sql")
 annotation class IT
