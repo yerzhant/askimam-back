@@ -20,7 +20,7 @@ create table fb_topics(
 create table fb_messages(
     id                  varchar(255)            not null primary key,
     uid                 varchar(255)            not null,
-    is_linked_to_user   bit                     not null,
+    is_linked_to_user   bit                     not null default false,
     topic_id            varchar(255)            not null,
     created_on          datetime                not null,
     sender              char                    not null,
@@ -36,7 +36,7 @@ create table fb_messages(
 create table fb_favorites(
     id                  varchar(255)            not null primary key,
     uid                 varchar(255)            not null,
-    is_linked_to_user   bit                     not null,
+    is_linked_to_user   bit                     not null default false,
     topic_id            varchar(255)            not null,
     created_on          datetime                not null,
     topic_name          varchar(1000)           not null,
