@@ -47,6 +47,7 @@ create table fb_imams(
 
 create table fb_profiles(
     id                  varchar(255)            not null primary key,
+    uid                 varchar(255)            not null,
     login               varchar(1000)           not null,
     timezone            int                     not null,
     user_id             int
