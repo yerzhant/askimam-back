@@ -10,7 +10,7 @@ create table chats(
     is_viewed_by_inquirer   bit             not null,
     created_at              datetime        not null,
     imam_fcm_token          varchar(255),
-    subject                 varchar(255),
+    subject                 varchar(4000),
 
     key        ix_chats_asked_by                (asked_by),
     key        ix_chats_answered_by             (answered_by),
