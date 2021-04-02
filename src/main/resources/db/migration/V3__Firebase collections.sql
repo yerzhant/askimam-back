@@ -40,9 +40,7 @@ create table fb_favorites(
 create table fb_imams(
     id                  varchar(255)            not null primary key,
     user_id             int                     not null,
-    name                varchar(255)            not null,
-
-    unique key uk_fb_imams_name (name)
+    name                varchar(255)            not null
 );
 
 create table fb_profiles(
