@@ -14,7 +14,8 @@ class Message private constructor(
 
     val id: Id?,
     val type: Type,
-    private var text: NonBlankString,
+    private var text: NonBlankString,   // TODO: make this nullable and return some text, probably Audio,
+                                        // if the type of this message is Audio
     val audio: NonBlankString? = null,
 
     val authorId: User.Id,
