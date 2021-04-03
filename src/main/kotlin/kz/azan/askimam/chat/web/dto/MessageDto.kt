@@ -9,7 +9,7 @@ data class MessageDto(
     val type: Message.Type,
     val text: String,
     val author: String?,
-    val createdAt: LocalDateTime,
+    val createdAt: LocalDateTime, // TODO: these two time are to be converted to zoned ones
     val updatedAt: LocalDateTime?,
 ) {
     companion object {
