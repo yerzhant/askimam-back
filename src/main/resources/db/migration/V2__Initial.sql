@@ -27,7 +27,7 @@ create table messages(
     author_type             varchar(100)    not null,
     text                    text            not null,
     updated_at              datetime,
-    duration                varchar(100),   -- TODO: add duration to Message entity
+    duration                varchar(100),   -- TODO: add duration to Message entity + it may need to be converted to int
     audio                   varchar(1024),
 
     key        ix_messages_chat_id                  (chat_id),
