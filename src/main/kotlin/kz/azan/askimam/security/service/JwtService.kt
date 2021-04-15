@@ -12,7 +12,6 @@ import kz.azan.askimam.user.domain.model.User
 import org.springframework.stereotype.Service
 import java.time.Clock
 import java.time.Instant
-import java.time.temporal.ChronoUnit
 import java.util.*
 
 @Service
@@ -42,7 +41,7 @@ class JwtService(
             JWT.create()
                 .withIssuer(issuer)
                 .withIssuedAt(Date.from(Instant.now(clock)))
-                .withExpiresAt(Date.from(Instant.now(clock).plus(1, ChronoUnit.DAYS)))
+//                .withExpiresAt(Date.from(Instant.now(clock).plus(1, ChronoUnit.DAYS)))
                 .withClaim(idClaim, user.id.value)
                 .withClaim(typeClaim, user.type.name)
                 .sign(algorithm)
