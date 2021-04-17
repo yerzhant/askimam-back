@@ -81,6 +81,7 @@ internal class AuthenticationControllerTest : ControllerTest() {
 
     private fun fixtures() {
         every { userService.find("jon") } returns fixtureInquirer
+        @Suppress("SpellCheckingInspection")
         every { userService.loadUserByUsername(any()) } returns User(
             "jon",
             "\$2y\$12\$4C3av3VYh/8CW7ITlH8Yeeza12Q9QR5QdWV04S4HcS896w0l0yBq.",

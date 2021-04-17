@@ -9,6 +9,7 @@ import org.junit.jupiter.api.assertThrows
 
 internal class JwtServiceTest : ChatFixtures() {
 
+    @Suppress("SpellCheckingInspection")
     private val properties = AppProperties(AppProperties.Jwt("xgIEe6JCu6PGkw8MxCDYQTzIXpUQ4PMqq0gRaezLNehilBlk"))
 
     private val service = JwtService(properties, clock)

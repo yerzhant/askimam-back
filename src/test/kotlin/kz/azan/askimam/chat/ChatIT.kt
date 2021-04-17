@@ -4,7 +4,6 @@ import kz.azan.askimam.common.web.dto.ResponseDto
 import kz.azan.askimam.meta.IT
 import kz.azan.askimam.security.service.JwtService
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.client.exchange
@@ -14,6 +13,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 
+// TODO: fix this tests
 @IT
 @Suppress("UNCHECKED_CAST")
 class ChatIT(
@@ -21,7 +21,7 @@ class ChatIT(
     private val jwtService: JwtService,
 ) : ChatFixtures() {
 
-//    @Test
+    @Test
     internal fun `should get public chats`() {
         val entity = rest.getForEntity<ResponseDto>("/chats/public/0/20")
 
@@ -34,8 +34,7 @@ class ChatIT(
         assertThat(list[0]["subject"]).isEqualTo("Subject")
     }
 
-//    @Test
-//    @Disabled
+    @Test
     internal fun `should get public messages`() {
         val headers = HttpHeaders().apply {
             add(HttpHeaders.AUTHORIZATION, "Bearer ${jwtService.sign(fixtureInquirer).get()}")

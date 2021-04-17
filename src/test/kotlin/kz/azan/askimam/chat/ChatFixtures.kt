@@ -262,6 +262,7 @@ open class ChatFixtures {
         clock = clock,
     )
 
+    @Suppress("SpellCheckingInspection")
     val fixturePasswordHash = NonBlankString.of("\$2y\$12\$YVshB8Gdf/S5tNB6kzSa9u0iebDtgDAv4tc47mtMYKW1dxTGfXvui")
 
     val fixtureImam = User(User.Id(1), User.Type.Imam, NonBlankString.of("Imam"), fixturePasswordHash)
