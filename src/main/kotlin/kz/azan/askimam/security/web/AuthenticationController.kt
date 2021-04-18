@@ -5,6 +5,8 @@ import kz.azan.askimam.common.web.meta.RestApi
 import kz.azan.askimam.security.service.JwtService
 import kz.azan.askimam.security.service.UserService
 import kz.azan.askimam.security.web.dto.AuthenticationDto
+import kz.azan.askimam.security.web.dto.AuthenticationResponseDto
+import kz.azan.askimam.user.domain.model.User
 import org.slf4j.LoggerFactory
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException
@@ -27,11 +29,14 @@ class AuthenticationController(
             authenticationManager.authenticate(
                 UsernamePasswordAuthenticationToken(dto.login, dto.password)
             ).run {
-                ResponseDto.ok(jwtService.sign(userService.find(dto.login))
+                val jwt = jwtService.sign(userService.find(dto.login))
                     .getOrElseThrow { declination ->
                         BadCredentialsException("Jwt signing error: ${declination.reason.value}")
                     }
-                )
+
+                val userType = User.Type.valueOf(this.authorities.first().authority)
+
+                ResponseDto.ok(AuthenticationResponseDto(jwt, userType))
             }
         } catch (e: BadCredentialsException) {
             logger.error("Authentication error: $e")
