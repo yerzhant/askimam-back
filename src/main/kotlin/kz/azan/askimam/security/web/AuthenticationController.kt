@@ -29,14 +29,15 @@ class AuthenticationController(
             authenticationManager.authenticate(
                 UsernamePasswordAuthenticationToken(dto.login, dto.password)
             ).run {
-                val jwt = jwtService.sign(userService.find(dto.login))
+                val user = userService.find(dto.login)
+                val jwt = jwtService.sign(user)
                     .getOrElseThrow { declination ->
                         BadCredentialsException("Jwt signing error: ${declination.reason.value}")
                     }
 
                 val userType = User.Type.valueOf(this.authorities.first().authority)
 
-                ResponseDto.ok(AuthenticationResponseDto(jwt, userType))
+                ResponseDto.ok(AuthenticationResponseDto(jwt, user.id.value, userType))
             }
         } catch (e: BadCredentialsException) {
             logger.error("Authentication error: $e")

@@ -32,6 +32,7 @@ internal class AuthenticationControllerTest : ControllerTest() {
             status { isOk() }
             jsonPath("\$.status") { value("Ok") }
             jsonPath("\$.data.jwt") { value("123") }
+            jsonPath("\$.data.userId") { value(2) }
             jsonPath("\$.data.userType") { value(Inquirer.name) }
         }
     }
@@ -47,6 +48,7 @@ internal class AuthenticationControllerTest : ControllerTest() {
             status { isOk() }
             jsonPath("\$.status") { value("Ok") }
             jsonPath("\$.data.jwt") { value("123") }
+            jsonPath("\$.data.userId") { value(1) }
             jsonPath("\$.data.userType") { value(Imam.name) }
         }
     }

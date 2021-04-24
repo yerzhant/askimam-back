@@ -4,5 +4,6 @@ import kz.azan.askimam.user.domain.model.User
 
 data class AuthenticationResponseDto(
     val jwt: String,
+    val userId: Long,
     val userType: User.Type,
 )
