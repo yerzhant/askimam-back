@@ -22,7 +22,7 @@ class GetUnansweredChats(
                 {
                     chatRepository.findUnansweredChats(offset, pageSize).map { chats ->
                         chats.map { chat ->
-                            ChatProjection(chat.id!!, chat.askedBy, chat.subjectText())
+                            ChatProjection(chat.id!!, chat.type, chat.askedBy, chat.subjectText())
                         }
                     }
                 },

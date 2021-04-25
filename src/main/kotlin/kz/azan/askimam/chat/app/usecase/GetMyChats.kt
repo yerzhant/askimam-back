@@ -14,7 +14,7 @@ class GetMyChats(
     operator fun invoke(offset: Int, pageSize: Int): Either<Declination, List<ChatProjection>> =
         chatRepository.findMyChats(offset, pageSize).map { chats ->
             chats.map { chat ->
-                ChatProjection(chat.id!!, chat.askedBy, chat.subjectText())
+                ChatProjection(chat.id!!, chat.type, chat.askedBy, chat.subjectText())
             }
         }
 }

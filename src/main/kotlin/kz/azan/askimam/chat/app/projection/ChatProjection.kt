@@ -10,6 +10,7 @@ import kz.azan.askimam.user.domain.model.UserRepository
 
 data class ChatProjection(
     val id: Chat.Id,
+    val type: Chat.Type,
     val askedBy: User.Id,
     val subject: Subject,
     val isFavorite: Boolean = false,
@@ -22,6 +23,7 @@ data class ChatProjection(
             ).map {
                 ChatProjection(
                     chat.id!!,
+                    chat.type,
                     chat.askedBy,
                     chat.subjectText(),
                     messages = it,
