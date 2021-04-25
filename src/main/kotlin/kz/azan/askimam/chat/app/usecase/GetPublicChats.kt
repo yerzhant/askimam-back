@@ -19,6 +19,7 @@ class GetPublicChats(
                 chats.map { chat ->
                     ChatProjection(
                         chat.id!!,
+                        chat.askedBy,
                         chat.subjectText(),
                         favorites.map { it.chatId }.contains(chat.id),
                     )

@@ -39,6 +39,7 @@ internal class ChatControllerAuthenticatedTest : ChatControllerTest() {
             jsonPath("\$.status") { value("Ok") }
             jsonPath("\$.data", hasSize<Any>(2))
             jsonPath("\$.data[0].id") { value(1) }
+            jsonPath("\$.data[0].askedBy") { value(2) }
             jsonPath("\$.data[0].subject") { value("Subject") }
             jsonPath("\$.data[0].messages", hasSize<Any>(1))
             jsonPath("\$.data[0].messages[0].id") { value(1) }
@@ -73,6 +74,7 @@ internal class ChatControllerAuthenticatedTest : ChatControllerTest() {
             jsonPath("\$.status") { value("Ok") }
             jsonPath("\$.data", hasSize<Any>(2))
             jsonPath("\$.data[0].id") { value(1) }
+            jsonPath("\$.data[0].askedBy") { value(2) }
             jsonPath("\$.data[0].subject") { value("Subject") }
             jsonPath("\$.data[0].messages", hasSize<Any>(1))
             jsonPath("\$.data[0].messages[0].id") { value(1) }

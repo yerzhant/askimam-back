@@ -5,10 +5,12 @@ import io.vavr.control.Either
 import kz.azan.askimam.chat.domain.model.Chat
 import kz.azan.askimam.chat.domain.model.Subject
 import kz.azan.askimam.common.domain.Declination
+import kz.azan.askimam.user.domain.model.User
 import kz.azan.askimam.user.domain.model.UserRepository
 
 data class ChatProjection(
     val id: Chat.Id,
+    val askedBy: User.Id,
     val subject: Subject,
     val isFavorite: Boolean = false,
     var messages: Seq<MessageProjection>? = null,
@@ -20,6 +22,7 @@ data class ChatProjection(
             ).map {
                 ChatProjection(
                     chat.id!!,
+                    chat.askedBy,
                     chat.subjectText(),
                     messages = it,
                 )

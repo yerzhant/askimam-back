@@ -36,6 +36,7 @@ internal class ChatControllerPublicTest : ChatControllerTest() {
             jsonPath("\$.status") { value("Ok") }
             jsonPath("\$.data", hasSize<Any>(2))
             jsonPath("\$.data[0].id") { value(1) }
+            jsonPath("\$.data[0].askedBy") { value(2) }
             jsonPath("\$.data[0].subject") { value("Subject") }
             jsonPath("\$.data[0].isFavorite") { value(false) }
         }
@@ -64,6 +65,7 @@ internal class ChatControllerPublicTest : ChatControllerTest() {
             status { isOk() }
             jsonPath("\$.status") { value("Ok") }
             jsonPath("\$.data.id") { value(1) }
+            jsonPath("\$.data.askedBy") { value(2) }
             jsonPath("\$.data.subject") { value("Subject") }
             jsonPath("\$.data.messages", hasSize<Any>(3))
             jsonPath("\$.data.messages[0].id") { value(1) }

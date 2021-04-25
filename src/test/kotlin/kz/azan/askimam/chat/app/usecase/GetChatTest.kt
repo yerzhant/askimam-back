@@ -23,6 +23,7 @@ internal class GetChatTest : ChatFixtures() {
 
         assertThat(result).isEqualTo(chatProjection)
         assertThat(result.id).isEqualTo(fixtureChatId1)
+        assertThat(result.askedBy).isEqualTo(fixtureInquirer.id)
         assertThat(result.subject).isEqualTo(fixtureSubject)
         assertThat(result.messages).hasSize(3)
         assertThat(result.messages?.first()?.id).isEqualTo(fixtureMessageId1)
