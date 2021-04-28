@@ -3,9 +3,9 @@ package kz.azan.askimam.chat.infra
 import kz.azan.askimam.chat.domain.model.Chat
 import kz.azan.askimam.chat.domain.model.FcmToken
 import kz.azan.askimam.chat.domain.model.Subject
-import kz.azan.askimam.user.domain.service.GetCurrentUser
 import kz.azan.askimam.common.domain.EventPublisher
 import kz.azan.askimam.user.domain.model.User
+import kz.azan.askimam.user.domain.service.GetCurrentUser
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.MappedCollection
 import org.springframework.data.relational.core.mapping.Table
@@ -32,7 +32,7 @@ data class ChatRow(
     val isViewedByImam: Boolean,
     val isViewedByInquirer: Boolean,
 
-    @MappedCollection(idColumn = "CHAT_ID")
+    @MappedCollection(idColumn = "chat_id")
     val messages: Set<MessageRow>,
 ) {
     companion object {
