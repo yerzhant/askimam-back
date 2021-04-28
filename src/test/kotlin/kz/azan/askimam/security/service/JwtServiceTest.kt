@@ -27,7 +27,7 @@ internal class JwtServiceTest : ChatFixtures() {
 
         assertThat(
             service.sign(fixtureImam).get()
-        ).startsWith("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJhc2tpbWFtLmF6YW4ua3oiLCJpZCI6MSwiZXh")
+        ).startsWith("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJhc2tpbWFtLmF6YW4ua3oiLCJpZCI6MSwi")
     }
 
     @Test
@@ -43,7 +43,7 @@ internal class JwtServiceTest : ChatFixtures() {
     }
 
     @Test
-    internal fun `should fail a verification`() {
+    internal fun `should fail verification`() {
         fixtureClock()
 
         val token = service.sign(fixtureImam).get()

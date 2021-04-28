@@ -41,7 +41,6 @@ class JwtService(
             JWT.create()
                 .withIssuer(issuer)
                 .withIssuedAt(Date.from(Instant.now(clock)))
-//                .withExpiresAt(Date.from(Instant.now(clock).plus(1, ChronoUnit.DAYS)))
                 .withClaim(idClaim, user.id.value)
                 .withClaim(typeClaim, user.type.name)
                 .sign(algorithm)
