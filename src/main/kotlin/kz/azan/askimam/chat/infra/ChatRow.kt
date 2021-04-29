@@ -76,7 +76,7 @@ data class ChatRow(
         isViewedByImam = isViewedByImam,
         isViewedByInquirer = isViewedByInquirer,
 
-        messages = messages.map { it.toDomain(clock) }.sortedBy { it.createdAt },
+        messages = messages.filter { it.text.isNotBlank() }.map { it.toDomain(clock) }.sortedBy { it.createdAt },
 
         clock = clock,
         eventPublisher = eventPublisher,
