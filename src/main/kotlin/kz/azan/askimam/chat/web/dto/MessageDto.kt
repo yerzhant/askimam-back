@@ -9,6 +9,7 @@ data class MessageDto(
     val type: Message.Type,
     val text: String,
     val audio: String?,
+    val duration: String?,
     val author: String?,
     val createdAt: LocalDateTime, // TODO: these two time are to be converted to zoned ones
     val updatedAt: LocalDateTime?,
@@ -19,6 +20,7 @@ data class MessageDto(
             type = message.type,
             text = message.text.value,
             audio = message.audio?.value,
+            duration = message.duration?.value,
             author = message.author?.name?.value,
             createdAt = message.createdAt,
             updatedAt = message.updatedAt,

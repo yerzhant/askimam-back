@@ -12,9 +12,14 @@ import kz.azan.askimam.common.type.NonBlankString
 @UseCase
 class AddAudioMessage(private val chatRepository: ChatRepository) {
 
-    operator fun invoke(id: Chat.Id, audio: NonBlankString, fcmToken: FcmToken): Option<Declination> =
+    operator fun invoke(
+        id: Chat.Id,
+        audio: NonBlankString,
+        duration: NonBlankString,
+        fcmToken: FcmToken,
+    ): Option<Declination> =
         chatRepository.findById(id).fold(
             { some(it) },
-            { it.addAudioMessage(audio, fcmToken).orElse { chatRepository.update(it) } }
+            { it.addAudioMessage(audio, duration, fcmToken).orElse { chatRepository.update(it) } }
         )
 }

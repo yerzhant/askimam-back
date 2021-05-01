@@ -79,7 +79,7 @@ class ChatPolicyTest : ChatFixtures() {
         every { getCurrentUser() } returns some(fixtureInquirer)
 
         fixtureChat(audio).run {
-            val option = addAudioMessage(fixtureAudio, fixtureImamFcmToken)
+            val option = addAudioMessage(fixtureAudio, fixtureAudioDuration, fixtureImamFcmToken)
 
             assertThat(option.isDefined).isTrue
         }

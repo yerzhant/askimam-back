@@ -32,7 +32,12 @@ class MessageController(
 
     @PostMapping("audio")
     fun addAudio(@RequestBody dto: AddAudioMessageDto): ResponseDto =
-        addAudioMessage(Chat.Id(dto.chatId), NonBlankString.of(dto.audio), FcmToken.from(dto.fcmToken)).fold(
+        addAudioMessage(
+            Chat.Id(dto.chatId),
+            NonBlankString.of(dto.audio),
+            NonBlankString.of(dto.duration),
+            FcmToken.from(dto.fcmToken),
+        ).fold(
             { ResponseDto.ok() },
             { ResponseDto.error(it) }
         )

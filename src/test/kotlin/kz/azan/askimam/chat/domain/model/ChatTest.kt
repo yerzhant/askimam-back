@@ -289,7 +289,7 @@ internal class ChatTest : ChatFixtures() {
         )
 
         fixtureChat(audio).run {
-            val option = addAudioMessage(fixtureAudio, fixtureImamFcmToken)
+            val option = addAudioMessage(fixtureAudio, fixtureAudioDuration, fixtureImamFcmToken)
 
             assertThat(option.isEmpty).isTrue
             assertThat(imamFcmToken()).isEqualTo(fixtureImamFcmToken)
@@ -297,6 +297,7 @@ internal class ChatTest : ChatFixtures() {
             assertThat(messages().last().type).isEqualTo(Audio)
             assertThat(messages().last().text()).isEqualTo(audio)
             assertThat(messages().last().audio).isEqualTo(fixtureAudio)
+            assertThat(messages().last().duration).isEqualTo(fixtureAudioDuration)
             assertThat(messages().last().authorId).isEqualTo(fixtureImam.id)
             assertThat(messages().last().authorType).isEqualTo(fixtureImam.type)
         }

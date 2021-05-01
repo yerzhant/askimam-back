@@ -112,17 +112,19 @@ class Chat private constructor(
     )
 
 
-    fun addAudioMessage(audio: NonBlankString, fcmToken: FcmToken): Option<Declination> = getCurrentUser().fold(
-        { some(Declination.withReason("Who are you?")) },
-        { imam ->
-            val message = Message.newAudio(
-                authorId = imam.id,
-                audio = audio,
-                clock = clock,
-            )
-            addMessage(message, AddMessagePolicy.forImam, imam, fcmToken)
-        }
-    )
+    fun addAudioMessage(audio: NonBlankString, duration: NonBlankString, fcmToken: FcmToken): Option<Declination> =
+        getCurrentUser().fold(
+            { some(Declination.withReason("Who are you?")) },
+            { imam ->
+                val message = Message.newAudio(
+                    authorId = imam.id,
+                    audio = audio,
+                    duration = duration,
+                    clock = clock,
+                )
+                addMessage(message, AddMessagePolicy.forImam, imam, fcmToken)
+            }
+        )
 
 
     private fun addMessage(

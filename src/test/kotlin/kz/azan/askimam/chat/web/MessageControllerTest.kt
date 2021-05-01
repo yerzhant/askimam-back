@@ -92,36 +92,43 @@ internal class MessageControllerTest : ControllerTest() {
     @Test
     @WithPrincipal(authority = Imam)
     internal fun `should add an audio message`() {
-        every { addAudioMessage(fixtureChatId1, fixtureAudio, fixtureImamFcmToken) } returns none()
+        every {
+            addAudioMessage(
+                fixtureChatId1,
+                fixtureAudio,
+                fixtureAudioDuration,
+                fixtureImamFcmToken,
+            )
+        } returns none()
 
         mvc.post("$url/audio") {
             contentType = APPLICATION_JSON
-            content = objectMapper.writeValueAsString(AddAudioMessageDto(1, "audio.mp3", "123"))
+            content = objectMapper.writeValueAsString(AddAudioMessageDto(1, "audio.mp3", "01:23", "123"))
         }.andExpect {
             status { isOk() }
             jsonPath("\$.status") { value("Ok") }
         }
 
-        verify { addAudioMessage(fixtureChatId1, fixtureAudio, fixtureImamFcmToken) }
+        verify { addAudioMessage(fixtureChatId1, fixtureAudio, fixtureAudioDuration, fixtureImamFcmToken) }
     }
 
     @Test
     @WithPrincipal(authority = Imam)
     internal fun `should not add an audio message`() {
         every {
-            addAudioMessage(fixtureChatId1, fixtureAudio, fixtureImamFcmToken)
+            addAudioMessage(fixtureChatId1, fixtureAudio, fixtureAudioDuration, fixtureImamFcmToken)
         } returns some(Declination.withReason("x"))
 
         mvc.post("$url/audio") {
             contentType = APPLICATION_JSON
-            content = objectMapper.writeValueAsString(AddAudioMessageDto(1, "audio.mp3", "123"))
+            content = objectMapper.writeValueAsString(AddAudioMessageDto(1, "audio.mp3", "01:23", "123"))
         }.andExpect {
             status { isOk() }
             jsonPath("\$.status") { value("Error") }
             jsonPath("\$.error") { value("x") }
         }
 
-        verify { addAudioMessage(fixtureChatId1, fixtureAudio, fixtureImamFcmToken) }
+        verify { addAudioMessage(fixtureChatId1, fixtureAudio, fixtureAudioDuration, fixtureImamFcmToken) }
     }
 
     @Test

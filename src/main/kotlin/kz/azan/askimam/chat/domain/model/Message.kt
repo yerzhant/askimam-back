@@ -14,9 +14,9 @@ class Message private constructor(
 
     val id: Id?,
     val type: Type,
-    private var text: NonBlankString,   // TODO: make this nullable and return some text, probably Audio,
-                                        // if the type of this message is Audio
+    private var text: NonBlankString,
     val audio: NonBlankString? = null,
+    val duration: NonBlankString? = null,
 
     val authorId: User.Id,
     val authorType: User.Type,
@@ -54,6 +54,7 @@ class Message private constructor(
 
         fun newAudio(
             audio: NonBlankString,
+            duration: NonBlankString,
             authorId: User.Id,
 
             clock: Clock,
@@ -64,6 +65,7 @@ class Message private constructor(
                 type = Audio,
                 text = text,
                 audio = audio,
+                duration = duration,
 
                 authorId = authorId,
                 authorType = Imam,
@@ -76,13 +78,14 @@ class Message private constructor(
             id: Id,
             type: Type,
             text: NonBlankString,
-            audio: NonBlankString?,
+            audio: NonBlankString? = null,
+            duration: NonBlankString? = null,
 
             authorId: User.Id,
             authorType: User.Type,
 
             createdAt: LocalDateTime,
-            updatedAt: LocalDateTime?,
+            updatedAt: LocalDateTime? = null,
 
             clock: Clock,
         ) =
@@ -91,6 +94,7 @@ class Message private constructor(
                 type = type,
                 text = text,
                 audio = audio,
+                duration = duration,
 
                 authorId = authorId,
                 authorType = authorType,
@@ -118,7 +122,7 @@ class Message private constructor(
     }
 
     override fun toString(): String {
-        return "Message(id=$id, type=$type, authorId=$authorId, text=$text, audio=$audio, createdAt=$createdAt, updatedAt=$updatedAt)"
+        return "Message(id=$id, type=$type, authorId=$authorId, text=$text, audio=$audio, duration=$duration, createdAt=$createdAt, updatedAt=$updatedAt)"
     }
 
     data class Id(val value: Long)

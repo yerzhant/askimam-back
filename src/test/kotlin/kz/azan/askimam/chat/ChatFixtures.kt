@@ -91,13 +91,11 @@ open class ChatFixtures {
                     id = fixtureMessageId1,
                     type = Text,
                     text = fixtureMessage,
-                    audio = null,
 
                     authorId = fixtureInquirerId,
                     authorType = fixtureInquirer.type,
 
                     createdAt = now,
-                    updatedAt = null,
 
                     clock = clock,
                 ),
@@ -105,13 +103,11 @@ open class ChatFixtures {
                     id = fixtureMessageId2,
                     type = Text,
                     text = fixtureMessage,
-                    audio = null,
 
                     authorId = fixtureImamId,
                     authorType = fixtureImam.type,
 
                     createdAt = now,
-                    updatedAt = null,
 
                     clock = clock,
                 ),
@@ -120,12 +116,12 @@ open class ChatFixtures {
                     type = Audio,
                     text = fixtureAudioText,
                     audio = fixtureAudio,
+                    duration = fixtureAudioDuration,
 
                     authorId = fixtureImamId,
                     authorType = fixtureImam.type,
 
                     createdAt = now,
-                    updatedAt = null,
 
                     clock = clock,
                 ),
@@ -166,13 +162,11 @@ open class ChatFixtures {
                         id = fixtureMessageId1,
                         type = Text,
                         text = fixtureMessage,
-                        audio = null,
 
                         authorId = fixtureInquirerId,
                         authorType = fixtureInquirer.type,
 
                         createdAt = now,
-                        updatedAt = null,
 
                         clock = clock,
                     ),
@@ -205,13 +199,11 @@ open class ChatFixtures {
                         id = fixtureMessageId1,
                         type = Text,
                         text = fixtureMessage,
-                        audio = null,
 
                         authorId = fixtureInquirerId,
                         authorType = fixtureInquirer.type,
 
                         createdAt = later,
-                        updatedAt = null,
 
                         clock = clock,
                     ),
@@ -236,7 +228,6 @@ open class ChatFixtures {
             id = id,
             type = Text,
             text = text,
-            audio = null,
 
             authorId = userId,
             authorType = userType,
@@ -252,12 +243,12 @@ open class ChatFixtures {
         type = Audio,
         text = fixtureAudioText,
         audio = fixtureAudio,
+        duration = fixtureAudioDuration,
 
         authorId = fixtureImamId,
         authorType = fixtureImam.type,
 
         createdAt = timeAfter(0),
-        updatedAt = null,
 
         clock = clock,
     )
@@ -292,6 +283,7 @@ open class ChatFixtures {
 
     val fixtureAudio = NonBlankString.of("audio.mp3")
     val fixtureAudioText = NonBlankString.of("Аудио")
+    val fixtureAudioDuration = NonBlankString.of("01:23")
 
     val fixtureNow: LocalDateTime = LocalDateTime.now(fixedClock)
 
