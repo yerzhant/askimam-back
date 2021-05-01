@@ -17,14 +17,19 @@ class GetChat(
     private val chatRepository: ChatRepository,
     private val userRepository: UserRepository,
 ) {
-    operator fun invoke(id: Chat.Id): Either<Declination, ChatProjection> = getCurrentUser().fold(
-        { left(Declination.withReason("Who are you?")) },
-        { currentUser ->
-            val policy = GetChatPolicy.getFor(currentUser)
-
-            chatRepository.findById(id).flatMap {
-                policy.isAllowed(it, currentUser).flatMap { chat -> ChatProjection.from(chat, userRepository) }
-            }
+    operator fun invoke(id: Chat.Id): Either<Declination, ChatProjection> = chatRepository.findById(id).flatMap {
+        if (it.isVisibleToPublic()) {
+        println(it)
+            ChatProjection.from(it, userRepository)
+        } else {
+            getCurrentUser().fold(
+                { left(Declination.withReason("Who are you?")) },
+                { currentUser ->
+                    GetChatPolicy
+                        .getFor(currentUser)
+                        .isAllowed(it, currentUser).flatMap { chat -> ChatProjection.from(chat, userRepository) }
+                }
+            )
         }
-    )
+    }
 }

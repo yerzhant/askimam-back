@@ -71,7 +71,6 @@ internal class GetChatTest : ChatFixtures() {
     @Test
     internal fun `should return a publicly visible chat`() {
         val chatProjection = fixtures()
-        every { getCurrentUser() } returns some(fixtureAnotherInquirer)
 
         assertThat(underTest().get()).isEqualTo(chatProjection)
     }
