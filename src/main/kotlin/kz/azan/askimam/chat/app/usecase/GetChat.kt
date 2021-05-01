@@ -19,7 +19,6 @@ class GetChat(
 ) {
     operator fun invoke(id: Chat.Id): Either<Declination, ChatProjection> = chatRepository.findById(id).flatMap {
         if (it.isVisibleToPublic()) {
-        println(it)
             ChatProjection.from(it, userRepository)
         } else {
             getCurrentUser().fold(
