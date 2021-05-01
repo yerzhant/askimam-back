@@ -14,6 +14,7 @@ data class MessageProjection(
     val id: Message.Id,
     val type: Message.Type,
     val text: NonBlankString,
+    val audio: NonBlankString?,
     val author: User?,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime?,
@@ -22,12 +23,13 @@ data class MessageProjection(
         fun from(message: Message, userRepository: UserRepository): Either<Declination, MessageProjection> =
             getUserIfNecessary(message, userRepository).map {
                 MessageProjection(
-                    message.id!!,
-                    message.type,
-                    message.text(),
-                    it,
-                    message.createdAt,
-                    message.updatedAt(),
+                    id = message.id!!,
+                    type = message.type,
+                    text = message.text(),
+                    audio = message.audio,
+                    author = it,
+                    createdAt = message.createdAt,
+                    updatedAt = message.updatedAt(),
                 )
             }
 

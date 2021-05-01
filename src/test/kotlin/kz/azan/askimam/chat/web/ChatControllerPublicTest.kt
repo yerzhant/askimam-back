@@ -80,6 +80,13 @@ internal class ChatControllerPublicTest : ChatControllerTest() {
             jsonPath("\$.data.messages[1].author") { value("Imam") }
             jsonPath("\$.data.messages[1].createdAt") { `is`(timeAfter(0)) }
             jsonPath("\$.data.messages[1].updatedAt") { doesNotExist() }
+            jsonPath("\$.data.messages[2].id") { value(3) }
+            jsonPath("\$.data.messages[2].type") { value("Audio") }
+            jsonPath("\$.data.messages[2].text") { value("Аудио") }
+            jsonPath("\$.data.messages[2].audio") { value("audio.mp3") }
+            jsonPath("\$.data.messages[2].author") { value("Imam") }
+            jsonPath("\$.data.messages[2].createdAt") { `is`(timeAfter(0)) }
+            jsonPath("\$.data.messages[2].updatedAt") { doesNotExist() }
         }
 
         verify { getChatUseCase(fixtureChatId1) }

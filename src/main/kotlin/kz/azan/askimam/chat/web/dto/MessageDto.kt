@@ -8,18 +8,20 @@ data class MessageDto(
     val id: Long,
     val type: Message.Type,
     val text: String,
+    val audio: String?,
     val author: String?,
     val createdAt: LocalDateTime, // TODO: these two time are to be converted to zoned ones
     val updatedAt: LocalDateTime?,
 ) {
     companion object {
         fun from(message: MessageProjection) = MessageDto(
-            message.id.value,
-            message.type,
-            message.text.value,
-            message.author?.name?.value,
-            message.createdAt,
-            message.updatedAt,
+            id = message.id.value,
+            type = message.type,
+            text = message.text.value,
+            audio = message.audio?.value,
+            author = message.author?.name?.value,
+            createdAt = message.createdAt,
+            updatedAt = message.updatedAt,
         )
     }
 }
