@@ -29,7 +29,7 @@ internal class ChatJdbcRepositoryTestIT(
     @Test
     internal fun `should get a chat by an id - dao`() {
         dao.findById(1).get()
-        val public = dao.findByTypeAndIsVisibleToPublicIsTrue(Public, PageRequest.of(0, 1))
+        val public = dao.findByTypeAndIsVisibleToPublicIsTrueOrderByUpdatedAtDesc(Public, PageRequest.of(0, 1))
         assertThat(public).hasSize(1)
     }
 

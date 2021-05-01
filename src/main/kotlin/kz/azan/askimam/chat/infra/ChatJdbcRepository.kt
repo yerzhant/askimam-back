@@ -37,7 +37,7 @@ class ChatJdbcRepository(
             )
 
     override fun findPublicChats(offset: Int, pageSize: Int): Either<Declination, List<Chat>> =
-        Try { dao.findByTypeAndIsVisibleToPublicIsTrue(Public, PageRequest.of(offset, pageSize)) }
+        Try { dao.findByTypeAndIsVisibleToPublicIsTrueOrderByUpdatedAtDesc(Public, PageRequest.of(offset, pageSize)) }
             .toEither()
             .bimap(
                 { Declination.from(it) },

@@ -78,7 +78,7 @@ internal class ChatJdbcRepositoryTest : ChatFixtures() {
     internal fun `should find public chats`() {
         fixtureClock()
         every {
-            dao.findByTypeAndIsVisibleToPublicIsTrue(Public, any())
+            dao.findByTypeAndIsVisibleToPublicIsTrueOrderByUpdatedAtDesc(Public, any())
         } returns fixtureSavedTwoChats().map { ChatRow.from(it) }
 
         assertThat(repository.findPublicChats(0, 20).get()).hasSize(2)
