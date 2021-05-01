@@ -13,6 +13,7 @@ data class MessageRow(
     val type: Message.Type,
     val text: String,
     val audio: String?,
+    val duration: String?,
 
     val authorId: Long,
     val authorType: User.Type,
@@ -26,6 +27,7 @@ data class MessageRow(
             type = message.type,
             text = message.text().value,
             audio = message.audio?.value,
+            duration = message.duration?.value,
 
             authorId = message.authorId.value,
             authorType = message.authorType,
@@ -40,6 +42,7 @@ data class MessageRow(
         type = type,
         text = NonBlankString.of(text),
         audio = audio?.run { NonBlankString.of(audio) },
+        duration = duration?.run { NonBlankString.of(duration) },
 
         authorId = User.Id(authorId),
         authorType = authorType,
