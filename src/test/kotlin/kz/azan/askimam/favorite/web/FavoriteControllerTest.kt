@@ -29,7 +29,7 @@ internal class FavoriteControllerTest : ControllerTest() {
     private val url = "/favorites"
 
     @MockkBean
-    private lateinit var getMyFavorites: GetMyFavorites
+    private lateinit var getMyFavoritesMock: GetMyFavorites
 
     @MockkBean
     private lateinit var addChatToFavorites: AddChatToFavorites
@@ -47,7 +47,7 @@ internal class FavoriteControllerTest : ControllerTest() {
 
     @Test
     internal fun `should get list of favorites`() {
-        every { getMyFavorites() } returns right(sequenceOfFavoriteProjectionsFixture)
+        every { getMyFavoritesMock() } returns right(sequenceOfFavoriteProjectionsFixture)
 
         mvc.get(url).andExpect {
             status { isOk() }
@@ -61,7 +61,7 @@ internal class FavoriteControllerTest : ControllerTest() {
 
     @Test
     internal fun `should not get list of favorites`() {
-        every { getMyFavorites() } returns left(Declination.withReason("oops!"))
+        every { getMyFavoritesMock() } returns left(Declination.withReason("oops!"))
 
         mvc.get(url).andExpect {
             status { isOk() }

@@ -13,6 +13,7 @@ import kz.azan.askimam.chat.domain.model.Message.Type.Audio
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
 import kz.azan.askimam.common.domain.EventPublisher
 import kz.azan.askimam.common.type.NonBlankString
+import kz.azan.askimam.favorite.app.usecase.GetMyFavorites
 import kz.azan.askimam.user.domain.model.User
 import kz.azan.askimam.user.domain.model.UserRepository
 import kz.azan.askimam.user.domain.service.GetCurrentUser
@@ -24,6 +25,7 @@ open class ChatFixtures {
     val getCurrentUser = mockk<GetCurrentUser>()
     val chatRepository = mockk<ChatRepository>()
     val userRepository = mockk<UserRepository>()
+    val getMyFavorites = mockk<GetMyFavorites>()
     val getChat = mockk<GetChat>()
 
     private val fixedClock: Clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())

@@ -32,7 +32,9 @@ internal class ChatControllerAuthenticatedTest : ChatControllerTest() {
 
     @Test
     internal fun `should get my chats`() {
-        every { getMyChats(0, 20) } returns right(listOfChatProjectionsFixture())
+        every { getMyChats(0, 20) } returns right(listOfChatProjectionsFixture()
+            .map { it.copy(isFavorite = true) }
+        )
 
         mvc.get("$url/my/0/20").andExpect {
             status { isOk() }
@@ -42,6 +44,7 @@ internal class ChatControllerAuthenticatedTest : ChatControllerTest() {
             jsonPath("\$.data[0].type") { value(Public.name) }
             jsonPath("\$.data[0].askedBy") { value(2) }
             jsonPath("\$.data[0].subject") { value("Subject") }
+            jsonPath("\$.data[0].isFavorite") { value(true) }
             jsonPath("\$.data[0].messages", hasSize<Any>(1))
             jsonPath("\$.data[0].messages[0].id") { value(1) }
             jsonPath("\$.data[0].messages[0].type") { value("Text") }

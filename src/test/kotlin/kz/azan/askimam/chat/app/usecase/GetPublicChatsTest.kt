@@ -1,7 +1,6 @@
 package kz.azan.askimam.chat.app.usecase
 
 import io.mockk.every
-import io.mockk.mockk
 import io.vavr.kotlin.left
 import io.vavr.kotlin.right
 import io.vavr.kotlin.toVavrList
@@ -9,13 +8,10 @@ import kz.azan.askimam.chat.domain.model.Subject
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.favorite.FavoriteFixtures
 import kz.azan.askimam.favorite.app.projection.FavoriteProjection
-import kz.azan.askimam.favorite.app.usecase.GetMyFavorites
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 internal class GetPublicChatsTest : FavoriteFixtures() {
-
-    private val getMyFavorites = mockk<GetMyFavorites>()
 
     @Test
     internal fun `should return a list of projections of public chats`() {
