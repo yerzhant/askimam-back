@@ -1,5 +1,6 @@
 package kz.azan.askimam.user.infra
 
+import kz.azan.askimam.chat.domain.model.FcmToken
 import kz.azan.askimam.common.type.NonBlankString
 import kz.azan.askimam.user.domain.model.User
 import kz.azan.askimam.user.domain.model.User.Type.Imam
@@ -24,11 +25,12 @@ data class UserRow(
     val roles: Set<AuthAssignmentRow>,
 ) {
 
-    fun toDomain() = User(
+    fun toDomain(tokens: Set<FcmTokenRow>) = User(
         id = User.Id(id),
         type = getType(),
         name = NonBlankString.of(name()),
         passwordHash = NonBlankString.of(passwordHash),
+        fcmTokens = tokens.map { FcmToken.from(it.value) }.toMutableSet()
     )
 
     private fun name() = "$firstName $lastName"

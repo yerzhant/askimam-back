@@ -10,9 +10,12 @@ import org.springframework.test.context.jdbc.Sql
 
 @DataJdbcIT
 @Sql("/scripts/users.sql")
-class UserJdbcRepositoryIT(private val dao: UserDao) : ChatFixtures() {
+class UserJdbcRepositoryIT(
+    private val dao: UserDao,
+    private val fcmTokenDao: FcmTokenDao,
+) : ChatFixtures() {
 
-    private val repository = UserJdbcRepository(dao)
+    private val repository = UserJdbcRepository(dao, fcmTokenDao)
 
     @Test
     internal fun `raw access`() {
@@ -50,5 +53,22 @@ class UserJdbcRepositoryIT(private val dao: UserDao) : ChatFixtures() {
     @Test
     internal fun `should not find by username and status`() {
         assertThat(repository.findByUsernameAndStatus("the-imam", 0).isLeft).isTrue
+    }
+
+    @Test
+    internal fun `should save tokens`() {
+        val user = User(
+            id = fixtureInquirerId,
+            type = fixtureInquirer.type,
+            name = fixtureInquirer.name,
+            passwordHash = fixtureInquirer.passwordHash,
+            fcmTokens = setOf(fixtureInquirerFcmToken).toMutableSet(),
+        )
+
+        repository.saveTokens(user)
+
+        val foundTokens = fcmTokenDao.findByUserId(fixtureInquirerId.value)
+        assertThat(foundTokens).hasSize(1)
+        assertThat(foundTokens.first().value).isEqualTo(fixtureInquirerFcmToken.value.value)
     }
 }

@@ -8,4 +8,5 @@ import org.springframework.transaction.annotation.Transactional
 interface UserRepository {
     fun findById(id: User.Id): Either<Declination, User>
     fun findByUsernameAndStatus(username: String?, status: Int): Either<Declination, User>
+    fun saveTokens(user: User)
 }
