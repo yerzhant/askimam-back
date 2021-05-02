@@ -7,6 +7,5 @@ import org.springframework.stereotype.Component
 @Component
 class LoggingEventPublisher : EventPublisher {
     override fun publish(event: Event) {
-        println(event)
     }
 }
