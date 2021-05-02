@@ -2,25 +2,30 @@ package kz.azan.askimam.security.web
 
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
-import io.mockk.verify
 import io.vavr.control.Either.right
 import io.vavr.kotlin.left
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.meta.ControllerTest
+import kz.azan.askimam.security.service.JwtService
+import kz.azan.askimam.security.service.UserService
 import kz.azan.askimam.security.web.dto.LoginDto
+import kz.azan.askimam.security.web.usecase.Login
 import kz.azan.askimam.user.domain.model.User.Type.Imam
 import kz.azan.askimam.user.domain.model.User.Type.Inquirer
 import kz.azan.askimam.user.domain.model.UserRepository
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.context.annotation.Bean
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.test.web.servlet.post
-import kz.azan.askimam.user.domain.model.User as AzanUser
 
 @WebMvcTest(AuthenticationController::class)
+
 internal class AuthenticationControllerTest : ControllerTest() {
 
     private val url = "/auth"
@@ -48,18 +53,6 @@ internal class AuthenticationControllerTest : ControllerTest() {
             jsonPath("\$.data.userId") { value(fixtureInquirerId.value) }
             jsonPath("\$.data.userType") { value(Inquirer.name) }
         }
-
-        verify {
-            userRepositoryMockBean.saveTokens(
-                AzanUser(
-                    fixtureInquirerId,
-                    fixtureInquirer.type,
-                    fixtureInquirer.name,
-                    fixturePasswordHash,
-                    mutableSetOf(fixtureInquirerFcmToken),
-                )
-            )
-        }
     }
 
     @Test
@@ -81,18 +74,6 @@ internal class AuthenticationControllerTest : ControllerTest() {
             jsonPath("\$.data.jwt") { value("123") }
             jsonPath("\$.data.userId") { value(fixtureImamId.value) }
             jsonPath("\$.data.userType") { value(Imam.name) }
-        }
-
-        verify {
-            userRepositoryMockBean.saveTokens(
-                AzanUser(
-                    fixtureImamId,
-                    fixtureImam.type,
-                    fixtureImam.name,
-                    fixturePasswordHash,
-                    mutableSetOf(fixtureImamFcmToken),
-                )
-            )
         }
     }
 
@@ -152,25 +133,6 @@ internal class AuthenticationControllerTest : ControllerTest() {
     }
 
     @Test
-    internal fun `should not authenticate a user - tokens are not saved`() {
-        fixtures()
-        every { userRepositoryMockBean.saveTokens(any()) } throws Exception("nope")
-
-        mvc.post("$url/login") {
-            contentType = APPLICATION_JSON
-            content = objectMapper.writeValueAsString(
-                LoginDto(
-                    fixtureInquirer.name.value,
-                    "password",
-                    fixtureInquirerFcmToken.value.value,
-                )
-            )
-        }.andExpect {
-            status { isUnauthorized() }
-        }
-    }
-
-    @Test
     internal fun `should not authenticate a user - blank login and password`() {
         mvc.post("$url/login") {
             contentType = APPLICATION_JSON
@@ -202,5 +164,16 @@ internal class AuthenticationControllerTest : ControllerTest() {
         every { jwtService.sign(fixtureImam) } returns right("123")
 
         every { userRepositoryMockBean.saveTokens(any()) } returns Unit
+    }
+
+    @TestConfiguration
+    class Config(
+        private val jwtService: JwtService,
+        private val userService: UserService,
+        private val userRepository: UserRepository,
+        private val authenticationManager: AuthenticationManager,
+    ) {
+        @Bean
+        fun login() = Login(jwtService, userService, userRepository, authenticationManager)
     }
 }
