@@ -256,15 +256,22 @@ open class ChatFixtures {
     )
 
     @Suppress("SpellCheckingInspection")
-    val fixturePasswordHash = NonBlankString.of("\$2y\$12\$CvQSK0JEQkkJN0T2GXDcduyIoeROqxryB3FIbc26GsXN4zy3CqDSG") // password
+    val fixturePasswordHash =
+        NonBlankString.of("\$2y\$12\$CvQSK0JEQkkJN0T2GXDcduyIoeROqxryB3FIbc26GsXN4zy3CqDSG") // password
 
     val fixtureImam = User(User.Id(1), User.Type.Imam, NonBlankString.of("Imam"), fixturePasswordHash)
     val fixtureImamId = fixtureImam.id
     val fixtureImamFcmToken = FcmToken(NonBlankString.of("123"))
 
-    val fixtureInquirer = User(User.Id(2), User.Type.Inquirer, NonBlankString.of("Inquirer"), fixturePasswordHash)
-    val fixtureInquirerId = fixtureInquirer.id
     val fixtureInquirerFcmToken = FcmToken(NonBlankString.of("456"))
+    val fixtureInquirer = User(
+        id = User.Id(2),
+        type = User.Type.Inquirer,
+        name = NonBlankString.of("Inquirer"),
+        passwordHash = fixturePasswordHash,
+        fcmTokens = setOf(fixtureInquirerFcmToken).toMutableSet(),
+    )
+    val fixtureInquirerId = fixtureInquirer.id
 
     val fixtureAnotherInquirer =
         User(User.Id(20), User.Type.Inquirer, NonBlankString.of("Some guy"), fixturePasswordHash)

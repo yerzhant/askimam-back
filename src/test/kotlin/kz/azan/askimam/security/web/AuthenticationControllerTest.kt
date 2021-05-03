@@ -2,14 +2,20 @@ package kz.azan.askimam.security.web
 
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
+import io.mockk.verify
 import io.vavr.control.Either.right
 import io.vavr.kotlin.left
+import io.vavr.kotlin.none
+import io.vavr.kotlin.some
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.meta.ControllerTest
+import kz.azan.askimam.meta.WithPrincipal
 import kz.azan.askimam.security.service.JwtService
 import kz.azan.askimam.security.service.UserService
 import kz.azan.askimam.security.web.dto.LoginDto
+import kz.azan.askimam.security.web.dto.LogoutDto
 import kz.azan.askimam.security.web.usecase.Login
+import kz.azan.askimam.security.web.usecase.Logout
 import kz.azan.askimam.user.domain.model.User.Type.Imam
 import kz.azan.askimam.user.domain.model.User.Type.Inquirer
 import kz.azan.askimam.user.domain.model.UserRepository
@@ -32,6 +38,9 @@ internal class AuthenticationControllerTest : ControllerTest() {
 
     @MockkBean
     private lateinit var userRepositoryMockBean: UserRepository
+
+    @MockkBean
+    private lateinit var logout: Logout
 
     @Test
     internal fun `should authenticate a user`() {
@@ -137,6 +146,52 @@ internal class AuthenticationControllerTest : ControllerTest() {
         mvc.post("$url/login") {
             contentType = APPLICATION_JSON
             content = objectMapper.writeValueAsString(LoginDto("", "", "123"))
+        }.andExpect {
+            status { isBadRequest() }
+        }
+    }
+
+    @Test
+    @WithPrincipal
+    internal fun `should log out a user`() {
+        val logoutDto = LogoutDto(fixtureInquirerFcmToken.value.value)
+        fixtures()
+        every { logout(logoutDto) } returns none()
+
+        mvc.post("$url/logout") {
+            contentType = APPLICATION_JSON
+            content = objectMapper.writeValueAsString(logoutDto)
+        }.andExpect {
+            status { isOk() }
+            jsonPath("\$.status") { value("Ok") }
+        }
+
+        verify { logout(logoutDto) }
+    }
+
+    @Test
+    @WithPrincipal
+    internal fun `should not log out a user`() {
+        val logoutDto = LogoutDto(fixtureInquirerFcmToken.value.value)
+        fixtures()
+        every { logout(logoutDto) } returns some(Declination.withReason("x"))
+
+        mvc.post("$url/logout") {
+            contentType = APPLICATION_JSON
+            content = objectMapper.writeValueAsString(logoutDto)
+        }.andExpect {
+            status { isOk() }
+            jsonPath("\$.status") { value("Error") }
+            jsonPath("\$.error") { value("x") }
+        }
+    }
+
+    @Test
+    @WithPrincipal
+    internal fun `should not log out a user - invalid dto`() {
+        mvc.post("$url/logout") {
+            contentType = APPLICATION_JSON
+            content = objectMapper.writeValueAsString(LogoutDto(""))
         }.andExpect {
             status { isBadRequest() }
         }

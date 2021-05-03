@@ -1,6 +1,7 @@
 package kz.azan.askimam.user.infra
 
 import kz.azan.askimam.chat.ChatFixtures
+import kz.azan.askimam.chat.domain.model.FcmToken
 import kz.azan.askimam.common.type.NonBlankString
 import kz.azan.askimam.meta.DataJdbcIT
 import kz.azan.askimam.user.domain.model.User
@@ -57,18 +58,30 @@ class UserJdbcRepositoryIT(
 
     @Test
     internal fun `should save tokens`() {
-        val user = User(
-            id = fixtureInquirerId,
-            type = fixtureInquirer.type,
-            name = fixtureInquirer.name,
-            passwordHash = fixtureInquirer.passwordHash,
-            fcmTokens = setOf(fixtureInquirerFcmToken).toMutableSet(),
-        )
-
-        repository.saveTokens(user)
+        repository.saveTokens(fixtureInquirer)
 
         val foundTokens = fcmTokenDao.findByUserId(fixtureInquirerId.value)
-        assertThat(foundTokens).hasSize(1)
-        assertThat(foundTokens.first().value).isEqualTo(fixtureInquirerFcmToken.value.value)
+        assertThat(foundTokens).hasSize(2)
+        assertThat(foundTokens.first { it.value == fixtureInquirerFcmToken.value.value }.value).isEqualTo(
+            fixtureInquirerFcmToken.value.value
+        )
+    }
+
+    @Test
+    internal fun `should delete a token`() {
+        assertThat(fcmTokenDao.findByUserId(fixtureInquirerId.value)).hasSize(1)
+
+        repository.deleteToken(FcmToken(NonBlankString.of("456x")), fixtureInquirer)
+
+        assertThat(fcmTokenDao.findByUserId(fixtureInquirerId.value)).hasSize(0)
+    }
+
+    @Test
+    internal fun `should not delete a token`() {
+        assertThat(fcmTokenDao.findByUserId(fixtureInquirerId.value)).hasSize(1)
+
+        repository.deleteToken(fixtureInquirerFcmToken, fixtureImam)
+
+        assertThat(fcmTokenDao.findByUserId(fixtureInquirerId.value)).hasSize(1)
     }
 }

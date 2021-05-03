@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import io.mockk.verifySequence
+import io.vavr.kotlin.some
 import kz.azan.askimam.chat.ChatFixtures
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.common.type.NonBlankString
@@ -129,6 +130,28 @@ internal class UserJdbcRepositoryTest : ChatFixtures() {
         every { fcmTokenDao.saveAll(tokens) } throws SQLException("x")
 
         assertThrows<SQLException> { repository.saveTokens(user) }
+    }
+
+    @Test
+    internal fun `should delete a token`() {
+        every { fcmTokenDao.deleteByValueAndUserId(any(), any()) } returns Unit
+
+        val deleteToken = repository.deleteToken(fixtureInquirerFcmToken, fixtureInquirer)
+
+        assertThat(deleteToken.isEmpty).isTrue
+
+        verify {
+            fcmTokenDao.deleteByValueAndUserId(fixtureInquirerFcmToken.value.value, fixtureInquirerId.value)
+        }
+    }
+
+    @Test
+    internal fun `should not delete a token`() {
+        every { fcmTokenDao.deleteByValueAndUserId(any(), any()) } throws Exception("x")
+
+        val deleteToken = repository.deleteToken(fixtureInquirerFcmToken, fixtureInquirer)
+
+        assertThat(deleteToken).isEqualTo(some(Declination.from(Exception("x"))))
     }
 
     private fun saveTokensFixture(): Pair<User, Set<FcmTokenRow>> {

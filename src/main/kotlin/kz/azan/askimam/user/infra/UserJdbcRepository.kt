@@ -1,7 +1,11 @@
 package kz.azan.askimam.user.infra
 
 import io.vavr.control.Either
+import io.vavr.control.Option
 import io.vavr.kotlin.Try
+import io.vavr.kotlin.none
+import io.vavr.kotlin.some
+import kz.azan.askimam.chat.domain.model.FcmToken
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.user.domain.model.User
 import kz.azan.askimam.user.domain.model.UserRepository
@@ -38,4 +42,11 @@ class UserJdbcRepository(
         fcmTokenDao.deleteAll(tokens)
         fcmTokenDao.saveAll(tokens)
     }
+
+    override fun deleteToken(fcmToken: FcmToken, user: User): Option<Declination> =
+        Try { fcmTokenDao.deleteByValueAndUserId(fcmToken.value.value, user.id.value) }
+            .fold(
+                { some(Declination.from(it)) },
+                { none() }
+            )
 }

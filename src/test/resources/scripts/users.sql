@@ -32,3 +32,5 @@ insert into users(
 
 
 insert into auth_assignment values ('ask-imam', '1');
+
+insert into fcm_tokens values ('456x', 2);
