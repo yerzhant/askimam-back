@@ -29,7 +29,7 @@ internal class AddTextMessageTest : ChatFixtures() {
 
         verifySequence {
             chatRepository.findById(any())
-            eventPublisher.publish(MessageAdded(fixtureSubject, fixtureNewMessage))
+            eventPublisher.publish(MessageAdded(fixtureSubject, fixtureNewMessage, fixtureImamId))
             chatRepository.update(any())
         }
     }

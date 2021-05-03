@@ -150,7 +150,17 @@ class Chat private constructor(
         }
 
         messages.add(message)
-        eventPublisher.publish(MessageAdded(subject, message.text()))
+
+        eventPublisher.publish(
+            MessageAdded(
+                subject,
+                message.text(),
+                when (user.type) {
+                    Inquirer -> answeredBy
+                    Imam -> askedBy
+                }
+            )
+        )
     }
 
     fun updateTextMessage(id: Message.Id, text: NonBlankString, fcmToken: FcmToken): Option<Declination> {

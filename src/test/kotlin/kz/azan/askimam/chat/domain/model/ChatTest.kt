@@ -303,7 +303,7 @@ internal class ChatTest : ChatFixtures() {
         }
 
         verify {
-            eventPublisher.publish(MessageAdded(fixtureSubject, audio))
+            eventPublisher.publish(MessageAdded(fixtureSubject, audio, fixtureInquirerId))
         }
     }
 

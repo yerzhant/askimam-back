@@ -30,7 +30,7 @@ internal class AddAudioMessageTest : ChatFixtures() {
 
         verifySequence {
             chatRepository.findById(any())
-            eventPublisher.publish(MessageAdded(fixtureSubject, fixtureAudioText))
+            eventPublisher.publish(MessageAdded(fixtureSubject, fixtureAudioText, fixtureInquirerId))
             chatRepository.update(any())
         }
     }
