@@ -9,6 +9,6 @@ import org.springframework.transaction.annotation.Transactional
 interface UserDao : CrudRepository<UserRow, Int> {
     fun findByUsernameAndStatus(username: String?, status: Int): UserRow?
 
-    @Query("select * from users u join auth_assignment a on u.id = a.user_id and item_name = :role")
+    @Query("select u.* from users u join auth_assignment a on u.id = a.user_id and item_name = :role")
     fun findAllByRole(role: String): List<UserRow>
 }
