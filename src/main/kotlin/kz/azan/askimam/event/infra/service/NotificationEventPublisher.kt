@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 
 @Component
 @Suppress("unused")
-class LoggingEventPublisher(
+class NotificationEventPublisher(
     private val fcmService: FcmService,
     private val userRepository: UserRepository,
     private val getImamsFcmTokens: GetImamsFcmTokensService,
@@ -30,11 +30,15 @@ class LoggingEventPublisher(
             userRepository.findById(event.addressee).fold(
                 { logger.error("Notification not sent: ${it.reason.value}") },
                 { user ->
-                    fcmService.notify(
-                        user.fcmTokens.map { it.value.value },
-                        event.subject,
-                        event.text,
-                    )
+                    user.fcmTokens.map { it.value.value }.run {
+                        if (isNotEmpty()) {
+                            fcmService.notify(
+                                this,
+                                event.subject,
+                                event.text,
+                            )
+                        }
+                    }
                 }
             )
         }
