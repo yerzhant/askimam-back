@@ -8,7 +8,6 @@ import io.vavr.kotlin.some
 import kz.azan.askimam.chat.ChatFixtures
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.common.type.NonBlankString
-import kz.azan.askimam.user.domain.model.User
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -111,11 +110,11 @@ internal class UserJdbcRepositoryTest : ChatFixtures() {
 
     @Test
     internal fun `should save tokens`() {
-        val (user, tokens) = saveTokensFixture()
+        val tokens = saveTokensFixture()
         every { fcmTokenDao.deleteAll(tokens) } returns Unit
         every { fcmTokenDao.saveAll(tokens) } returns tokens
 
-        repository.saveTokens(user)
+        repository.saveTokens(fixtureInquirer)
 
         verifySequence {
             fcmTokenDao.deleteAll(tokens)
@@ -125,11 +124,11 @@ internal class UserJdbcRepositoryTest : ChatFixtures() {
 
     @Test
     internal fun `should not save tokens`() {
-        val (user, tokens) = saveTokensFixture()
+        val tokens = saveTokensFixture()
         every { fcmTokenDao.deleteAll(tokens) } returns Unit
         every { fcmTokenDao.saveAll(tokens) } throws SQLException("x")
 
-        assertThrows<SQLException> { repository.saveTokens(user) }
+        assertThrows<SQLException> { repository.saveTokens(fixtureInquirer) }
     }
 
     @Test
@@ -154,17 +153,7 @@ internal class UserJdbcRepositoryTest : ChatFixtures() {
         assertThat(deleteToken).isEqualTo(some(Declination.from(Exception("x"))))
     }
 
-    private fun saveTokensFixture(): Pair<User, Set<FcmTokenRow>> {
-        val user = User(
-            id = fixtureInquirerId,
-            type = fixtureInquirer.type,
-            name = fixtureInquirer.name,
-            passwordHash = fixtureInquirer.passwordHash,
-            fcmTokens = setOf(fixtureInquirerFcmToken).toMutableSet(),
-        )
-        val tokens = setOf(FcmTokenRow(fixtureInquirerFcmToken.value.value, fixtureInquirerId.value))
-        return Pair(user, tokens)
-    }
+    private fun saveTokensFixture() = setOf(FcmTokenRow(fixtureInquirerFcmToken.value.value, fixtureInquirerId.value))
 
     private fun fixture() {
         every { dao.findById(fixtureImamId.value.toInt()) } returns Optional.of(
