@@ -11,8 +11,8 @@ import kz.azan.askimam.chat.domain.model.*
 import kz.azan.askimam.chat.domain.model.Chat.Type.Public
 import kz.azan.askimam.chat.domain.model.Message.Type.Audio
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
-import kz.azan.askimam.common.domain.EventPublisher
 import kz.azan.askimam.common.type.NonBlankString
+import kz.azan.askimam.event.domain.service.EventPublisher
 import kz.azan.askimam.favorite.app.usecase.GetMyFavorites
 import kz.azan.askimam.user.domain.model.User
 import kz.azan.askimam.user.domain.model.UserRepository

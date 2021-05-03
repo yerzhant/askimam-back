@@ -9,8 +9,8 @@ import kz.azan.askimam.chat.domain.model.FcmToken
 import kz.azan.askimam.chat.domain.model.Subject
 import kz.azan.askimam.common.app.meta.UseCase
 import kz.azan.askimam.common.domain.Declination
-import kz.azan.askimam.common.domain.EventPublisher
 import kz.azan.askimam.common.type.NonBlankString
+import kz.azan.askimam.event.domain.service.EventPublisher
 import kz.azan.askimam.user.domain.service.GetCurrentUser
 import java.time.Clock
 

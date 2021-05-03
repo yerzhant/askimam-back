@@ -35,6 +35,7 @@ dependencies {
 //    implementation("org.springframework.integration:spring-integration-security")
     implementation("io.vavr:vavr-kotlin:0.10.2")
     implementation("com.auth0:java-jwt:3.14.0")
+    implementation("com.google.firebase:firebase-admin:7.2.0")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 

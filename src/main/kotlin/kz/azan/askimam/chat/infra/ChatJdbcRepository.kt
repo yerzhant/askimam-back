@@ -10,7 +10,7 @@ import kz.azan.askimam.chat.domain.model.Chat
 import kz.azan.askimam.chat.domain.model.Chat.Type.Public
 import kz.azan.askimam.chat.domain.model.ChatRepository
 import kz.azan.askimam.common.domain.Declination
-import kz.azan.askimam.common.domain.EventPublisher
+import kz.azan.askimam.event.domain.service.EventPublisher
 import kz.azan.askimam.user.domain.model.User.Type.Imam
 import kz.azan.askimam.user.domain.model.User.Type.Inquirer
 import kz.azan.askimam.user.domain.service.GetCurrentUser

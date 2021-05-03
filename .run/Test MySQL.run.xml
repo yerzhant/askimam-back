@@ -3,6 +3,7 @@
     <ExternalSystemSettings>
       <option name="env">
         <map>
+          <entry key="GOOGLE_APPLICATION_CREDENTIALS" value="google/service-account.json" />
           <entry key="spring_profiles_active" value="test,mysql" />
         </map>
       </option>

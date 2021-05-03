@@ -9,7 +9,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.MappedCollection
 import org.springframework.data.relational.core.mapping.Table
 
-private const val askImam = "ask-imam"
+const val askImamDbRole = "ask-imam"
 
 @Table("users")
 data class UserRow(
@@ -35,5 +35,5 @@ data class UserRow(
 
     private fun name() = "$firstName $lastName"
 
-    private fun getType() = if (roles.map { it.itemName }.any { it == askImam }) Imam else Inquirer
+    private fun getType() = if (roles.map { it.itemName }.any { it == askImamDbRole }) Imam else Inquirer
 }
