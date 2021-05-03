@@ -43,8 +43,6 @@ class ChatIT(
         )
         fixtureClock()
         chatId = chatDao.save(ChatRow.from(fixtureSavedChat()).copy(id = null)).id!!
-
-        println(chatDao.findById(chatId))
     }
 
     @AfterEach

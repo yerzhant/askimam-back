@@ -62,9 +62,7 @@ class UserJdbcRepositoryIT(
 
         val foundTokens = fcmTokenDao.findByUserId(fixtureInquirerId.value)
         assertThat(foundTokens).hasSize(2)
-        assertThat(foundTokens.first { it.value == fixtureInquirerFcmToken.value.value }.value).isEqualTo(
-            fixtureInquirerFcmToken.value.value
-        )
+        assertThat(foundTokens.first { it.value == fixtureInquirerFcmToken.value.value }).isNotNull
     }
 
     @Test

@@ -34,11 +34,7 @@ class Login(
                 }
 
             user.fcmTokens.add(FcmToken.from(dto.fcmToken))
-            try {
-                userRepository.saveTokens(user)
-            } catch (e: Exception) {
-                throw BadCredentialsException("Tokens aren't saved", e)
-            }
+            userRepository.saveTokens(user)
 
             val userType = User.Type.valueOf(authorities.first().authority)
             ResponseDto.ok(LoginResponseDto(jwt, user.id.value, userType))

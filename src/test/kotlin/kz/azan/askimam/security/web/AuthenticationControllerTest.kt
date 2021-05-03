@@ -31,7 +31,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.test.web.servlet.post
 
 @WebMvcTest(AuthenticationController::class)
-
 internal class AuthenticationControllerTest : ControllerTest() {
 
     private val url = "/auth"

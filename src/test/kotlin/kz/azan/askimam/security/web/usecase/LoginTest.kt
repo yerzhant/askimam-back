@@ -117,7 +117,7 @@ internal class LoginTest : ChatFixtures() {
         fixtures()
         every { userRepository.saveTokens(any()) } throws Exception("nope")
 
-        assertThrows<BadCredentialsException> {
+        assertThrows<Exception> {
             underTest(
                 LoginDto(
                     fixtureInquirer.name.value,
