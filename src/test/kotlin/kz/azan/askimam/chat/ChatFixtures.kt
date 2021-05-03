@@ -7,6 +7,7 @@ import kz.azan.askimam.chat.app.projection.ChatProjection
 import kz.azan.askimam.chat.app.usecase.GetChat
 import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.event.MessageAdded
+import kz.azan.askimam.chat.domain.repo.ChatRepository
 import kz.azan.askimam.chat.domain.model.*
 import kz.azan.askimam.chat.domain.model.Chat.Type.Public
 import kz.azan.askimam.chat.domain.model.Message.Type.Audio
@@ -15,7 +16,7 @@ import kz.azan.askimam.common.type.NonBlankString
 import kz.azan.askimam.event.domain.service.EventPublisher
 import kz.azan.askimam.favorite.app.usecase.GetMyFavorites
 import kz.azan.askimam.user.domain.model.User
-import kz.azan.askimam.user.domain.model.UserRepository
+import kz.azan.askimam.user.domain.repo.UserRepository
 import kz.azan.askimam.user.domain.service.GetCurrentUser
 import java.time.*
 

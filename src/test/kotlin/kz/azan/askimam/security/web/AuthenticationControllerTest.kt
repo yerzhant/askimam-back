@@ -18,7 +18,7 @@ import kz.azan.askimam.security.web.usecase.Login
 import kz.azan.askimam.security.web.usecase.Logout
 import kz.azan.askimam.user.domain.model.User.Type.Imam
 import kz.azan.askimam.user.domain.model.User.Type.Inquirer
-import kz.azan.askimam.user.domain.model.UserRepository
+import kz.azan.askimam.user.domain.repo.UserRepository
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.context.TestConfiguration

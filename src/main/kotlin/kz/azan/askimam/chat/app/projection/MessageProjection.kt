@@ -7,7 +7,7 @@ import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.common.type.NonBlankString
 import kz.azan.askimam.user.domain.model.User
 import kz.azan.askimam.user.domain.model.User.Type.Imam
-import kz.azan.askimam.user.domain.model.UserRepository
+import kz.azan.askimam.user.domain.repo.UserRepository
 import java.time.LocalDateTime
 
 data class MessageProjection(

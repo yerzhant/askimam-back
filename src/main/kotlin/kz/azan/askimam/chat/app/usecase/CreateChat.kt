@@ -4,7 +4,7 @@ import io.vavr.control.Option
 import io.vavr.kotlin.some
 import kz.azan.askimam.chat.domain.model.Chat
 import kz.azan.askimam.chat.domain.model.Chat.Type
-import kz.azan.askimam.chat.domain.model.ChatRepository
+import kz.azan.askimam.chat.domain.repo.ChatRepository
 import kz.azan.askimam.chat.domain.model.FcmToken
 import kz.azan.askimam.chat.domain.model.Subject
 import kz.azan.askimam.common.app.meta.UseCase

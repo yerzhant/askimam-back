@@ -8,7 +8,7 @@ import kz.azan.askimam.security.service.UserService
 import kz.azan.askimam.security.web.dto.LoginDto
 import kz.azan.askimam.security.web.dto.LoginResponseDto
 import kz.azan.askimam.user.domain.model.User
-import kz.azan.askimam.user.domain.model.UserRepository
+import kz.azan.askimam.user.domain.repo.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException

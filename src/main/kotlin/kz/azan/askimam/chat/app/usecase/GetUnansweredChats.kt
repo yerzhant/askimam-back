@@ -3,7 +3,7 @@ package kz.azan.askimam.chat.app.usecase
 import io.vavr.control.Either
 import io.vavr.kotlin.left
 import kz.azan.askimam.chat.app.projection.ChatProjection
-import kz.azan.askimam.chat.domain.model.ChatRepository
+import kz.azan.askimam.chat.domain.repo.ChatRepository
 import kz.azan.askimam.chat.domain.policy.GetUnansweredChatsPolicy
 import kz.azan.askimam.common.app.meta.UseCase
 import kz.azan.askimam.common.domain.Declination

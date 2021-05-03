@@ -6,9 +6,9 @@ import kz.azan.askimam.chat.ChatFixtures
 import kz.azan.askimam.chat.domain.model.Subject
 import kz.azan.askimam.favorite.app.projection.FavoriteProjection
 import kz.azan.askimam.favorite.domain.model.Favorite
-import kz.azan.askimam.favorite.domain.model.FavoriteRepository
-import kz.azan.askimam.favorite.infra.FavoriteDao
-import kz.azan.askimam.favorite.infra.FavoriteRow
+import kz.azan.askimam.favorite.domain.repo.FavoriteRepository
+import kz.azan.askimam.favorite.infra.dao.FavoriteDao
+import kz.azan.askimam.favorite.infra.model.FavoriteRow
 
 open class FavoriteFixtures : ChatFixtures() {
 

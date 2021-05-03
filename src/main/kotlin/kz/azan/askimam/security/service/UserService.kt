@@ -1,6 +1,6 @@
 package kz.azan.askimam.security.service
 
-import kz.azan.askimam.user.domain.model.UserRepository
+import kz.azan.askimam.user.domain.repo.UserRepository
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails

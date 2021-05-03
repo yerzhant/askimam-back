@@ -4,11 +4,11 @@ import io.vavr.control.Either
 import io.vavr.kotlin.left
 import kz.azan.askimam.chat.app.projection.ChatProjection
 import kz.azan.askimam.chat.domain.model.Chat
-import kz.azan.askimam.chat.domain.model.ChatRepository
+import kz.azan.askimam.chat.domain.repo.ChatRepository
 import kz.azan.askimam.chat.domain.policy.GetChatPolicy
 import kz.azan.askimam.common.app.meta.UseCase
 import kz.azan.askimam.common.domain.Declination
-import kz.azan.askimam.user.domain.model.UserRepository
+import kz.azan.askimam.user.domain.repo.UserRepository
 import kz.azan.askimam.user.domain.service.GetCurrentUser
 
 @UseCase

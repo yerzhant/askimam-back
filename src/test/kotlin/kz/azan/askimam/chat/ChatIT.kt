@@ -1,11 +1,11 @@
 package kz.azan.askimam.chat
 
-import kz.azan.askimam.chat.infra.ChatDao
-import kz.azan.askimam.chat.infra.ChatRow
+import kz.azan.askimam.chat.infra.dao.ChatDao
+import kz.azan.askimam.chat.infra.model.ChatRow
 import kz.azan.askimam.common.web.dto.ResponseDto
 import kz.azan.askimam.meta.IT
 import kz.azan.askimam.security.service.JwtService
-import kz.azan.askimam.user.infra.UserDao
+import kz.azan.askimam.user.infra.dao.UserDao
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach

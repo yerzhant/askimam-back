@@ -6,7 +6,7 @@ import kz.azan.askimam.chat.domain.model.Chat
 import kz.azan.askimam.chat.domain.model.Subject
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.user.domain.model.User
-import kz.azan.askimam.user.domain.model.UserRepository
+import kz.azan.askimam.user.domain.repo.UserRepository
 
 data class ChatProjection(
     val id: Chat.Id,

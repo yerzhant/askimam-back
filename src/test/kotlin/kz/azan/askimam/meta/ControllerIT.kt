@@ -2,7 +2,7 @@ package kz.azan.askimam.meta
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import kz.azan.askimam.favorite.FavoriteFixtures
-import kz.azan.askimam.user.infra.UserDao
+import kz.azan.askimam.user.infra.dao.UserDao
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired

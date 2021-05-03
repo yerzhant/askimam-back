@@ -8,7 +8,7 @@ import kz.azan.askimam.chat.app.usecase.GetChat
 import kz.azan.askimam.common.app.meta.UseCase
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.favorite.app.projection.FavoriteProjection
-import kz.azan.askimam.favorite.domain.model.FavoriteRepository
+import kz.azan.askimam.favorite.domain.repo.FavoriteRepository
 import kz.azan.askimam.user.domain.service.GetCurrentUser
 
 @UseCase
