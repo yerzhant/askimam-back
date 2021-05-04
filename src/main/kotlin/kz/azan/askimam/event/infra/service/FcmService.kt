@@ -33,6 +33,8 @@ class FcmService(
     }
 
     fun notify(tokens: List<String>, subject: Subject?, text: NonBlankString) {
+        if (tokens.isEmpty()) return
+
         val message = MulticastMessage.builder()
             .setNotification(
                 Notification.builder()

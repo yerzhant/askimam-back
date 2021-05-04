@@ -31,13 +31,11 @@ class NotificationEventPublisher(
                 { logger.error("Notification not sent: ${it.reason.value}") },
                 { user ->
                     user.fcmTokens.map { it.value.value }.run {
-                        if (isNotEmpty()) {
-                            fcmService.notify(
-                                this,
-                                event.subject,
-                                event.text,
-                            )
-                        }
+                        fcmService.notify(
+                            this,
+                            event.subject,
+                            event.text,
+                        )
                     }
                 }
             )
