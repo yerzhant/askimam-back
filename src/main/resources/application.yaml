@@ -11,3 +11,7 @@ spring:
 app:
   jwt:
     key: ${jwt-key}
+
+server:
+  servlet:
+    context-path: /v1
