@@ -98,7 +98,8 @@ jib {
         tags = setOf("$version")
     }
     container {
-
+        user = "azan"
+        creationTime = "USE_CURRENT_TIMESTAMP"
     }
     pluginExtensions {
         pluginExtension {
