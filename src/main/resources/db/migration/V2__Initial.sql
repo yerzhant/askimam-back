@@ -27,7 +27,7 @@ create table messages(
     author_type             varchar(100)    not null,
     text                    text            not null,
     updated_at              datetime,
-    duration                varchar(100),   -- TODO: add duration to Message entity + it may need to be converted to int
+    duration                varchar(100),
     audio                   varchar(1024),
 
     key        ix_messages_chat_id                  (chat_id),
@@ -46,4 +46,12 @@ create table favorites(
     key        ix_favorites_chat_id                 (chat_id),
     constraint fk_favorites_user_id     foreign key (user_id)   references users(id),
     constraint fk_favorites_chat_id     foreign key (chat_id)   references chats(id) on delete cascade
+);
+
+create table fcm_tokens(
+    value       varchar(768)            not null primary key,
+    user_id     int                     not null,
+
+    key         ix_fcm_tokens_user_id                (user_id),
+    constraint  fk_fcm_tokens_user_id    foreign key (user_id)   references users(id) on delete cascade
 );

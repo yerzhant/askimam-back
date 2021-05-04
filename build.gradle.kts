@@ -91,6 +91,7 @@ val registry = System.getenv("AskimamRegistry") ?: "localhost:5000"
 
 jib {
     from {
+        @Suppress("SpellCheckingInspection")
         image = "$registry/openjdk:11-slim@sha256:b789d521bbe81ab0991c59c6d604cf5bec6a2257128a0ecafb15b2d63bbce872"
     }
     to {
