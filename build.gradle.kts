@@ -1,14 +1,21 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+buildscript {
+    dependencies {
+        classpath("com.google.cloud.tools:jib-spring-boot-extension-gradle:0.1.0")
+    }
+}
+
 plugins {
     id("org.springframework.boot") version "2.4.3"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
+    id("com.google.cloud.tools.jib") version "3.0.0"
     kotlin("jvm") version "1.4.30"
     kotlin("plugin.spring") version "1.4.30"
 }
 
 group = "kz.azan"
-version = "0.0.1-SNAPSHOT"
+version = System.getenv("version")
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 repositories {
@@ -72,4 +79,30 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+tasks {
+    build {
+        dependsOn(jib)
+    }
+}
+
+val registry = System.getenv("AskimamRegistry") ?: "localhost:5000"
+
+jib {
+    from {
+        image = "$registry/openjdk:11-slim@sha256:b789d521bbe81ab0991c59c6d604cf5bec6a2257128a0ecafb15b2d63bbce872"
+    }
+    to {
+        image = "$registry/askimam-back"
+        tags = setOf("$version")
+    }
+    container {
+
+    }
+    pluginExtensions {
+        pluginExtension {
+            implementation = "com.google.cloud.tools.jib.gradle.extension.springboot.JibSpringBootExtension"
+        }
+    }
 }
