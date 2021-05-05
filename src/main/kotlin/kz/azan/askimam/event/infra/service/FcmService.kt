@@ -25,7 +25,6 @@ class FcmService(
         if (FirebaseApp.getApps().size == 0) {
             val options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.getApplicationDefault())
-                .setDatabaseUrl("https://azan-kz-ask-imam.firebaseio.com")
                 .build()
 
             FirebaseApp.initializeApp(options)
