@@ -14,6 +14,8 @@ data class ChatProjection(
     val askedBy: User.Id,
     val subject: Subject,
     val isFavorite: Boolean = false,
+    val isViewedByImam: Boolean = false,
+    val isViewedByInquirer: Boolean = false,
     var messages: Seq<MessageProjection>? = null,
 ) {
     companion object {
@@ -22,10 +24,12 @@ data class ChatProjection(
                 chat.messages().map { MessageProjection.from(it, userRepository) }
             ).map {
                 ChatProjection(
-                    chat.id!!,
-                    chat.type,
-                    chat.askedBy,
-                    chat.subjectText(),
+                    id = chat.id!!,
+                    type = chat.type,
+                    askedBy = chat.askedBy,
+                    subject = chat.subjectText(),
+                    isViewedByImam = chat.isViewedByImam(),
+                    isViewedByInquirer = chat.isViewedByInquirer(),
                     messages = it,
                 )
             }

@@ -45,6 +45,8 @@ internal class ChatControllerAuthenticatedTest : ChatControllerTest() {
             jsonPath("\$.data[0].askedBy") { value(2) }
             jsonPath("\$.data[0].subject") { value("Subject") }
             jsonPath("\$.data[0].isFavorite") { value(true) }
+            jsonPath("\$.data[0].isViewedByImam") { value(true) }
+            jsonPath("\$.data[0].isViewedByInquirer") { value(true) }
             jsonPath("\$.data[0].messages", hasSize<Any>(1))
             jsonPath("\$.data[0].messages[0].id") { value(1) }
             jsonPath("\$.data[0].messages[0].type") { value("Text") }
@@ -81,6 +83,8 @@ internal class ChatControllerAuthenticatedTest : ChatControllerTest() {
             jsonPath("\$.data[0].type") { value(Public.name) }
             jsonPath("\$.data[0].askedBy") { value(2) }
             jsonPath("\$.data[0].subject") { value("Subject") }
+            jsonPath("\$.data[0].isViewedByImam") { value(true) }
+            jsonPath("\$.data[0].isViewedByInquirer") { value(true) }
             jsonPath("\$.data[0].messages", hasSize<Any>(1))
             jsonPath("\$.data[0].messages[0].id") { value(1) }
             jsonPath("\$.data[0].messages[0].type") { value("Text") }
