@@ -57,11 +57,10 @@ class WebSecurityConfig(
     fun corsFilter() = UrlBasedCorsConfigurationSource().let {
         it.registerCorsConfiguration("/**",
             CorsConfiguration().apply {
-                allowCredentials = true
-                addAllowedOrigin("https://askimam.azan.kz")
-                addAllowedOriginPattern("http://localhost:*")
+                addAllowedOriginPattern("*")
                 addAllowedHeader("*")
                 addAllowedMethod("*")
+                allowCredentials = true
             }
         )
 
