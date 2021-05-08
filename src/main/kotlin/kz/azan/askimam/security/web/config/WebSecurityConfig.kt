@@ -58,7 +58,8 @@ class WebSecurityConfig(
         it.registerCorsConfiguration("/**",
             CorsConfiguration().apply {
                 allowCredentials = true
-                addAllowedOrigin("*")
+                addAllowedOrigin("https://askimam.azan.kz")
+                addAllowedOriginPattern("http://localhost:*")
                 addAllowedHeader("*")
                 addAllowedMethod("*")
             }
