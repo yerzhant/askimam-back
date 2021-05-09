@@ -35,7 +35,6 @@ class ArchitectureTests {
         .layer(web).definedBy("..web..")
         .whereLayer(infra).mayNotBeAccessedByAnyLayer()
         .whereLayer(web).mayNotBeAccessedByAnyLayer()
-        .whereLayer(application).mayOnlyBeAccessedByLayers(web)
 
     @ArchTest
     val `domain should not access Spring framework` =

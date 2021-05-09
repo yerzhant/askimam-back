@@ -214,6 +214,17 @@ internal class ChatTest : ChatFixtures() {
             assertThat(messages().last().authorId).isEqualTo(fixtureImamId)
             assertThat(messages().last().authorType).isEqualTo(fixtureImam.type)
         }
+
+        verify {
+            eventPublisher.publish(
+                MessageAdded(
+                    fixtureSubject,
+                    fixtureNewReply,
+                    fixtureInquirerId,
+                    fixtureImamId,
+                )
+            )
+        }
     }
 
     @Test
@@ -223,6 +234,16 @@ internal class ChatTest : ChatFixtures() {
             some(fixtureInquirer),
             some(fixtureAnotherImam)
         )
+        every {
+            eventPublisher.publish(
+                MessageAdded(
+                    fixtureSubject,
+                    fixtureNewReply,
+                    fixtureInquirerId,
+                    fixtureAnotherImam.id,
+                )
+            )
+        } returns Unit
 
         fixtureChat(fixtureNewReply).run {
             addTextMessage(fixtureNewReply, FcmToken.from("777"))
@@ -303,7 +324,7 @@ internal class ChatTest : ChatFixtures() {
         }
 
         verify {
-            eventPublisher.publish(MessageAdded(fixtureSubject, audio, fixtureInquirerId))
+            eventPublisher.publish(MessageAdded(fixtureSubject, audio, fixtureInquirerId, fixtureImamId))
         }
     }
 

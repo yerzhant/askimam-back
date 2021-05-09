@@ -4,15 +4,16 @@ import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.event.MessageAdded
 import kz.azan.askimam.event.domain.model.Event
 import kz.azan.askimam.event.domain.service.EventPublisher
+import kz.azan.askimam.imamrating.app.usecase.IncreaseImamsRating
 import kz.azan.askimam.user.domain.repo.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
 @Component
-@Suppress("unused")
-class NotificationEventPublisher(
+class EventProcessor(
     private val fcmService: FcmService,
     private val userRepository: UserRepository,
+    private val increaseImamsRating: IncreaseImamsRating,
     private val getImamsFcmTokens: GetImamsFcmTokensService,
 ) : EventPublisher {
 
@@ -26,8 +27,14 @@ class NotificationEventPublisher(
     }
 
     private fun onNewMessage(event: MessageAdded) {
-        if (event.addressee != null) {
-            userRepository.findById(event.addressee).fold(
+        sendNotification(event)
+
+        event.answeredImamId?.let { increaseImamsRating(it) }
+    }
+
+    private fun sendNotification(event: MessageAdded) {
+        if (event.userIdToBeNotified != null) {
+            userRepository.findById(event.userIdToBeNotified).fold(
                 { logger.error("Notification not sent: ${it.reason.value}") },
                 { user ->
                     user.fcmTokens.map { it.value.value }.run {

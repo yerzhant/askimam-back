@@ -8,5 +8,6 @@ import kz.azan.askimam.user.domain.model.User
 data class MessageAdded(
     val subject: Subject?,
     val text: NonBlankString,
-    val addressee: User.Id? = null,
+    val userIdToBeNotified: User.Id? = null,
+    val answeredImamId: User.Id? = null,
 ) : Event()

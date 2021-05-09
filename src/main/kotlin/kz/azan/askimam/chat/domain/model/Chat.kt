@@ -158,7 +158,8 @@ class Chat private constructor(
                 when (user.type) {
                     Inquirer -> answeredBy
                     Imam -> askedBy
-                }
+                },
+                if (user.type == Imam) answeredBy else null,
             )
         )
     }

@@ -7,11 +7,14 @@ import kz.azan.askimam.chat.app.projection.ChatProjection
 import kz.azan.askimam.chat.app.usecase.GetChat
 import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.event.MessageAdded
-import kz.azan.askimam.chat.domain.repo.ChatRepository
-import kz.azan.askimam.chat.domain.model.*
+import kz.azan.askimam.chat.domain.model.Chat
 import kz.azan.askimam.chat.domain.model.Chat.Type.Public
+import kz.azan.askimam.chat.domain.model.FcmToken
+import kz.azan.askimam.chat.domain.model.Message
 import kz.azan.askimam.chat.domain.model.Message.Type.Audio
 import kz.azan.askimam.chat.domain.model.Message.Type.Text
+import kz.azan.askimam.chat.domain.model.Subject
+import kz.azan.askimam.chat.domain.repo.ChatRepository
 import kz.azan.askimam.common.type.NonBlankString
 import kz.azan.askimam.event.domain.service.EventPublisher
 import kz.azan.askimam.favorite.app.usecase.GetMyFavorites
@@ -54,6 +57,16 @@ open class ChatFixtures {
         every { eventPublisher.publish(ChatCreated(subject, firstMessage)) } returns Unit
         every { eventPublisher.publish(MessageAdded(subject, newMessage)) } returns Unit
         every { eventPublisher.publish(MessageAdded(subject, newMessage, fixtureInquirerId)) } returns Unit
+        every {
+            eventPublisher.publish(
+                MessageAdded(
+                    subject,
+                    newMessage,
+                    fixtureInquirerId,
+                    fixtureImamId,
+                )
+            )
+        } returns Unit
 
         return Chat.newWithSubject(
             type = type,
