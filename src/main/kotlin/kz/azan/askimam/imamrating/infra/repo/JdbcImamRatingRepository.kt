@@ -39,7 +39,7 @@ class JdbcImamRatingRepository(
             )
 
     override fun findAllOrderedByRating(): Either<Declination, List<ImamRating>> =
-        Try { dao.findAllByOrderByRating() }
+        Try { dao.findAllByOrderByRatingDesc() }
             .map { list ->
                 list
                     .filter { ratingRow ->

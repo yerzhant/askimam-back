@@ -70,7 +70,7 @@ internal class JdbcImamRatingRepositoryTest : ImamRatingFixtures() {
 
     @Test
     internal fun `should get ratings`() {
-        every { dao.findAllByOrderByRating() } returns listOf(ratingRow)
+        every { dao.findAllByOrderByRatingDesc() } returns listOf(ratingRow)
         every { userDao.findById(imamId.value.toInt()) } returns Optional.of(imamRow)
 
         val result = underTest.findAllOrderedByRating()
@@ -80,7 +80,7 @@ internal class JdbcImamRatingRepositoryTest : ImamRatingFixtures() {
 
     @Test
     internal fun `should get empty ratings`() {
-        every { dao.findAllByOrderByRating() } returns listOf(ratingRow)
+        every { dao.findAllByOrderByRatingDesc() } returns listOf(ratingRow)
         every { userDao.findById(imamId.value.toInt()) } returns Optional.of(userRow)
 
         val result = underTest.findAllOrderedByRating()
@@ -90,7 +90,7 @@ internal class JdbcImamRatingRepositoryTest : ImamRatingFixtures() {
 
     @Test
     internal fun `should get empty ratings - user not found`() {
-        every { dao.findAllByOrderByRating() } returns listOf(ratingRow)
+        every { dao.findAllByOrderByRatingDesc() } returns listOf(ratingRow)
         every { userDao.findById(imamId.value.toInt()) } returns Optional.empty()
 
         val result = underTest.findAllOrderedByRating()
@@ -100,7 +100,7 @@ internal class JdbcImamRatingRepositoryTest : ImamRatingFixtures() {
 
     @Test
     internal fun `should get empty ratings as well`() {
-        every { dao.findAllByOrderByRating() } returns listOf()
+        every { dao.findAllByOrderByRatingDesc() } returns listOf()
 
         val result = underTest.findAllOrderedByRating()
 
@@ -109,7 +109,7 @@ internal class JdbcImamRatingRepositoryTest : ImamRatingFixtures() {
 
     @Test
     internal fun `should not get ratings`() {
-        every { dao.findAllByOrderByRating() } returns listOf(ratingRow)
+        every { dao.findAllByOrderByRatingDesc() } returns listOf(ratingRow)
         every { userDao.findById(imamId.value.toInt()) } throws Exception("x")
 
         val result = underTest.findAllOrderedByRating()
@@ -119,7 +119,7 @@ internal class JdbcImamRatingRepositoryTest : ImamRatingFixtures() {
 
     @Test
     internal fun `should not get ratings either`() {
-        every { dao.findAllByOrderByRating() } throws Exception("x")
+        every { dao.findAllByOrderByRatingDesc() } throws Exception("x")
 
         val result = underTest.findAllOrderedByRating()
 
