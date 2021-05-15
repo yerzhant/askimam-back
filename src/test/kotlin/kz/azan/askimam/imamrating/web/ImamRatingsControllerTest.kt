@@ -52,10 +52,7 @@ internal class ImamRatingsControllerTest : ControllerTest() {
     internal fun `should get ratings with desc`() {
         every { getImamRatings() } returns right(list(projection))
         every { getSetting(AskImamImamRatingsDescription) } returns right(
-            Setting(
-                AskImamImamRatingsDescription,
-                "Desc"
-            )
+            Setting(AskImamImamRatingsDescription, "Desc")
         )
 
         mvc.get("$url/with-desc").andExpect {
