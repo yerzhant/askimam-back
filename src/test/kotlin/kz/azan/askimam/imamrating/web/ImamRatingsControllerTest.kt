@@ -10,7 +10,11 @@ import kz.azan.askimam.common.type.NonBlankString
 import kz.azan.askimam.imamrating.app.projection.ImamRatingProjection
 import kz.azan.askimam.imamrating.app.usecase.GetImamRatings
 import kz.azan.askimam.meta.ControllerTest
+import kz.azan.askimam.setting.app.usecase.GetSetting
+import kz.azan.askimam.setting.domain.model.Setting
+import kz.azan.askimam.setting.domain.model.Setting.Key.AskImamImamRatingsDescription
 import kz.azan.askimam.user.domain.model.User
+import kz.azan.askimam.user.domain.model.User.Type.Imam
 import org.hamcrest.Matchers.hasSize
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -24,7 +28,10 @@ internal class ImamRatingsControllerTest : ControllerTest() {
     @MockkBean
     private lateinit var getImamRatings: GetImamRatings
 
-    private val imam = User(User.Id(1), User.Type.Imam, NonBlankString.of("Imam"), NonBlankString.of("p"))
+    @MockkBean
+    private lateinit var getSetting: GetSetting
+
+    private val imam = User(User.Id(1), Imam, NonBlankString.of("Imam"), NonBlankString.of("p"))
 
     private val projection = ImamRatingProjection(imam, 123)
 
@@ -38,6 +45,26 @@ internal class ImamRatingsControllerTest : ControllerTest() {
             jsonPath("\$.data", hasSize<Any>(1))
             jsonPath("\$.data[0].name") { value("Imam") }
             jsonPath("\$.data[0].rating") { value(123) }
+        }
+    }
+
+    @Test
+    internal fun `should get ratings with desc`() {
+        every { getImamRatings() } returns right(list(projection))
+        every { getSetting(AskImamImamRatingsDescription) } returns right(
+            Setting(
+                AskImamImamRatingsDescription,
+                "Desc"
+            )
+        )
+
+        mvc.get("$url/with-desc").andExpect {
+            status { isOk() }
+            jsonPath("\$.status") { value("Ok") }
+            jsonPath("\$.data.description") { value("Desc") }
+            jsonPath("\$.data.ratings", hasSize<Any>(1))
+            jsonPath("\$.data.ratings[0].name") { value("Imam") }
+            jsonPath("\$.data.ratings[0].rating") { value(123) }
         }
     }
 

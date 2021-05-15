@@ -34,6 +34,7 @@ class WebSecurityConfig(
                 authorize("/chats/*/return-to-unanswered", hasAuthority(Imam.name))
                 authorize("/messages/audio", hasAuthority(Imam.name))
                 authorize("/imam-ratings", permitAll)
+                authorize("/imam-ratings/with-desc", permitAll)
                 authorize("/auth/login", permitAll)
                 authorize()
             }

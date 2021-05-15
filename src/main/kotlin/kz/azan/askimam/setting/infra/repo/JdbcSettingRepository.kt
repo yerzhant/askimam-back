@@ -6,7 +6,9 @@ import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.setting.domain.model.Setting
 import kz.azan.askimam.setting.domain.repo.SettingRepository
 import kz.azan.askimam.setting.infra.dao.SettingDao
+import org.springframework.stereotype.Component
 
+@Component
 class JdbcSettingRepository(private val dao: SettingDao) : SettingRepository {
 
     override fun findByKey(key: Setting.Key): Either<Declination, Setting> =

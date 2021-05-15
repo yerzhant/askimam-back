@@ -4,5 +4,5 @@ data class Setting(
     val key: Key,
     val value: String,
 ) {
-    enum class Key { AskImamImamRatingDescription }
+    enum class Key { AskImamImamRatingsDescription }
 }
