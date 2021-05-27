@@ -7,6 +7,7 @@ import kz.azan.askimam.event.domain.service.EventPublisher
 import kz.azan.askimam.imamrating.app.usecase.IncreaseImamsRating
 import kz.azan.askimam.user.domain.repo.UserRepository
 import org.slf4j.LoggerFactory
+import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
 
 @Component
@@ -19,6 +20,7 @@ class EventProcessor(
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
+    @Async
     override fun publish(event: Event) {
         when (event) {
             is ChatCreated -> onNewQuestion(event)

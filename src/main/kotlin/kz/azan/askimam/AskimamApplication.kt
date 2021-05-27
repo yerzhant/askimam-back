@@ -6,8 +6,10 @@ import org.springframework.boot.context.properties.ConstructorBinding
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
+import org.springframework.scheduling.annotation.EnableAsync
 import java.time.Clock
 
+@EnableAsync
 @SpringBootApplication
 @EnableConfigurationProperties(AppProperties::class)
 class AskimamApplication {
