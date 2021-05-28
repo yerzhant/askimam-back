@@ -5,10 +5,7 @@ import io.mockk.every
 import io.mockk.verify
 import io.vavr.kotlin.none
 import io.vavr.kotlin.some
-import kz.azan.askimam.chat.app.usecase.AddAudioMessage
-import kz.azan.askimam.chat.app.usecase.AddTextMessage
-import kz.azan.askimam.chat.app.usecase.DeleteMessage
-import kz.azan.askimam.chat.app.usecase.UpdateTextMessage
+import kz.azan.askimam.chat.app.usecase.*
 import kz.azan.askimam.chat.web.dto.AddAudioMessageDto
 import kz.azan.askimam.chat.web.dto.AddTextMessageDto
 import kz.azan.askimam.chat.web.dto.UpdateTextMessageDto
@@ -18,9 +15,12 @@ import kz.azan.askimam.meta.WithPrincipal
 import kz.azan.askimam.user.domain.model.User.Type.Imam
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.http.MediaType
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.mock.web.MockMultipartFile
 import org.springframework.security.test.context.support.WithAnonymousUser
 import org.springframework.test.web.servlet.delete
+import org.springframework.test.web.servlet.multipart
 import org.springframework.test.web.servlet.patch
 import org.springframework.test.web.servlet.post
 
@@ -37,6 +37,9 @@ internal class MessageControllerTest : ControllerTest() {
     private lateinit var addAudioMessage: AddAudioMessage
 
     @MockkBean
+    private lateinit var uploadAudioFile: UploadAudioFile
+
+    @MockkBean
     private lateinit var deleteMessage: DeleteMessage
 
     @MockkBean
@@ -47,6 +50,7 @@ internal class MessageControllerTest : ControllerTest() {
     internal fun `should be rejected with 401`() {
         mvc.post(url).andExpect { status { isUnauthorized() } }
         mvc.post("$url/audio").andExpect { status { isUnauthorized() } }
+        mvc.post("$url/upload-audio").andExpect { status { isUnauthorized() } }
         mvc.delete("$url/1/1").andExpect { status { isUnauthorized() } }
         mvc.patch("$url/1/1").andExpect { status { isUnauthorized() } }
     }
@@ -54,6 +58,7 @@ internal class MessageControllerTest : ControllerTest() {
     @Test
     internal fun `should be rejected with 403 for non imams`() {
         mvc.post("$url/audio").andExpect { status { isForbidden() } }
+        mvc.post("$url/upload-audio").andExpect { status { isForbidden() } }
     }
 
     @Test
@@ -129,6 +134,37 @@ internal class MessageControllerTest : ControllerTest() {
         }
 
         verify { addAudioMessage(fixtureChatId1, fixtureAudio, fixtureAudioDuration, fixtureImamFcmToken) }
+    }
+
+    @Test
+    @WithPrincipal(authority = Imam)
+    internal fun `should upload an audio file`() {
+        val file = MockMultipartFile("file", "audio.mp3", MediaType.MULTIPART_FORM_DATA_VALUE, "test".toByteArray())
+        every { uploadAudioFile(file) } returns none()
+
+        mvc.multipart("$url/upload-audio") {
+            file(file)
+        }.andExpect {
+            status { isOk() }
+            jsonPath("\$.status") { value("Ok") }
+        }
+
+        verify { uploadAudioFile(file) }
+    }
+
+    @Test
+    @WithPrincipal(authority = Imam)
+    internal fun `should not upload an audio file`() {
+        val file = MockMultipartFile("file", "test".toByteArray())
+        every { uploadAudioFile(file) } returns some(Declination.withReason("x"))
+
+        mvc.multipart("$url/upload-audio") {
+            file(file)
+        }.andExpect {
+            status { isOk() }
+            jsonPath("\$.status") { value("Error") }
+            jsonPath("\$.error") { value("x") }
+        }
     }
 
     @Test

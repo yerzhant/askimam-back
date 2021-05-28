@@ -1,9 +1,6 @@
 package kz.azan.askimam.chat.web
 
-import kz.azan.askimam.chat.app.usecase.AddAudioMessage
-import kz.azan.askimam.chat.app.usecase.AddTextMessage
-import kz.azan.askimam.chat.app.usecase.DeleteMessage
-import kz.azan.askimam.chat.app.usecase.UpdateTextMessage
+import kz.azan.askimam.chat.app.usecase.*
 import kz.azan.askimam.chat.domain.model.Chat
 import kz.azan.askimam.chat.domain.model.FcmToken
 import kz.azan.askimam.chat.domain.model.Message
@@ -14,11 +11,13 @@ import kz.azan.askimam.common.type.NonBlankString
 import kz.azan.askimam.common.web.dto.ResponseDto
 import kz.azan.askimam.common.web.meta.RestApi
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 
 @RestApi("messages")
 class MessageController(
     private val addTextMessage: AddTextMessage,
     private val addAudioMessage: AddAudioMessage,
+    private val uploadAudioFile: UploadAudioFile,
     private val deleteMessage: DeleteMessage,
     private val updateTextMessage: UpdateTextMessage,
 ) {
@@ -40,6 +39,13 @@ class MessageController(
         ).fold(
             { ResponseDto.ok() },
             { ResponseDto.error(it) }
+        )
+
+    @PostMapping("upload-audio")
+    fun uploadAudio(@RequestParam file: MultipartFile): ResponseDto =
+        uploadAudioFile(file).fold(
+            { ResponseDto.ok() },
+            { ResponseDto.error(it) },
         )
 
     @DeleteMapping("{chatId}/{messageId}")
