@@ -197,12 +197,23 @@ class Chat private constructor(
                 { user ->
                     DeleteMessagePolicy.forThe(user).isAllowed(authorId, user).onEmpty {
                         messages.remove(this)
-                        eventPublisher.publish(MessageDeleted(id))
+                        eventPublisher.publish(MessageDeleted(id, audio))
                     }
                 }
             )
         }
     }
+
+    fun deleteAllMessages(): Option<Declination> = getCurrentUser().fold(
+        { some(Declination.withReason("Who are you?")) },
+        { user ->
+            DeleteMessagePolicy.forThe(user).isAllowed(askedBy, user).onEmpty {
+                messages.forEach { eventPublisher.publish(MessageDeleted(it.id!!, it.audio)) }
+                messages.clear()
+            }
+        }
+    )
+
 
     fun returnToUnansweredList(): Option<Declination> = getCurrentUser().fold(
         { some(Declination.withReason("Who are you?")) },

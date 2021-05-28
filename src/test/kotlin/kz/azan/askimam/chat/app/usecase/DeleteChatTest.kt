@@ -2,14 +2,16 @@ package kz.azan.askimam.chat.app.usecase
 
 import io.mockk.every
 import io.mockk.verify
+import io.mockk.verifyOrder
 import io.vavr.kotlin.left
 import io.vavr.kotlin.none
 import io.vavr.kotlin.right
 import io.vavr.kotlin.some
 import kz.azan.askimam.chat.ChatFixtures
+import kz.azan.askimam.chat.domain.event.MessageDeleted
 import kz.azan.askimam.chat.domain.model.Chat
 import kz.azan.askimam.common.domain.Declination
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 internal class DeleteChatTest : ChatFixtures() {
@@ -18,9 +20,12 @@ internal class DeleteChatTest : ChatFixtures() {
     internal fun `should delete a chat by an author`() {
         val chat = fixtures()
 
-        Assertions.assertThat(DeleteChat(getCurrentUser, chatRepository)(fixtureChatId1).isEmpty).isTrue
+        assertThat(DeleteChat(getCurrentUser, chatRepository)(fixtureChatId1).isEmpty).isTrue
 
-        verify {
+        verifyOrder {
+            eventPublisher.publish(MessageDeleted(fixtureMessageId1, null))
+            eventPublisher.publish(MessageDeleted(fixtureMessageId2, null))
+            eventPublisher.publish(MessageDeleted(fixtureMessageId3, fixtureAudio))
             chatRepository.delete(chat)
         }
     }
@@ -30,7 +35,7 @@ internal class DeleteChatTest : ChatFixtures() {
         val chat = fixtures()
         every { chatRepository.delete(chat) } returns some(Declination.withReason("error"))
 
-        Assertions.assertThat(DeleteChat(getCurrentUser, chatRepository)(fixtureChatId1).isDefined).isTrue
+        assertThat(DeleteChat(getCurrentUser, chatRepository)(fixtureChatId1).isDefined).isTrue
     }
 
     @Test
@@ -38,7 +43,7 @@ internal class DeleteChatTest : ChatFixtures() {
         val chat = fixtures()
         every { getCurrentUser() } returns some(fixtureImam)
 
-        Assertions.assertThat(DeleteChat(getCurrentUser, chatRepository)(fixtureChatId1).isEmpty).isTrue
+        assertThat(DeleteChat(getCurrentUser, chatRepository)(fixtureChatId1).isEmpty).isTrue
 
         verify {
             chatRepository.delete(chat)
@@ -52,7 +57,7 @@ internal class DeleteChatTest : ChatFixtures() {
         every { getCurrentUser() } returns some(fixtureAnotherInquirer)
         every { chatRepository.findById(fixtureChatId1) } returns right(chat)
 
-        Assertions.assertThat(DeleteChat(getCurrentUser, chatRepository)(fixtureChatId1).isDefined).isTrue
+        assertThat(DeleteChat(getCurrentUser, chatRepository)(fixtureChatId1).isDefined).isTrue
 
         verify(exactly = 0) {
             chatRepository.delete(chat)
@@ -64,7 +69,7 @@ internal class DeleteChatTest : ChatFixtures() {
         every { getCurrentUser() } returns some(fixtureInquirer)
         every { chatRepository.findById(fixtureChatId1) } returns left(Declination.withReason("Not found"))
 
-        Assertions.assertThat(DeleteChat(getCurrentUser, chatRepository)(fixtureChatId1).isDefined).isTrue
+        assertThat(DeleteChat(getCurrentUser, chatRepository)(fixtureChatId1).isDefined).isTrue
 
         verify(exactly = 0) {
             chatRepository.delete(any())
@@ -77,6 +82,7 @@ internal class DeleteChatTest : ChatFixtures() {
         every { getCurrentUser() } returns some(fixtureInquirer)
         every { chatRepository.findById(fixtureChatId1) } returns right(chat)
         every { chatRepository.delete(chat) } returns none()
+        every { eventPublisher.publish(any()) } returns Unit
         return chat
     }
 }

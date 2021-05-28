@@ -2,6 +2,7 @@ package kz.azan.askimam.event.infra.service
 
 import kz.azan.askimam.chat.domain.event.ChatCreated
 import kz.azan.askimam.chat.domain.event.MessageAdded
+import kz.azan.askimam.chat.domain.event.MessageDeleted
 import kz.azan.askimam.event.domain.model.Event
 import kz.azan.askimam.event.domain.service.EventPublisher
 import kz.azan.askimam.imamrating.app.usecase.IncreaseImamsRating
@@ -9,6 +10,7 @@ import kz.azan.askimam.user.domain.repo.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
+import java.io.File
 
 @Component
 class EventProcessor(
@@ -25,6 +27,7 @@ class EventProcessor(
         when (event) {
             is ChatCreated -> onNewQuestion(event)
             is MessageAdded -> onNewMessage(event)
+            is MessageDeleted -> onDeleteMessage(event)
         }
     }
 
@@ -57,5 +60,15 @@ class EventProcessor(
             event.subject,
             event.message,
         )
+    }
+
+    private fun onDeleteMessage(event: MessageDeleted) {
+        if (event.audio != null) {
+            try {
+                File("./audio/${event.audio.value}").delete()
+            } catch (e: Exception) {
+                logger.error("The audio file ${event.audio.value} is not deleted: ${e.message}.")
+            }
+        }
     }
 }

@@ -332,7 +332,7 @@ internal class ChatTest : ChatFixtures() {
     internal fun `should delete a message by an inquirer`() {
         fixtureClock()
         every { getCurrentUser() } returns some(fixtureInquirer)
-        every { eventPublisher.publish(MessageDeleted(fixtureMessageId1)) } returns Unit
+        every { eventPublisher.publish(any()) } returns Unit
 
         with(fixtureSavedChat()) {
             val option = deleteMessage(fixtureMessageId1)
@@ -342,7 +342,66 @@ internal class ChatTest : ChatFixtures() {
         }
 
         verify {
-            eventPublisher.publish(MessageDeleted(fixtureMessageId1))
+            eventPublisher.publish(MessageDeleted(fixtureMessageId1, null))
+        }
+    }
+
+    @Test
+    internal fun `should delete all messages by an inquirer`() {
+        fixtureClock()
+        every { getCurrentUser() } returns some(fixtureInquirer)
+        every { eventPublisher.publish(any()) } returns Unit
+
+        with(fixtureSavedChat()) {
+            val option = deleteAllMessages()
+
+            assertThat(option.isEmpty).isTrue
+            assertThat(messages()).hasSize(0)
+        }
+
+        verify {
+            eventPublisher.publish(MessageDeleted(fixtureMessageId1, null))
+            eventPublisher.publish(MessageDeleted(fixtureMessageId2, null))
+            eventPublisher.publish(MessageDeleted(fixtureMessageId3, fixtureAudio))
+        }
+    }
+
+    @Test
+    internal fun `should delete all messages by an imam`() {
+        fixtureClock()
+        every { getCurrentUser() } returns some(fixtureImam)
+        every { eventPublisher.publish(any()) } returns Unit
+
+        with(fixtureSavedChat()) {
+            val option = deleteAllMessages()
+
+            assertThat(option.isEmpty).isTrue
+            assertThat(messages()).hasSize(0)
+        }
+
+        verify {
+            eventPublisher.publish(MessageDeleted(fixtureMessageId1, null))
+            eventPublisher.publish(MessageDeleted(fixtureMessageId2, null))
+            eventPublisher.publish(MessageDeleted(fixtureMessageId3, fixtureAudio))
+        }
+    }
+
+    @Test
+    internal fun `should not delete all messages by someone else`() {
+        fixtureClock()
+        every { getCurrentUser() } returns some(fixtureAnotherInquirer)
+
+        with(fixtureSavedChat()) {
+            val option = deleteAllMessages()
+
+            assertThat(option.isEmpty).isFalse
+            assertThat(messages()).hasSize(3)
+        }
+
+        verify(exactly = 0) {
+            eventPublisher.publish(MessageDeleted(fixtureMessageId1, null))
+            eventPublisher.publish(MessageDeleted(fixtureMessageId2, null))
+            eventPublisher.publish(MessageDeleted(fixtureMessageId3, fixtureAudio))
         }
     }
 
@@ -363,7 +422,7 @@ internal class ChatTest : ChatFixtures() {
     internal fun `should delete a message by an imam`() {
         fixtureClock()
         every { getCurrentUser() } returns some(fixtureImam)
-        every { eventPublisher.publish(MessageDeleted(fixtureMessageId1)) } returns Unit
+        every { eventPublisher.publish(any()) } returns Unit
 
         with(fixtureSavedChat()) {
             val option = deleteMessage(fixtureMessageId1)
@@ -373,7 +432,7 @@ internal class ChatTest : ChatFixtures() {
         }
 
         verify {
-            eventPublisher.publish(MessageDeleted(fixtureMessageId1))
+            eventPublisher.publish(MessageDeleted(fixtureMessageId1, null))
         }
     }
 

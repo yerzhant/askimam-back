@@ -98,7 +98,7 @@ class ChatPolicyTest : ChatFixtures() {
         }
 
         verify(exactly = 0) {
-            eventPublisher.publish(MessageDeleted(fixtureMessageId1))
+            eventPublisher.publish(MessageDeleted(fixtureMessageId1, null))
         }
     }
 
