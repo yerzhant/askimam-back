@@ -140,7 +140,7 @@ internal class MessageControllerTest : ControllerTest() {
     @WithPrincipal(authority = Imam)
     internal fun `should upload an audio file`() {
         val file = MockMultipartFile("file", "audio.mp3", MediaType.MULTIPART_FORM_DATA_VALUE, "test".toByteArray())
-        every { uploadAudioFile(file) } returns none()
+        every { uploadAudioFile(file.originalFilename, file.bytes) } returns none()
 
         mvc.multipart("$url/upload-audio") {
             file(file)
@@ -149,14 +149,14 @@ internal class MessageControllerTest : ControllerTest() {
             jsonPath("\$.status") { value("Ok") }
         }
 
-        verify { uploadAudioFile(file) }
+        verify { uploadAudioFile(file.originalFilename, file.bytes) }
     }
 
     @Test
     @WithPrincipal(authority = Imam)
     internal fun `should not upload an audio file`() {
         val file = MockMultipartFile("file", "test".toByteArray())
-        every { uploadAudioFile(file) } returns some(Declination.withReason("x"))
+        every { uploadAudioFile(file.originalFilename, file.bytes) } returns some(Declination.withReason("x"))
 
         mvc.multipart("$url/upload-audio") {
             file(file)

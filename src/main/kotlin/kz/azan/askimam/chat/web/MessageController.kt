@@ -43,7 +43,7 @@ class MessageController(
 
     @PostMapping("upload-audio")
     fun uploadAudio(@RequestParam file: MultipartFile): ResponseDto =
-        uploadAudioFile(file).fold(
+        uploadAudioFile(file.originalFilename, file.bytes).fold(
             { ResponseDto.ok() },
             { ResponseDto.error(it) },
         )
