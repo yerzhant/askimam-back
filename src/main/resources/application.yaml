@@ -1,8 +1,11 @@
 spring:
   datasource:
+    driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://db:3306/azan_kz?characterEncoding=UTF-8
     username: ${db-username}
     password: ${db-password}
+  search-datasource:
+    jdbc-url: jdbc:mysql://sphinx:9306?characterEncoding=UTF-8
   flyway:
     baseline-on-migrate: true
   output:
