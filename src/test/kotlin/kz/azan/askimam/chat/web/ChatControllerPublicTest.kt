@@ -56,6 +56,34 @@ internal class ChatControllerPublicTest : ChatControllerTest() {
     }
 
     @Test
+    internal fun `should find chats`() {
+        every { findChats(any()) } returns right(listOfChatProjectionsFixture())
+
+        mvc.get("$url/find/some phrase").andExpect {
+            status { isOk() }
+            jsonPath("\$.status") { value("Ok") }
+            jsonPath("\$.data", hasSize<Any>(2))
+            jsonPath("\$.data[0].id") { value(1) }
+            jsonPath("\$.data[0].askedBy") { value(2) }
+            jsonPath("\$.data[0].subject") { value("Subject") }
+            jsonPath("\$.data[0].isFavorite") { value(false) }
+        }
+
+        verify { findChats("some phrase") }
+    }
+
+    @Test
+    internal fun `should not find chats`() {
+        every { findChats(any()) } returns left(Declination.withReason("x"))
+
+        mvc.get("$url/find/some phrase").andExpect {
+            status { isOk() }
+            jsonPath("\$.status") { value("Error") }
+            jsonPath("\$.error") { value("x") }
+        }
+    }
+
+    @Test
     internal fun `should get a chat`() {
         fixtureClock()
         every { userRepository.findById(fixtureImamId) } returns right(fixtureImam)

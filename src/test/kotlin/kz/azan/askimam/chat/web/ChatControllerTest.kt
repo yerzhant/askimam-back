@@ -23,6 +23,9 @@ internal open class ChatControllerTest : ControllerTest() {
     protected lateinit var getUnansweredChats: GetUnansweredChats
 
     @MockkBean
+    protected lateinit var findChats: FindChats
+
+    @MockkBean
     protected lateinit var createChat: CreateChat
 
     @MockkBean

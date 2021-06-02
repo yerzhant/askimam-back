@@ -18,6 +18,7 @@ class ChatController(
     private val getMyChats: GetMyChats,
     private val getPublicChats: GetPublicChats,
     private val unansweredChats: GetUnansweredChats,
+    private val findChats: FindChats,
     private val createChat: CreateChat,
     private val deleteChat: DeleteChat,
     private val updateChatSubject: UpdateChatSubject,
@@ -42,6 +43,13 @@ class ChatController(
     @GetMapping("unanswered/{offset}/{pageSize}")
     fun unanswered(@PathVariable offset: Int, @PathVariable pageSize: Int): ResponseDto =
         unansweredChats(offset, pageSize).fold(
+            { ResponseDto.error(it) },
+            { ResponseDto.ok(it.map { projection -> ChatDto.from(projection) }) }
+        )
+
+    @GetMapping("find/{phrase}")
+    fun find(@PathVariable phrase: String): ResponseDto =
+        findChats(phrase).fold(
             { ResponseDto.error(it) },
             { ResponseDto.ok(it.map { projection -> ChatDto.from(projection) }) }
         )

@@ -30,6 +30,7 @@ class WebSecurityConfig(
             authorizeRequests {
                 authorize("/chats/public/*/*", permitAll)
                 authorize("/chats/messages/*", permitAll)
+                authorize("/chats/find/*", permitAll)
                 authorize("/chats/unanswered/*/*", hasAuthority(Imam.name))
                 authorize("/chats/*/return-to-unanswered", hasAuthority(Imam.name))
                 authorize("/messages/audio", hasAuthority(Imam.name))
