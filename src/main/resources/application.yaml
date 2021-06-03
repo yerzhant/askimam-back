@@ -11,7 +11,7 @@ spring:
 app:
   jwt:
     key: ${jwt-key}
-  search-url: http://app/api
+  search-url: http://nginx/api
 
 server:
   servlet:
