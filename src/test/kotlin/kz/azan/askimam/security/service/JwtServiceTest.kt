@@ -10,14 +10,14 @@ import org.junit.jupiter.api.assertThrows
 internal class JwtServiceTest : ChatFixtures() {
 
     @Suppress("SpellCheckingInspection")
-    private val properties = AppProperties(AppProperties.Jwt("xgIEe6JCu6PGkw8MxCDYQTzIXpUQ4PMqq0gRaezLNehilBlk"))
+    private val properties = AppProperties(AppProperties.Jwt("xgIEe6JCu6PGkw8MxCDYQTzIXpUQ4PMqq0gRaezLNehilBlk"), "x")
 
     private val service = JwtService(properties, clock)
 
     @Test
     internal fun `should fail key length check`() {
         assertThrows<IllegalArgumentException> {
-            JwtService(AppProperties(AppProperties.Jwt("123")), clock)
+            JwtService(AppProperties(AppProperties.Jwt("123"), "x"), clock)
         }
     }
 
