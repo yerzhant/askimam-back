@@ -18,11 +18,12 @@ class GetPublicChats(
             chatRepository.findPublicChats(offset, pageSize).map { chats ->
                 chats.map { chat ->
                     ChatProjection(
-                        chat.id!!,
-                        chat.type,
-                        chat.askedBy,
-                        chat.subjectText(),
-                        favorites.map { it.chatId }.contains(chat.id),
+                        id = chat.id!!,
+                        type = chat.type,
+                        askedBy = chat.askedBy,
+                        subject = chat.subjectText(),
+                        updatedAt = chat.updatedAt(),
+                        isFavorite = favorites.map { it.chatId }.contains(chat.id),
                     )
                 }
             }

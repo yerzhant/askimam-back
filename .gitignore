@@ -1,11 +1,12 @@
 HELP.md
 .gradle
 build/
+/local.properties
+/src/main/resources/application-dev.yaml
+/google/service-account.json
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-/src/main/resources/application-dev.yaml
-/google/service-account.json
 
 ### STS ###
 .apt_generated

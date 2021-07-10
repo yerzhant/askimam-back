@@ -7,12 +7,14 @@ import kz.azan.askimam.chat.domain.model.Subject
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.user.domain.model.User
 import kz.azan.askimam.user.domain.repo.UserRepository
+import java.time.LocalDateTime
 
 data class ChatProjection(
     val id: Chat.Id,
     val type: Chat.Type,
     val askedBy: User.Id,
     val subject: Subject,
+    val updatedAt: LocalDateTime,
     val isFavorite: Boolean = false,
     val isViewedByImam: Boolean = false,
     val isViewedByInquirer: Boolean = false,
@@ -28,6 +30,7 @@ data class ChatProjection(
                     type = chat.type,
                     askedBy = chat.askedBy,
                     subject = chat.subjectText(),
+                    updatedAt = chat.updatedAt(),
                     isViewedByImam = chat.isViewedByImam(),
                     isViewedByInquirer = chat.isViewedByInquirer(),
                     messages = it,

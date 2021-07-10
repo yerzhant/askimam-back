@@ -22,6 +22,7 @@ import kz.azan.askimam.user.domain.model.User
 import kz.azan.askimam.user.domain.repo.UserRepository
 import kz.azan.askimam.user.domain.service.GetCurrentUser
 import java.time.*
+import java.time.format.DateTimeFormatter
 
 open class ChatFixtures {
 
@@ -312,6 +313,8 @@ open class ChatFixtures {
     val fixtureNow: LocalDateTime = LocalDateTime.now(fixedClock)
 
     fun timeAfter(minutes: Long): LocalDateTime = fixtureNow.plusMinutes(minutes)
+
+    fun timeAsString(): String = fixtureNow.format(DateTimeFormatter.ISO_DATE_TIME)
 
     fun listOfChatProjectionsFixture(): List<ChatProjection> {
         fixtureClock()

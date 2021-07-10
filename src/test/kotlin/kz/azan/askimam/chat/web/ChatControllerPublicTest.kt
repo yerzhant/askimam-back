@@ -6,7 +6,6 @@ import io.vavr.kotlin.left
 import io.vavr.kotlin.right
 import kz.azan.askimam.chat.app.projection.ChatProjection
 import kz.azan.askimam.common.domain.Declination
-import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.hasSize
 import org.junit.jupiter.api.Test
 import org.springframework.test.web.servlet.delete
@@ -39,6 +38,7 @@ internal class ChatControllerPublicTest : ChatControllerTest() {
             jsonPath("\$.data[0].askedBy") { value(2) }
             jsonPath("\$.data[0].subject") { value("Subject") }
             jsonPath("\$.data[0].isFavorite") { value(false) }
+            jsonPath("\$.data[0].updatedAt") { value(timeAsString()) }
         }
 
         verify { getPublicChats(0, 20) }
@@ -100,13 +100,13 @@ internal class ChatControllerPublicTest : ChatControllerTest() {
             jsonPath("\$.data.messages[0].type") { value("Text") }
             jsonPath("\$.data.messages[0].text") { value("A message") }
             jsonPath("\$.data.messages[0].author") { doesNotExist() }
-            jsonPath("\$.data.messages[0].createdAt") { `is`(timeAfter(0)) }
+            jsonPath("\$.data.messages[0].createdAt") { value(timeAsString()) }
             jsonPath("\$.data.messages[0].updatedAt") { doesNotExist() }
             jsonPath("\$.data.messages[1].id") { value(2) }
             jsonPath("\$.data.messages[1].type") { value("Text") }
             jsonPath("\$.data.messages[1].text") { value("A message") }
             jsonPath("\$.data.messages[1].author") { value("Imam") }
-            jsonPath("\$.data.messages[1].createdAt") { `is`(timeAfter(0)) }
+            jsonPath("\$.data.messages[1].createdAt") { value(timeAsString()) }
             jsonPath("\$.data.messages[1].updatedAt") { doesNotExist() }
             jsonPath("\$.data.messages[2].id") { value(3) }
             jsonPath("\$.data.messages[2].type") { value("Audio") }
@@ -114,7 +114,7 @@ internal class ChatControllerPublicTest : ChatControllerTest() {
             jsonPath("\$.data.messages[2].audio") { value("audio.mp3") }
             jsonPath("\$.data.messages[2].duration") { value("01:23") }
             jsonPath("\$.data.messages[2].author") { value("Imam") }
-            jsonPath("\$.data.messages[2].createdAt") { `is`(timeAfter(0)) }
+            jsonPath("\$.data.messages[2].createdAt") { value(timeAsString()) }
             jsonPath("\$.data.messages[2].updatedAt") { doesNotExist() }
         }
 

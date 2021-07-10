@@ -12,7 +12,6 @@ import kz.azan.askimam.chat.web.dto.UpdateChatDto
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.meta.WithPrincipal
 import kz.azan.askimam.user.domain.model.User.Type.Imam
-import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.hasSize
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -44,6 +43,7 @@ internal class ChatControllerAuthenticatedTest : ChatControllerTest() {
             jsonPath("\$.data[0].type") { value(Public.name) }
             jsonPath("\$.data[0].askedBy") { value(2) }
             jsonPath("\$.data[0].subject") { value("Subject") }
+            jsonPath("\$.data[0].updatedAt") { value(timeAsString()) }
             jsonPath("\$.data[0].isFavorite") { value(true) }
             jsonPath("\$.data[0].isViewedByImam") { value(true) }
             jsonPath("\$.data[0].isViewedByInquirer") { value(true) }
@@ -52,7 +52,7 @@ internal class ChatControllerAuthenticatedTest : ChatControllerTest() {
             jsonPath("\$.data[0].messages[0].type") { value("Text") }
             jsonPath("\$.data[0].messages[0].text") { value("A message") }
             jsonPath("\$.data[0].messages[0].author") { doesNotExist() }
-            jsonPath("\$.data[0].messages[0].createdAt") { `is`(timeAfter(0)) }
+            jsonPath("\$.data[0].messages[0].createdAt") { value(timeAsString()) }
             jsonPath("\$.data[0].messages[0].updatedAt") { doesNotExist() }
         }
 
@@ -83,6 +83,7 @@ internal class ChatControllerAuthenticatedTest : ChatControllerTest() {
             jsonPath("\$.data[0].type") { value(Public.name) }
             jsonPath("\$.data[0].askedBy") { value(2) }
             jsonPath("\$.data[0].subject") { value("Subject") }
+            jsonPath("\$.data[0].updatedAt") { value(timeAsString()) }
             jsonPath("\$.data[0].isViewedByImam") { value(true) }
             jsonPath("\$.data[0].isViewedByInquirer") { value(true) }
             jsonPath("\$.data[0].messages", hasSize<Any>(1))
@@ -90,7 +91,7 @@ internal class ChatControllerAuthenticatedTest : ChatControllerTest() {
             jsonPath("\$.data[0].messages[0].type") { value("Text") }
             jsonPath("\$.data[0].messages[0].text") { value("A message") }
             jsonPath("\$.data[0].messages[0].author") { doesNotExist() }
-            jsonPath("\$.data[0].messages[0].createdAt") { `is`(timeAfter(0)) }
+            jsonPath("\$.data[0].messages[0].createdAt") { value(timeAsString()) }
             jsonPath("\$.data[0].messages[0].updatedAt") { doesNotExist() }
         }
 

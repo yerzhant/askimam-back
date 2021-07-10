@@ -9,7 +9,7 @@ buildscript {
 plugins {
     id("org.springframework.boot") version "2.4.3"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
-    id("com.google.cloud.tools.jib") version "3.0.0"
+    id("com.google.cloud.tools.jib") version "3.1.1"
     kotlin("jvm") version "1.4.30"
     kotlin("plugin.spring") version "1.4.30"
 }
@@ -24,7 +24,7 @@ repositories {
 
 //extra["solaceSpringBootVersion"] = "1.1.0"
 //extra["springCloudVersion"] = "2020.0.1"
-extra["testcontainersVersion"] = "1.15.2"
+extra["testcontainersVersion"] = "1.15.3"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
@@ -55,10 +55,10 @@ dependencies {
 //    testImplementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner")
 //    testImplementation("org.springframework.integration:spring-integration-test")
     testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("com.tngtech.archunit:archunit-junit5:0.17.0")
+    testImplementation("com.ninja-squad:springmockk:3.0.1")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:mysql")
-    testImplementation("com.ninja-squad:springmockk:3.0.1")
-    testImplementation("com.tngtech.archunit:archunit-junit5:0.17.0")
     testRuntimeOnly("com.h2database:h2")
 }
 
@@ -79,6 +79,7 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    failFast = true
 }
 
 tasks {

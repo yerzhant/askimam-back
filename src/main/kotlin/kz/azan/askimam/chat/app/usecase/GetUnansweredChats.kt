@@ -27,6 +27,7 @@ class GetUnansweredChats(
                                 type = chat.type,
                                 askedBy = chat.askedBy,
                                 subject = chat.subjectText(),
+                                updatedAt = chat.updatedAt(),
                                 isViewedByImam = chat.isViewedByImam(),
                                 isViewedByInquirer = chat.isViewedByInquirer(),
                             )
