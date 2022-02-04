@@ -40,7 +40,7 @@ class Login(
             ResponseDto.ok(LoginResponseDto(jwt, user.id.value, userType))
         }
     } catch (e: BadCredentialsException) {
-        logger.error("Authentication error: $e, ${e.cause}")
+        logger.error("Authentication error: $e, ${e.cause} for user: ${dto.login}")
         throw e
     }
 }
