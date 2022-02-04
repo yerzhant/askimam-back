@@ -9,6 +9,9 @@ import kz.azan.askimam.AppProperties
 import kz.azan.askimam.common.domain.Declination
 import kz.azan.askimam.common.type.NonBlankString
 import kz.azan.askimam.user.domain.model.User
+import kz.azan.askimam.user.domain.repo.UserRepository
+import org.slf4j.LoggerFactory
+import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
 import java.time.Clock
 import java.time.Instant
@@ -18,10 +21,13 @@ import java.util.*
 class JwtService(
     appProperties: AppProperties,
     private val clock: Clock,
+    private val userRepository: UserRepository,
 ) {
     private val issuer = "askimam.azan.kz"
     private val idClaim = "id"
     private val typeClaim = "type"
+
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     init {
         if (appProperties.jwt.key.toByteArray().size < 32)
@@ -59,11 +65,24 @@ class JwtService(
                 { it }
             )
 
-    fun decode(decodedJWT: DecodedJWT) =
-        User(
-            User.Id(decodedJWT.getClaim(idClaim).asLong()),
-            User.Type.valueOf(decodedJWT.getClaim(typeClaim).asString()),
+    fun decode(decodedJWT: DecodedJWT): User {
+        val userId = User.Id(decodedJWT.getClaim(idClaim).asLong())
+        val typeInJwt = decodedJWT.getClaim(typeClaim).asString()
+
+        val user = userRepository.findById(userId).getOrElseThrow { declination ->
+            UsernameNotFoundException("User by id ${decodedJWT.id} not found: ${declination.reason.value}")
+        }
+        val typeInDb = user.type.name
+
+        if (typeInJwt == User.Type.Imam.name && typeInDb != typeInJwt) {
+            logger.error("The user ${user.name.value} has an outdated Imam type in a JWT.")
+        }
+
+        return User(
+            userId,
+            User.Type.valueOf(typeInDb),
             NonBlankString.of("A hydrated user"),
             NonBlankString.of("--- unused ---"),
         )
+    }
 }
