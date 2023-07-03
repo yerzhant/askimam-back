@@ -35,7 +35,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("io.vavr:vavr-kotlin:0.10.2")
     implementation("com.auth0:java-jwt:3.14.0")
-    implementation("com.google.firebase:firebase-admin:7.2.0")
+    implementation("com.google.firebase:firebase-admin:9.2.0")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
@@ -81,7 +81,6 @@ val registry = System.getenv("AskimamRegistry") ?: "localhost:5000"
 
 jib {
     from {
-        @Suppress("SpellCheckingInspection")
         image = "$registry/openjdk:11-slim@sha256:3f19e6e5394a6f601af082cfc4491eaf9b5cd85c6f576c84a7c47aef07542ba8"
     }
     to {
