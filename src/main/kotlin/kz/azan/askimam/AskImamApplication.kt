@@ -2,7 +2,6 @@ package kz.azan.askimam
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.context.properties.ConstructorBinding
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
 import org.springframework.boot.web.client.RestTemplateBuilder
@@ -14,7 +13,7 @@ import java.time.Clock
 @EnableAsync
 @SpringBootApplication
 @EnableConfigurationProperties(AppProperties::class)
-class AskimamApplication {
+class AskImamApplication {
 
     @Bean
     fun restTemplate(appProperties: AppProperties, restTemplateBuilder: RestTemplateBuilder): RestTemplate =
@@ -25,10 +24,9 @@ class AskimamApplication {
 }
 
 fun main(args: Array<String>) {
-    runApplication<AskimamApplication>(*args)
+    runApplication<AskImamApplication>(*args)
 }
 
-@ConstructorBinding
 @ConfigurationProperties("app")
 data class AppProperties(
     val jwt: Jwt,

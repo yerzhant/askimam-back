@@ -12,12 +12,12 @@ import com.tngtech.archunit.lang.SimpleConditionEvent
 import com.tngtech.archunit.lang.syntax.ArchRuleDefinition.methods
 import com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses
 import com.tngtech.archunit.library.Architectures
-import kz.azan.askimam.AskimamApplication
+import kz.azan.askimam.AskImamApplication
 import kz.azan.askimam.common.arch.PackagePrivate
 
 @Suppress("PropertyName", "HasPlatformType")
 @AnalyzeClasses(
-    packagesOf = [AskimamApplication::class],
+    packagesOf = [AskImamApplication::class],
     importOptions = [DoNotIncludeTests::class, DoNotIncludeJars::class]
 )
 class ArchitectureTests {

@@ -1,10 +1,10 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="AskimamApplicationKt" type="JetRunConfigurationType" nameIsGenerated="true">
+  <configuration default="false" name="AskImamApplicationKt" type="JetRunConfigurationType" nameIsGenerated="true">
     <envs>
       <env name="spring_profiles_active" value="dev" />
       <env name="GOOGLE_APPLICATION_CREDENTIALS" value="google/service-account.json" />
     </envs>
-    <option name="MAIN_CLASS_NAME" value="kz.azan.askimam.AskimamApplicationKt" />
+    <option name="MAIN_CLASS_NAME" value="kz.azan.askimam.AskImamApplicationKt" />
     <module name="askimam.main" />
     <method v="2">
       <option name="Make" enabled="true" />
