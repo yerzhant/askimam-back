@@ -12,6 +12,7 @@ import kz.azan.askimam.meta.ControllerTest
 import kz.azan.askimam.meta.WithPrincipal
 import kz.azan.askimam.security.service.JwtService
 import kz.azan.askimam.security.service.UserService
+import kz.azan.askimam.security.web.config.WebSecurityConfig
 import kz.azan.askimam.security.web.dto.LoginDto
 import kz.azan.askimam.security.web.dto.LogoutDto
 import kz.azan.askimam.security.web.usecase.Login
@@ -23,6 +24,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -221,6 +223,7 @@ internal class AuthenticationControllerTest : ControllerTest() {
     }
 
     @TestConfiguration
+    @Import(WebSecurityConfig::class)
     class Config(
         private val jwtService: JwtService,
         private val userService: UserService,
