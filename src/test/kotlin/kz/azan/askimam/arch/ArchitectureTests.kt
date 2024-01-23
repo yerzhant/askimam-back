@@ -29,6 +29,7 @@ class ArchitectureTests {
 
     @ArchTest
     val layerRule = Architectures.layeredArchitecture()
+        .consideringAllDependencies()
         .layer(domain).definedBy("..domain..")
         .layer(application).definedBy("..app..")
         .layer(infra).definedBy("..infra..")
@@ -48,7 +49,7 @@ class ArchitectureTests {
 
     private val areAnnotatedByAPackagePrivate =
         object : DescribedPredicate<JavaMethod>("are annotated as a package private") {
-            override fun apply(input: JavaMethod?): Boolean {
+            override fun test(input: JavaMethod?): Boolean {
                 return input?.isAnnotatedWith(PackagePrivate::class.java)!!
             }
         }
