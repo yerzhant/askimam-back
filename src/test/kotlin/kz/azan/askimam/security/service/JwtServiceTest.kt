@@ -34,7 +34,7 @@ internal class JwtServiceTest : ChatFixtures() {
 
         assertThat(
             service.sign(fixtureImam).get()
-        ).startsWith("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJhc2tpbWFtLmF6YW4ua3oiLCJpZCI6MSwi")
+        ).startsWith("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhc2tpbWFtLmF6YW4ua3oiLCJp")
     }
 
     @Test
