@@ -26,7 +26,7 @@ internal class AuthenticationControllerIT : ControllerIT() {
         }.andExpect {
             status { isOk() }
             jsonPath("\$.status") { value("Ok") }
-            jsonPath("\$.data.jwt") { value(Matchers.startsWith("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJhc2t")) }
+            jsonPath("\$.data.jwt") { value(Matchers.startsWith("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhc2tpbWFtLmF6YW4ua3oiLCJp")) }
             jsonPath("\$.data.userId") { value(fixtureInquirerId.value) }
             jsonPath("\$.data.userType") { value(Inquirer.name) }
         }
