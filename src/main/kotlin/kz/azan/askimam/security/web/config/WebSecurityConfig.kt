@@ -1,31 +1,32 @@
 package kz.azan.askimam.security.web.config
 
-import kz.azan.askimam.security.service.UserService
+import jakarta.servlet.http.HttpServletResponse
 import kz.azan.askimam.security.web.filter.JwtFilter
 import kz.azan.askimam.user.domain.model.User.Type.Imam
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationManager
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.config.http.SessionCreationPolicy
-import org.springframework.security.config.web.servlet.invoke
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.AuthenticationEntryPoint
+import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 import org.springframework.web.filter.CorsFilter
-import javax.servlet.http.HttpServletResponse
 
+@Configuration
 @EnableWebSecurity
 class WebSecurityConfig(
     private val jwtFilter: JwtFilter,
-    private val userService: UserService,
-) : WebSecurityConfigurerAdapter() {
+) {
 
-    override fun configure(http: HttpSecurity?) {
+    @Bean
+    fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http {
             authorizeRequests {
                 authorize("/chats/public/*/*", permitAll)
@@ -38,7 +39,7 @@ class WebSecurityConfig(
                 authorize("/imam-ratings", permitAll)
                 authorize("/imam-ratings/with-desc", permitAll)
                 authorize("/auth/login", permitAll)
-                authorize()
+                authorize(anyRequest, fullyAuthenticated)
             }
 
             exceptionHandling {
@@ -47,14 +48,16 @@ class WebSecurityConfig(
                 }
             }
 
-            addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter::class.java)
-
             sessionManagement { sessionCreationPolicy = SessionCreationPolicy.STATELESS }
 
             logout { disable() }
             csrf { disable() }
             cors { }
         }
+
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter::class.java)
+
+        return http.build()
     }
 
     @Bean
@@ -71,12 +74,8 @@ class WebSecurityConfig(
         CorsFilter(it)
     }
 
-    override fun configure(auth: AuthenticationManagerBuilder?) {
-        auth?.userDetailsService(userService)
-    }
-
     @Bean
-    fun authManager(): AuthenticationManager = authenticationManagerBean()
+    fun authManager(config: AuthenticationConfiguration): AuthenticationManager = config.authenticationManager
 
     @Bean
     fun passwordEncoder() = BCryptPasswordEncoder()
