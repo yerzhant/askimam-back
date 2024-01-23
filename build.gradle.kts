@@ -46,9 +46,9 @@ dependencies {
 }
 
 dependencies {
-    implementation(platform("io.arrow-kt:arrow-stack:1.2.1"))
-    implementation("io.arrow-kt:arrow-core")
-//    implementation("io.vavr:vavr-kotlin:0.10.4")
+//    implementation(platform("io.arrow-kt:arrow-stack:1.2.1"))
+//    implementation("io.arrow-kt:arrow-core")
+    implementation("io.vavr:vavr-kotlin:0.10.2")
     implementation("com.auth0:java-jwt:4.4.0")
     implementation("com.google.firebase:firebase-admin:9.2.0")
 
