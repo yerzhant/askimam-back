@@ -15,9 +15,7 @@ class NonBlankString private constructor(val value: String) {
 
         other as NonBlankString
 
-        if (value != other.value) return false
-
-        return true
+        return value == other.value
     }
 
     override fun hashCode(): Int {
