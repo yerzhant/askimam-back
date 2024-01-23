@@ -1,6 +1,6 @@
 package kz.azan.askimam.security.web.dto
 
-import javax.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotBlank
 
 data class LogoutDto(
     @get:NotBlank
