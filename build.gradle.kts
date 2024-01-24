@@ -52,10 +52,6 @@ dependencies {
     implementation("com.auth0:java-jwt:4.4.0")
     implementation("com.google.firebase:firebase-admin:9.2.0")
 
-//    testImplementation("org.springframework.boot:spring-boot-starter-test") {
-//        exclude(module = "junit")
-//        exclude(module = "mockito-core")
-//    }
     testImplementation("com.tngtech.archunit:archunit-junit5:1.2.1")
     testImplementation("com.ninja-squad:springmockk:4.0.2")
 }
