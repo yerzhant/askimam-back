@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "kz.azan"
-version = System.getenv("version")
+version = System.getenv("GITHUB_REF_NAME")
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
