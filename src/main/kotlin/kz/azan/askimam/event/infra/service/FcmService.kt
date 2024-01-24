@@ -37,7 +37,7 @@ class FcmService(
             .addAllTokens(tokens)
             .build()
 
-        FirebaseMessaging.getInstance().sendMulticast(message).run {
+        FirebaseMessaging.getInstance().sendEachForMulticast(message).run {
             if (failureCount > 0) {
                 responses.indices
                     .filterNot { responses[it].isSuccessful }
