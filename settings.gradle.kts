@@ -1,1 +1,1 @@
-rootProject.name = "askimam"
+rootProject.name = "askimam-back"
