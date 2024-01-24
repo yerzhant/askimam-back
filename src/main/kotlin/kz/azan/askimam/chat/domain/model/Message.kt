@@ -112,9 +112,7 @@ class Message private constructor(
 
         other as Message
 
-        if (id != other.id) return false
-
-        return true
+        return id == other.id
     }
 
     override fun hashCode(): Int {

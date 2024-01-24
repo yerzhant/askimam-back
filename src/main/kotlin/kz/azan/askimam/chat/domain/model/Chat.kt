@@ -141,6 +141,7 @@ class Chat private constructor(
                 isViewedByImam = false
                 inquirerFcmToken = fcmToken
             }
+
             Imam -> {
                 if (type == Public) isVisibleToPublic = true
                 isViewedByInquirer = false
@@ -345,9 +346,7 @@ class Chat private constructor(
 
         other as Chat
 
-        if (id != other.id) return false
-
-        return true
+        return id == other.id
     }
 
     override fun hashCode(): Int {
