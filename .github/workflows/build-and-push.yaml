@@ -22,5 +22,6 @@ jobs:
           path: "**/build/reports/"
       - run: ./gradlew bootBuildImage
         env:
+          REG_URL: ${{ secrets.REG_URL }}
           REG_USERNAME: ${{ secrets.REG_USERNAME }}
           REG_PASSWORD: ${{ secrets.REG_PASSWORD }}
