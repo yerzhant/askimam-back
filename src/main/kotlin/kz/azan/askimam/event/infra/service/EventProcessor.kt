@@ -67,7 +67,7 @@ class EventProcessor(
             try {
                 File("./audio/${event.audio.value}").delete()
             } catch (e: Exception) {
-                logger.error("The audio file ${event.audio.value} is not deleted: ${e.message}.")
+                logger.error("The audio file ${event.audio.value} was not deleted: ${e.message}.")
             }
         }
     }
