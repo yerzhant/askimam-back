@@ -1,0 +1,21 @@
+on:
+  release:
+    types:
+      - released
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: liberica
+          java-version: 17
+      - run: cd mysql && ./build.sh && cd ..
+      - run: ./gradlew build
+        env:
+          SPRING_PROFILES_ACTIVE: test,mysql
+      - run: ./gradlew bootBuildImage
+        env:
+          REG_USERNAME: ${{ secrets.REG_USERNAME }}
+          REG_PASSWORD: ${{ secrets.REG_PASSWORD }}

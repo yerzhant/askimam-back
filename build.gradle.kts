@@ -65,4 +65,18 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    failFast = true
+}
+
+tasks.bootBuildImage {
+    docker {
+        publish = true
+        val regUrl = System.getenv("REG_URL")
+        imageName = "$regUrl/${project.name}:${version}"
+
+        publishRegistry {
+            username = System.getenv("REG_USERNAME")
+            password = System.getenv("REG_PASSWORD")
+        }
+    }
 }

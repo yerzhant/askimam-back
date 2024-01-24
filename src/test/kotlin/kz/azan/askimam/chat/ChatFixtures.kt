@@ -1,5 +1,6 @@
 package kz.azan.askimam.chat
 
+import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.mockk.mockk
 import io.vavr.control.Either
@@ -17,6 +18,7 @@ import kz.azan.askimam.chat.domain.model.Subject
 import kz.azan.askimam.chat.domain.repo.ChatRepository
 import kz.azan.askimam.common.type.NonBlankString
 import kz.azan.askimam.event.domain.service.EventPublisher
+import kz.azan.askimam.event.infra.service.FcmService
 import kz.azan.askimam.favorite.app.usecase.GetMyFavorites
 import kz.azan.askimam.user.domain.model.User
 import kz.azan.askimam.user.domain.repo.UserRepository
@@ -25,6 +27,9 @@ import java.time.*
 import java.time.format.DateTimeFormatter
 
 open class ChatFixtures {
+
+    @MockkBean
+    lateinit var fcmService: FcmService
 
     val eventPublisher = mockk<EventPublisher>()
     val getCurrentUser = mockk<GetCurrentUser>()
