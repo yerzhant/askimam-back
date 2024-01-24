@@ -24,7 +24,7 @@ internal class UpdateFcmTokenTest : ChatFixtures() {
     fun `unknown user`() {
         every { getCurrentUser() } returns none()
 
-        val result = useCase.process(UpdateFcmTokenRequest(FcmToken.from("123"), FcmToken.from("456")))
+        val result = useCase.process(FcmToken.from("123"), FcmToken.from("456"))
 
         assertThat(result.isDefined).isTrue()
         assertThat(result.get()).isEqualTo(Declination.withReason("Who are you?"))
@@ -32,21 +32,22 @@ internal class UpdateFcmTokenTest : ChatFixtures() {
 
     @Test
     fun `update an old token by a new one`() {
-        val request = UpdateFcmTokenRequest(FcmToken.from("123"), FcmToken.from("456"))
+        val oldToken = FcmToken.from("123")
+        val newToken = FcmToken.from("456")
         val user = fixtureInquirer.apply {
             fcmTokens.clear()
-            fcmTokens.add(request.oldToken)
+            fcmTokens.add(oldToken)
         }
 
         every { getCurrentUser() } returns some(user)
         every { userRepository.saveTokens(any()) } returns Unit
 
-        val result = useCase.process(request)
+        val result = useCase.process(oldToken, newToken)
 
         assertThat(result.isEmpty).isTrue()
         assertThat(user.fcmTokens.size).isEqualTo(1)
-        assertThat(user.fcmTokens.contains(request.oldToken)).isFalse()
-        assertThat(user.fcmTokens.contains(request.newToken)).isTrue()
+        assertThat(user.fcmTokens.contains(oldToken)).isFalse()
+        assertThat(user.fcmTokens.contains(newToken)).isTrue()
 
         verifySequence {
             userRepository.saveTokens(fixtureInquirer)
@@ -55,7 +56,8 @@ internal class UpdateFcmTokenTest : ChatFixtures() {
 
     @Test
     fun `add a new one`() {
-        val request = UpdateFcmTokenRequest(FcmToken.from("123"), FcmToken.from("456"))
+        val oldToken = FcmToken.from("123")
+        val newToken = FcmToken.from("456")
         val user = fixtureInquirer.apply {
             fcmTokens.clear()
         }
@@ -63,12 +65,12 @@ internal class UpdateFcmTokenTest : ChatFixtures() {
         every { getCurrentUser() } returns some(user)
         every { userRepository.saveTokens(any()) } returns Unit
 
-        val result = useCase.process(request)
+        val result = useCase.process(oldToken, newToken)
 
         assertThat(result.isEmpty).isTrue()
         assertThat(user.fcmTokens.size).isEqualTo(1)
-        assertThat(user.fcmTokens.contains(request.oldToken)).isFalse()
-        assertThat(user.fcmTokens.contains(request.newToken)).isTrue()
+        assertThat(user.fcmTokens.contains(oldToken)).isFalse()
+        assertThat(user.fcmTokens.contains(newToken)).isTrue()
 
         verifySequence {
             userRepository.saveTokens(fixtureInquirer)
