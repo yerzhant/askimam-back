@@ -40,7 +40,7 @@ class EventProcessor(
     private fun sendNotification(event: MessageAdded) {
         if (event.userIdToBeNotified != null) {
             userRepository.findById(event.userIdToBeNotified).fold(
-                { logger.error("Notification not sent: ${it.reason.value}") },
+                { logger.error("Notification was not sent: ${it.reason.value}") },
                 { user ->
                     user.fcmTokens.map { it.value.value }.run {
                         fcmService.notify(
