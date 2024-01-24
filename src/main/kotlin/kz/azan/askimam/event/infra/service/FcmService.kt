@@ -1,8 +1,6 @@
 package kz.azan.askimam.event.infra.service
 
-import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.FirebaseApp
-import com.google.firebase.FirebaseOptions
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.MulticastMessage
 import com.google.firebase.messaging.Notification
@@ -20,14 +18,9 @@ class FcmService(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @PostConstruct
-    @Suppress("unused")
     fun init() {
         if (FirebaseApp.getApps().size == 0) {
-            val options = FirebaseOptions.builder()
-                .setCredentials(GoogleCredentials.getApplicationDefault())
-                .build()
-
-            FirebaseApp.initializeApp(options)
+            FirebaseApp.initializeApp()
         }
     }
 
