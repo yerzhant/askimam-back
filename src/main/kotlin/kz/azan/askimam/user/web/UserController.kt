@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody
 class UserController(
     private val updateFcmToken: UpdateFcmToken,
 ) {
-    @PatchMapping("update-token")
-    fun updateToken(@RequestBody dto: UpdateFcmTokenDto): ResponseDto = updateFcmToken
+    @PatchMapping("update-fcm-token")
+    fun updateFcmToken(@RequestBody dto: UpdateFcmTokenDto): ResponseDto = updateFcmToken
         .process(FcmToken.from(dto.old), FcmToken.from(dto.new)).fold(
             { ResponseDto.ok() },
             { ResponseDto.error(it) }

@@ -46,4 +46,6 @@ internal class UpdateChatSubjectTest : ChatFixtures() {
             UpdateChatSubject(chatRepository)(fixtureChatId1, fixtureSubject)
         ).isEqualTo(some(Declination.withReason("x")))
     }
+
+    // TODO: strip new lines
 }

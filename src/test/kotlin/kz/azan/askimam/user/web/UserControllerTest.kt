@@ -23,8 +23,8 @@ class UserControllerTest : ControllerTest() {
     private lateinit var updateFcmToken: UpdateFcmToken
 
     @Test
-    fun `update token - unauthorized`() {
-        mvc.patch("$url/update-token") {
+    fun `update fcm token - unauthorized`() {
+        mvc.patch("$url/update-fcm-token") {
             contentType = APPLICATION_JSON
             content = objectMapper.writeValueAsString(UpdateFcmTokenDto("123", "456"))
         }.andExpect { status { isUnauthorized() } }
@@ -32,10 +32,10 @@ class UserControllerTest : ControllerTest() {
 
     @Test
     @WithPrincipal
-    fun `update token - error`() {
+    fun `update fcm token - error`() {
         every { updateFcmToken.process(any(), any()) } returns some(Declination.withReason("err"))
 
-        mvc.patch("$url/update-token") {
+        mvc.patch("$url/update-fcm-token") {
             contentType = APPLICATION_JSON
             content = objectMapper.writeValueAsString(UpdateFcmTokenDto("123", "456"))
         }.andExpect {
@@ -47,10 +47,10 @@ class UserControllerTest : ControllerTest() {
 
     @Test
     @WithPrincipal
-    fun `update token - ok`() {
+    fun `update fcm token - ok`() {
         every { updateFcmToken.process(any(), any()) } returns none()
 
-        mvc.patch("$url/update-token") {
+        mvc.patch("$url/update-fcm-token") {
             contentType = APPLICATION_JSON
             content = objectMapper.writeValueAsString(UpdateFcmTokenDto("123", "456"))
         }.andExpect {

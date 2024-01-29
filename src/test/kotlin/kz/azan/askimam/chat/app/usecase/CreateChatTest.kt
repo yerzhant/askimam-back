@@ -54,6 +54,8 @@ internal class CreateChatTest : ChatFixtures() {
         }
     }
 
+    // TODO: remove new lines
+
     private fun fixtures() {
         fixtureClock()
         every { getCurrentUser() } returns some(fixtureInquirer)
