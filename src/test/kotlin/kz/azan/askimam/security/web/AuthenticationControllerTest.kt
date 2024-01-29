@@ -62,6 +62,7 @@ internal class AuthenticationControllerTest : ControllerTest() {
             jsonPath("\$.data.jwt") { value("123") }
             jsonPath("\$.data.userId") { value(fixtureInquirerId.value) }
             jsonPath("\$.data.userType") { value(Inquirer.name) }
+            jsonPath("\$.data.fcmToken") { value(fixtureInquirerFcmToken.value.value) }
         }
     }
 
@@ -84,6 +85,7 @@ internal class AuthenticationControllerTest : ControllerTest() {
             jsonPath("\$.data.jwt") { value("123") }
             jsonPath("\$.data.userId") { value(fixtureImamId.value) }
             jsonPath("\$.data.userType") { value(Imam.name) }
+            jsonPath("\$.data.fcmToken") { value(fixtureImamFcmToken.value.value) }
         }
     }
 

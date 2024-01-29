@@ -6,4 +6,5 @@ data class LoginResponseDto(
     val jwt: String,
     val userId: Long,
     val userType: User.Type,
+    val fcmToken: String,
 )

@@ -37,7 +37,7 @@ class Login(
             userRepository.saveTokens(user)
 
             val userType = User.Type.valueOf(authorities.first().authority)
-            ResponseDto.ok(LoginResponseDto(jwt, user.id.value, userType))
+            ResponseDto.ok(LoginResponseDto(jwt, user.id.value, userType, dto.fcmToken))
         }
     } catch (e: BadCredentialsException) {
         logger.error("Authentication error: $e, ${e.cause} for user: ${dto.login}")

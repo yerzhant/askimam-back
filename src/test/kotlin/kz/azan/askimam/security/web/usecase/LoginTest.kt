@@ -49,6 +49,7 @@ internal class LoginTest : ChatFixtures() {
         assertThat((result.data as LoginResponseDto).jwt).isEqualTo("123")
         assertThat((result.data as LoginResponseDto).userId).isEqualTo(fixtureInquirerId.value)
         assertThat((result.data as LoginResponseDto).userType).isEqualTo(Inquirer)
+        assertThat((result.data as LoginResponseDto).fcmToken).isEqualTo(fixtureInquirerFcmToken.value.value)
 
         verify {
             userRepository.saveTokens(
@@ -81,6 +82,7 @@ internal class LoginTest : ChatFixtures() {
         assertThat((result.data as LoginResponseDto).jwt).isEqualTo("123")
         assertThat((result.data as LoginResponseDto).userId).isEqualTo(fixtureImamId.value)
         assertThat((result.data as LoginResponseDto).userType).isEqualTo(Imam)
+        assertThat((result.data as LoginResponseDto).fcmToken).isEqualTo(fixtureImamFcmToken.value.value)
 
         verify {
             userRepository.saveTokens(
