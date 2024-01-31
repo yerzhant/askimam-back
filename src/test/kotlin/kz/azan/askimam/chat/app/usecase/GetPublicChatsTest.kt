@@ -6,6 +6,7 @@ import io.vavr.kotlin.right
 import io.vavr.kotlin.toVavrList
 import kz.azan.askimam.chat.domain.model.Subject
 import kz.azan.askimam.common.domain.Declination
+import kz.azan.askimam.common.type.NonBlankString
 import kz.azan.askimam.favorite.FavoriteFixtures
 import kz.azan.askimam.favorite.app.projection.FavoriteProjection
 import org.assertj.core.api.Assertions.assertThat
@@ -30,6 +31,20 @@ internal class GetPublicChatsTest : FavoriteFixtures() {
         assertThat(list.last().id).isEqualTo(fixtureChatId1)
         assertThat(list.last().subject).isEqualTo(fixtureSubject)
         assertThat(list.last().isFavorite).isTrue
+    }
+
+    @Test
+    internal fun `should return a chat with corrected subject`() {
+        fixtureClock()
+
+        every { getMyFavorites() } returns right(sequenceOfFavoriteProjectionsFixture)
+        every { chatRepository.findPublicChats(0, 20) } returns right(
+            fixtureSavedTwoChats(message2 = NonBlankString.of("line1\nline2"))
+        )
+
+        val list = GetPublicChats(chatRepository, getMyFavorites)(0, 20).get()
+
+        assertThat(list.last().subject).isEqualTo(Subject(NonBlankString.of(" line1 line2")))
     }
 
     @Test

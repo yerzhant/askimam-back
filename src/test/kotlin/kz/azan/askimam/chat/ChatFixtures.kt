@@ -156,7 +156,7 @@ open class ChatFixtures {
         )
     }
 
-    fun fixtureSavedTwoChats(type: Chat.Type = Public): List<Chat> {
+    fun fixtureSavedTwoChats(type: Chat.Type = Public, message2: NonBlankString = fixtureMessage): List<Chat> {
         val subject = fixtureSubject
         val now = LocalDateTime.now(clock)
         val later = timeAfter(10)
@@ -221,7 +221,7 @@ open class ChatFixtures {
                     Message.restore(
                         id = fixtureMessageId1,
                         type = Text,
-                        text = fixtureMessage,
+                        text = message2,
 
                         authorId = fixtureInquirerId,
                         authorType = fixtureInquirer.type,

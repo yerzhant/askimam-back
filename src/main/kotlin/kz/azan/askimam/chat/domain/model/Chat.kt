@@ -57,7 +57,7 @@ class Chat private constructor(
     }
 
     fun subject() = subject
-    fun subjectText() = subject ?: Subject(messages.first().text())
+    fun subjectText() = subject ?: Subject(messages.first().text().rectified())
     fun updatedAt() = updatedAt
 
     fun answeredBy() = answeredBy
@@ -360,3 +360,5 @@ class Chat private constructor(
     data class Id(val value: Long)
     enum class Type { Public, Private }
 }
+
+fun NonBlankString.rectified() = NonBlankString.of(value.replace('\n', ' '))

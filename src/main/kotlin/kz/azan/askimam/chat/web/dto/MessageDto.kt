@@ -11,7 +11,7 @@ data class MessageDto(
     val audio: String?,
     val duration: String?,
     val author: String?,
-    val createdAt: LocalDateTime, // TODO: these two time are to be converted to zoned ones
+    val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime?,
 ) {
     companion object {
